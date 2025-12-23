@@ -26,7 +26,7 @@ export default function DashboardPage() {
       </header>
 
       {/* Balance Card */}
-      <Card className="bg-linear-to-br from-neutral-900 via-neutral-800 to-neutral-900 text-white border-none shadow-xl relative overflow-hidden">
+      <Card className="bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white border-none shadow-xl relative overflow-hidden">
          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
          <div className="absolute -right-10 -top-10 h-32 w-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
          
@@ -40,12 +40,12 @@ export default function DashboardPage() {
                  </div>
             </div>
             <div className="grid grid-cols-2 gap-4 pt-2">
-                <Button className="w-full bg-white/10 hover:bg-white/20 border-0 backdrop-blur-sm h-12" asChild>
+                <Button className="w-full bg-white/10 hover:bg-white/20 hover:scale-[1.02] transition-all duration-300 border-0 backdrop-blur-sm h-12" asChild>
                     <Link href="/deposit">
                         <ArrowDownLeft className="mr-2 h-4 w-4" /> Ingresar
                     </Link>
                 </Button>
-                <Button className="w-full bg-white/10 hover:bg-white/20 border-0 backdrop-blur-sm h-12" asChild>
+                <Button className="w-full bg-white/10 hover:bg-white/20 hover:scale-[1.02] transition-all duration-300 border-0 backdrop-blur-sm h-12" asChild>
                      <Link href="/withdraw">
                         <ArrowUpRight className="mr-2 h-4 w-4" /> Retirar
                      </Link>
@@ -73,7 +73,7 @@ export default function DashboardPage() {
                             className="object-cover"
                          />
                          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-                         <div className="absolute top-2 right-2 bg-black/60 text-white text-[10px] uppercase font-bold px-2 py-1 rounded-full backdrop-blur-md">
+                         <div className="absolute top-2 right-2 bg-black/40 text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full backdrop-blur-md border border-white/10 shadow-sm">
                             En Construcción
                          </div>
                     </div>
@@ -112,7 +112,7 @@ export default function DashboardPage() {
                             className="object-cover"
                          />
                           <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
-                          <div className="absolute top-2 right-2 bg-accent text-white text-[10px] uppercase font-bold px-2 py-1 rounded-full backdrop-blur-md">
+                          <div className="absolute top-2 right-2 bg-accent/90 text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full backdrop-blur-md border border-white/10 shadow-sm shadow-accent/20">
                              Pre-Venta
                           </div>
                      </div>
@@ -149,7 +149,7 @@ export default function DashboardPage() {
             {[1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center justify-between p-3 bg-card rounded-xl shadow-sm border hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/10">
                             {i === 1 ? <ArrowDownLeft className="h-5 w-5" /> : <Building2 className="h-5 w-5" />}
                         </div>
                         <div>
