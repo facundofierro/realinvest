@@ -1,0 +1,140 @@
+@import "tailwindcss";
+@source "../../../../packages/ui/src";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Light Mode - using #F4F3F5 as bg and #3B2146 as text base */
+  --background: 270 5% 96%;
+  --foreground: 282 36% 20%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 282 36% 20%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 282 36% 20%;
+
+  --primary: 298 25% 44%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 252 47% 71%;
+  --secondary-foreground: 282 36% 20%;
+
+  --muted: 270 13% 90%;
+  --muted-foreground: 270 13% 40%;
+
+  --accent: 338 86% 64%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 338 86% 64%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 270 13% 85%;
+  --input: 270 13% 85%;
+  --ring: 298 25% 44%;
+
+  --radius: 0.5rem;
+
+  --chart-1: 298 25% 44%;
+  --chart-2: 338 86% 64%;
+  --chart-3: 252 47% 71%;
+  --chart-4: 48 76% 60%;
+  --chart-5: 56 33% 39%;
+}
+
+.dark {
+  /* Dark Mode - Sentry-like */
+  --background: 282 36% 12%;
+  --foreground: 270 5% 96%;
+
+  --card: 282 36% 20%;
+  --card-foreground: 270 5% 96%;
+
+  --popover: 282 36% 20%;
+  --popover-foreground: 270 5% 96%;
+
+  --primary: 252 47% 71%;
+  --primary-foreground: 282 36% 20%;
+
+  --secondary: 298 25% 44%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 282 36% 30%;
+  --muted-foreground: 270 13% 70%;
+
+  --accent: 338 86% 64%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 338 86% 64%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 282 36% 25%;
+  --input: 282 36% 25%;
+  --ring: 252 47% 71%;
+
+  --chart-1: 252 47% 71%;
+  --chart-2: 338 86% 64%;
+  --chart-3: 298 25% 44%;
+  --chart-4: 48 76% 60%;
+  --chart-5: 56 33% 39%;
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentColor);
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
