@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
+import { cn } from "@repo/ui/lib/utils";
 import { 
   Search, 
   ArrowUpDown, 
@@ -49,7 +50,7 @@ interface TokenData {
 const INITIAL_TOKENS: TokenData[] = [
   { 
     id: "1", 
-    name: "LA-MZA-T1", 
+    name: "VEX-ALAMOS-B3-522", 
     project: "Los Álamos T1", 
     price: 1.25, 
     marketCap: "520K", 
@@ -62,7 +63,7 @@ const INITIAL_TOKENS: TokenData[] = [
   },
   { 
     id: "2", 
-    name: "HOR-ROS-T2", 
+    name: "VEX-HORIZON-T2-105", 
     project: "Horizonte T2", 
     price: 0.98, 
     marketCap: "840K", 
@@ -75,7 +76,7 @@ const INITIAL_TOKENS: TokenData[] = [
   },
   { 
     id: "3", 
-    name: "VIV-BSAS-T1", 
+    name: "VEX-VIVERO-A1-302", 
     project: "Vivero BSAS", 
     price: 2.10, 
     marketCap: "1.2M", 
@@ -88,7 +89,7 @@ const INITIAL_TOKENS: TokenData[] = [
   },
   { 
     id: "4", 
-    name: "CASA-LOM-T4", 
+    name: "VEX-CASA-L4-211", 
     project: "Casas Lomas", 
     price: 1.05, 
     marketCap: "310K", 
@@ -107,6 +108,7 @@ export default function ExchangePage() {
   const [sortBy, setSortBy] = useState<"marketCap" | "change">("marketCap");
   const [timeframe, setTimeframe] = useState<"24h" | "7d" | "30d" | "all">("all");
   const [showConfig, setShowConfig] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   const toggleFavorite = (id: string) => {
     setTokens(tokens.map(t => t.id === id ? { ...t, isFavorite: !t.isFavorite } : t));
@@ -197,10 +199,40 @@ export default function ExchangePage() {
       </div>
 
       <div className="flex items-center justify-between pt-2">
-        <h1 className="text-2xl font-bold tracking-tight bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-          Exchange
-        </h1>
-        <div className="flex gap-2">
+        {isSearching ? (
+          <div className="flex-1 mr-4 animate-in slide-in-from-right duration-300">
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                autoFocus
+                type="search" 
+                placeholder="Buscar tokens o proyectos..." 
+                className="pl-9 h-10 bg-muted/20 border-muted/10 rounded-xl focus-visible:ring-primary/20 backdrop-blur-sm transition-all"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onBlur={() => {
+                  if (search === "") setIsSearching(false);
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <h1 className="text-2xl font-bold tracking-tight bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent animate-in fade-in duration-500">
+            Exchange
+          </h1>
+        )}
+        <div className="flex gap-2 shrink-0">
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className={cn(
+              "h-9 w-9 rounded-full bg-background/50 backdrop-blur-sm border-muted/20 transition-all",
+              isSearching && "bg-primary/10 border-primary/30 text-primary"
+            )}
+            onClick={() => setIsSearching(!isSearching)}
+          >
+            <Search className="h-4 w-4" />
+          </Button>
           <Dialog open={showConfig} onOpenChange={setShowConfig}>
             <DialogTrigger asChild>
               <Button variant="outline" size="icon" className="h-9 w-9 rounded-full bg-background/50 backdrop-blur-sm border-muted/20">
@@ -253,24 +285,13 @@ export default function ExchangePage() {
           <TabsTrigger value="positions" className="rounded-full data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all">Mis Posiciones</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="market" className="space-y-4 pt-6">
+        <TabsContent value="market" className="space-y-4 pt-4">
           <div className="flex flex-col gap-4">
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary" />
-              <Input 
-                type="search" 
-                placeholder="Buscar tokens o proyectos..." 
-                className="pl-9 h-11 bg-muted/20 border-muted/10 rounded-xl focus-visible:ring-primary/20 backdrop-blur-sm transition-all"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-            
             <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
               <Button 
                 variant={sortBy === "marketCap" ? "secondary" : "ghost"} 
                 size="sm" 
-                className={`rounded-full gap-1 shrink-0 h-8 transition-all ${sortBy === "marketCap" ? "shadow-sm" : ""}`}
+                className={`rounded-full gap-1 shrink-0 h-8 transition-all ${sortBy === "marketCap" ? "shadow-sm bg-secondary text-white border-none" : ""}`}
                 onClick={() => setSortBy("marketCap")}
               >
                 <CircleDollarSign className="h-3.5 w-3.5" />
@@ -279,7 +300,7 @@ export default function ExchangePage() {
               <Button 
                 variant={sortBy === "change" ? "secondary" : "ghost"} 
                 size="sm" 
-                className={`rounded-full gap-1 shrink-0 h-8 transition-all ${sortBy === "change" ? "shadow-sm" : ""}`}
+                className={`rounded-full gap-1 shrink-0 h-8 transition-all ${sortBy === "change" ? "shadow-sm bg-secondary text-white border-none" : ""}`}
                 onClick={() => setSortBy("change")}
               >
                 <TrendingUp className="h-3.5 w-3.5" />
@@ -292,7 +313,7 @@ export default function ExchangePage() {
                     key={tf}
                     variant={timeframe === tf ? "secondary" : "ghost"} 
                     size="sm" 
-                    className={`rounded-full px-3 h-8 text-[11px] uppercase tracking-wider transition-all ${timeframe === tf ? "shadow-sm font-bold" : ""}`}
+                    className={`rounded-full px-3 h-8 text-[11px] uppercase tracking-wider transition-all ${timeframe === tf ? "shadow-sm font-bold bg-secondary text-white border-none" : ""}`}
                     onClick={() => setTimeframe(tf)}
                   >
                     {tf}
@@ -355,8 +376,8 @@ export default function ExchangePage() {
 
           <div className="grid gap-3">
             {[
-              { id: "1", name: "LA-MZA-T1", amount: "1500", value: "1,875.00", roi: "12", change: "+2.4" },
-              { id: "3", name: "VIV-BSAS-T1", amount: "1000", value: "2,100.00", roi: "8", change: "+1.5" },
+              { id: "1", name: "VEX-ALAMOS-B3-522", amount: "1500", value: "1,875.00", roi: "12", change: "+2.4" },
+              { id: "3", name: "VEX-VIVERO-A1-302", amount: "1000", value: "2,100.00", roi: "8", change: "+1.5" },
             ].map((pos) => (
               <Card key={pos.id} className="border-muted/20 hover:bg-muted/10 transition-colors cursor-pointer group">
                 <CardContent className="p-4 flex items-center justify-between">
