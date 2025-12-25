@@ -30,12 +30,14 @@ interface Project {
     title: string;
     location: string;
     image: string;
-    status: string;
-    statusColor: string;
-    tir: string;
+    status: 'PRE-VENTA' | 'EN CONSTRUCCION' | 'COMPLETADO';
+    roi: string;
     progress: number;
-    desde: string;
-    renta: string;
+    precioRange?: string;
+    rentaFija?: string;
+    tokensTotal?: string;
+    launchDate?: string;
+    nextLaunchDate?: string;
 }
 
 export default function InvestPage() {
@@ -49,19 +51,19 @@ export default function InvestPage() {
         color: "bg-primary text-primary-foreground"
     },
     { 
-        id: "upcoming", 
+        id: "PRE-VENTA", 
         label: "Lanzamientos", 
         icon: Clock, 
         color: "bg-blue-500/10 text-blue-600"
     },
     { 
-        id: "construction", 
+        id: "EN CONSTRUCCION", 
         label: "En obra", 
         icon: Hammer, 
         color: "bg-amber-500/10 text-amber-600"
     },
     { 
-        id: "finished", 
+        id: "COMPLETADO", 
         label: "Completados", 
         icon: Key, 
         color: "bg-purple-500/10 text-purple-600"
@@ -74,74 +76,83 @@ export default function InvestPage() {
         title: "Torre Libertador 8000", 
         location: "Nuñez, Buenos Aires", 
         image: "/projects/torre-libertador.png",
-        status: "En Construcción",
-        statusColor: "bg-black/40",
-        tir: "12%",
+        status: "EN CONSTRUCCION",
+        roi: "15%",
         progress: 65,
-        desde: "$100.000",
-        renta: "12%"
+        precioRange: "$100K - $250K",
+        rentaFija: "12%",
+        tokensTotal: "$450K",
+        nextLaunchDate: "10 de Junio 2026"
     },
     { 
         id: "2", 
         title: "Barrio El Ceibo", 
         location: "Pilar, Buenos Aires", 
         image: "/projects/barrio-el-ceibo.png",
-        status: "Pre-Venta",
-        statusColor: "bg-accent/90",
-        tir: "18%",
+        status: "PRE-VENTA",
+        roi: "22%",
         progress: 30,
-        desde: "$100.000",
-        renta: "18%"
+        precioRange: "$100K - $180K",
+        rentaFija: "18%",
+        tokensTotal: "$1.2M",
+        launchDate: "28 de Agosto 2026"
     },
     { 
         id: "3", 
         title: "Residencial Las Heras", 
         location: "Recoleta, BSAS", 
-        image: "/projects/torre-libertador.png", // Reusing image for demo
-        status: "En Obra",
-        statusColor: "bg-blue-600/80",
-        tir: "14%",
+        image: "/projects/torre-libertador.png",
+        status: "EN CONSTRUCCION",
+        roi: "18%",
         progress: 85,
-        desde: "$150.000",
-        renta: "14%"
+        precioRange: "$150K - $300K",
+        rentaFija: "14%",
+        tokensTotal: "$320K"
     },
     { 
         id: "4", 
         title: "Oficinas Madero", 
         location: "Puerto Madero, CABA", 
-        image: "/projects/barrio-el-ceibo.png", // Reusing image for demo
-        status: "Terminado",
-        statusColor: "bg-emerald-600/80",
-        tir: "8.5%",
+        image: "/projects/barrio-el-ceibo.png",
+        status: "COMPLETADO",
+        roi: "10%",
         progress: 100,
-        desde: "$250.000",
-        renta: "8.5%"
+        precioRange: "$250K+",
+        rentaFija: "8.5%",
+        tokensTotal: "$0"
     },
     { 
         id: "5", 
         title: "Paseo del Sol", 
         location: "Mendoza, Argentina", 
         image: "/projects/torre-libertador.png",
-        status: "Próximamente",
-        statusColor: "bg-purple-600/80",
-        tir: "22%",
+        status: "PRE-VENTA",
+        roi: "28%",
         progress: 0,
-        desde: "$80.000",
-        renta: "22%"
+        precioRange: "$80K - $150K",
+        rentaFija: "22%",
+        tokensTotal: "$2.5M",
+        launchDate: "15 de Diciembre 2026"
     },
     { 
         id: "6", 
         title: "Eco-Habitat", 
         location: "Tigre, Buenos Aires", 
         image: "/projects/barrio-el-ceibo.png",
-        status: "En Obra",
-        statusColor: "bg-blue-600/80",
-        tir: "15%",
+        status: "EN CONSTRUCCION",
+        roi: "20%",
         progress: 45,
-        desde: "$120.000",
-        renta: "15%"
+        precioRange: "$120K+",
+        rentaFija: "15%",
+        tokensTotal: "$180K",
+        nextLaunchDate: "20 de Mayo 2026"
     },
   ];
+
+  const filteredProjects = selectedCategory === "all" 
+    ? projects 
+    : projects.filter(p => p.status === selectedCategory);
+
 
   return (
     <div className="p-4 space-y-6 pb-32 animate-in fade-in duration-500 overflow-x-hidden max-w-2xl mx-auto">
@@ -190,23 +201,25 @@ export default function InvestPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-            {projects.map((project) => (
+            {filteredProjects.map((project) => (
                 <Link href={`/project/${project.id}`} key={project.id}>
                     <Card className="overflow-hidden border-none shadow-md group bg-card transition-all hover:scale-[1.02] flex flex-col h-full">
-                        <div className="h-28 relative shrink-0">
+                        <div className="h-32 relative shrink-0">
                             <Image 
                                 src={project.image}
                                 alt={project.title}
                                 fill
                                 className="object-cover"
                             />
-                            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+                            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+                            
+                            {/* Status Badge */}
                             <div className={cn(
                                 "absolute top-2 right-2 text-[8px] uppercase font-bold px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10 shadow-sm text-white flex flex-col items-center gap-1",
-                                project.statusColor
+                                project.status === "PRE-VENTA" ? "bg-accent" : "bg-black/40"
                             )}>
                                 {project.status}
-                                {project.status === "En Construcción" && (
+                                {project.status === "EN CONSTRUCCION" && (
                                     <div className="w-full bg-white/20 h-0.5 rounded-full overflow-hidden">
                                         <div 
                                             className="bg-white h-full transition-all duration-1000" 
@@ -215,19 +228,35 @@ export default function InvestPage() {
                                     </div>
                                 )}
                             </div>
+
+                            {/* Image Legend */}
+                            {project.status === "PRE-VENTA" && project.launchDate && (
+                                <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-md py-2 px-3 border-t border-white/10 translate-y-px">
+                                    <p className="text-[9px] font-bold text-white text-center uppercase tracking-wide">
+                                        Lanzamiento {project.launchDate}
+                                    </p>
+                                </div>
+                            )}
+                            {project.status === "EN CONSTRUCCION" && project.nextLaunchDate && (
+                                <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-md py-2 px-3 border-t border-white/10 translate-y-px">
+                                    <p className="text-[9px] font-bold text-white text-center uppercase tracking-wide">
+                                        Próximo lanzamiento {project.nextLaunchDate}
+                                    </p>
+                                </div>
+                            )}
                         </div>
-                        <CardContent className="p-3 flex flex-col flex-1 gap-2">
+                        <CardContent className="p-3 flex flex-col flex-1 gap-3">
                             <div className="space-y-1">
                                 <div className="flex justify-between items-start gap-1">
-                                    <h3 className="font-bold text-xs line-clamp-1 group-hover:text-primary transition-colors flex-1">{project.title}</h3>
-                                    <span className="text-[10px] font-bold text-primary">{project.tir}</span>
+                                    <h3 className="font-bold text-[11px] line-clamp-1 group-hover:text-primary transition-colors flex-1">{project.title}</h3>
+                                    <span className="text-[9px] font-bold text-primary whitespace-nowrap">ROI ~{project.roi}</span>
                                 </div>
-                                <p className="text-[10px] text-muted-foreground flex items-center truncate">
+                                <p className="text-[9px] text-muted-foreground flex items-center truncate">
                                     <Building2 className="h-2.5 w-2.5 mr-1 shrink-0" /> {project.location.split(',')[0]}
                                 </p>
                             </div>
 
-                            <div className="mt-auto space-y-2">
+                            <div className="mt-auto space-y-3">
                                 <div className="w-full bg-secondary h-1 rounded-full overflow-hidden">
                                     <div 
                                         className="bg-primary h-full transition-all duration-1000" 
@@ -235,21 +264,52 @@ export default function InvestPage() {
                                     />
                                 </div>
                                 
-                                <div className="space-y-0.5">
-                                    <div className="flex justify-between text-[9px] text-muted-foreground">
-                                        <span className="font-medium">Desde:</span>
-                                        <span className="font-bold text-foreground">{project.desde}</span>
-                                    </div>
-                                    <div className="flex justify-between text-[9px] text-muted-foreground">
-                                        <span className="font-medium">Renta fija:</span>
-                                        <span className="font-bold text-foreground">{project.renta}</span>
-                                    </div>
+                                <div className="flex gap-1.5">
+                                    {project.precioRange && (
+                                        <div className="bg-secondary/40 rounded-xl p-2 flex-1 min-w-0 border border-muted/5 flex flex-col items-center justify-center">
+                                            <p className="text-[7px] text-muted-foreground font-extrabold uppercase tracking-wider mb-0.5 truncate">Desde</p>
+                                            <p className="text-[9px] font-black text-foreground truncate">{project.precioRange.split(' ')[0]}</p>
+                                        </div>
+                                    )}
+                                    {project.tokensTotal && project.tokensTotal !== "$0" && (
+                                        <div className="bg-primary/5 rounded-xl p-2 flex-1 min-w-0 border border-primary/10 flex flex-col items-center justify-center">
+                                            <p className="text-[7px] text-primary/60 font-extrabold uppercase tracking-wider mb-0.5 truncate">Tokens</p>
+                                            <p className="text-[9px] font-black text-primary truncate">{project.tokensTotal}</p>
+                                        </div>
+                                    )}
+                                    {project.rentaFija && (
+                                        <div className="bg-secondary/40 rounded-xl p-2 flex-1 min-w-0 border border-muted/5 flex flex-col items-center justify-center">
+                                            <p className="text-[7px] text-muted-foreground font-extrabold uppercase tracking-wider mb-0.5 truncate">Renta Fija</p>
+                                            <p className="text-[9px] font-black text-foreground truncate">{project.rentaFija}</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
                 </Link>
             ))}
+        </div>
+      </div>
+
+      {/* Global Stats / Tokens Summary */}
+      <div className="bg-card border border-muted/20 rounded-2xl p-4 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <Building2 className="h-5 w-5" />
+            </div>
+            <div>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight">Total Tokens en venta</p>
+                <p className="text-xl font-black text-primary">$4.650.000</p>
+            </div>
+        </div>
+        <div className="text-right">
+            <p className="text-[10px] text-muted-foreground font-medium">6 Proyectos activos</p>
+            <div className="flex gap-1 mt-1 justify-end">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/20" />
+            </div>
         </div>
       </div>
 
@@ -268,6 +328,7 @@ export default function InvestPage() {
             </Button>
         </div>
       </Card>
+
     </div>
   );
 }
