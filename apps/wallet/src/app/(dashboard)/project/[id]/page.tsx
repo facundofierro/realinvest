@@ -128,8 +128,8 @@ export default function ProjectPage() {
                 <Card className="border-border/50 shadow-sm bg-card/60 backdrop-blur-md overflow-hidden group hover:border-primary/50 transition-colors">
                     <CardContent className="p-3 text-center">
                         <div className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">ROI Est.</div>
-                        <div className="text-xl font-black text-primary flex items-center justify-center gap-1">
-                            12.4% <ArrowUpRight className="w-3 h-3 text-brand-green" />
+                        <div className="text-xl font-black text-brand-green flex items-center justify-center gap-1">
+                            12.4% <ArrowUpRight className="w-3 h-3" />
                         </div>
                     </CardContent>
                 </Card>
@@ -304,7 +304,7 @@ export default function ProjectPage() {
                             <CardContent className="p-4 space-y-1">
                                 <TrendingUp className="w-5 h-5 text-primary mb-2" />
                                 <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">TIR Proyectada</span>
-                                <div className="text-2xl font-black text-foreground">12.4%</div>
+                                <div className="text-2xl font-black text-brand-green">12.4%</div>
                             </CardContent>
                          </Card>
                          <Card className="bg-secondary/20 border-border/50 shadow-sm">
