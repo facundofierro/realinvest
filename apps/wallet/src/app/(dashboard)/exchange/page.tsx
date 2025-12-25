@@ -439,12 +439,12 @@ export default function ExchangePage() {
             <div className="bg-card/95 backdrop-blur-3xl border border-primary/30 shadow-[0_-10px_50px_-15px_rgba(0,0,0,0.4)] rounded-[32px] p-6 overflow-hidden relative">
                 {/* Close Button */}
                 <Button 
-                    variant="ghost" 
+                    variant="secondary" 
                     size="icon" 
                     onClick={() => setSelectedTokenId(null)}
-                    className="absolute top-4 right-4 rounded-full h-8 w-8 hover:bg-muted"
+                    className="absolute top-6 right-6 rounded-full h-9 w-9 shadow-lg z-50 bg-white hover:bg-white/90 text-slate-500 border-none"
                 >
-                    <X className="h-4 w-4" />
+                    <X className="h-5 w-5" />
                 </Button>
 
                 <div className="flex flex-col gap-6">
@@ -462,7 +462,7 @@ export default function ExchangePage() {
                                 <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> Nuñez, BA</span>
                             </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right pr-10">
                             <div className="text-2xl font-black text-foreground">${selectedToken.price.toFixed(2)}</div>
                             <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">Stock: {selectedToken.tokensAvailable} Tokens</div>
                         </div>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@repo/ui/components/ui/dialog";
-import { ArrowLeft, ChevronRight, Filter, Info, MapPin, Building2, Layers, CheckCircle2, Maximize2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, Filter, Info, MapPin, Building2, Layers, CheckCircle2, Maximize2, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ interface Unit {
     floor: string;
     status: string;
     price: string;
+    tokenName?: string;
     totalTokens?: number;
     tokensSold?: number;
     isTokenized: boolean;
@@ -23,10 +24,10 @@ interface Unit {
 }
 
 const UNITS: Unit[] = [
-    { id: "101", type: "2 Amb", floor: "1", status: "Disponible", price: "$125,000", totalTokens: 1250, tokensSold: 450, isTokenized: true, area: "55m²", orientation: "Norte" },
-    { id: "402", type: "3 Amb", floor: "4", status: "Vendido", price: "$210,000", totalTokens: 2100, tokensSold: 2100, isTokenized: true, area: "85m²", orientation: "Sur" },
+    { id: "101", type: "2 Amb", floor: "1", status: "Disponible", price: "$125,000", tokenName: "RIV-LIB8000-101", totalTokens: 1250, tokensSold: 450, isTokenized: true, area: "55m²", orientation: "Norte" },
+    { id: "402", type: "3 Amb", floor: "4", status: "Vendido", price: "$210,000", tokenName: "RIV-LIB8000-402", totalTokens: 2100, tokensSold: 2100, isTokenized: true, area: "85m²", orientation: "Sur" },
     { id: "805", type: "Studio", floor: "8", status: "Disponible", price: "$95,000", isTokenized: false, area: "35m²", orientation: "Este" },
-    { id: "1201", type: "Penth.", floor: "12", status: "Reservado", price: "$450,000", totalTokens: 4500, tokensSold: 4500, isTokenized: true, area: "145m²", orientation: "Norte" },
+    { id: "1201", type: "Penth.", floor: "12", status: "Vendido", price: "$450,000", tokenName: "RIV-LIB8000-1201", totalTokens: 4500, tokensSold: 4500, isTokenized: true, area: "145m²", orientation: "Norte" },
     { id: "302", type: "2 Amb", floor: "3", status: "Disponible", price: "$130,000", isTokenized: false, area: "58m²", orientation: "Oeste" },
 ];
 
@@ -41,14 +42,17 @@ export default function ProjectUnitsPage() {
     return (
         <div className="bg-background min-h-screen flex flex-col pb-40">
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-background text-foreground px-4 py-8 rounded-b-[40px] shadow-sm border-b border-border/50">
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full text-foreground hover:bg-primary/10">
+            <header className="sticky top-0 z-50 bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white px-4 py-8 rounded-b-[40px] shadow-xl border-none overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
+                <div className="absolute -right-10 -top-10 h-32 w-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <div className="flex items-center gap-4 relative z-10">
+                    <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full text-white hover:bg-white/10">
                         <ArrowLeft className="h-6 w-6" />
                     </Button>
                     <div className="text-center flex-1 pr-10">
-                        <h1 className="text-3xl font-black uppercase tracking-tight leading-none text-primary">Etapa 1</h1>
-                        <p className="text-sm font-medium text-muted-foreground mt-1 font-serif italic">Torre Libertador 8000</p>
+                        <h1 className="text-3xl font-black uppercase tracking-tight leading-none text-white">Etapa 1</h1>
+                        <p className="text-sm font-medium text-white/70 mt-1 font-serif italic">Torre Libertador 8000</p>
                     </div>
                 </div>
             </header>
@@ -78,7 +82,7 @@ export default function ProjectUnitsPage() {
                     <div 
                         key={unit.id} 
                         onClick={() => setSelectedUnitId(unit.id)}
-                        className={`flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border-2 ${
+                        className={`flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border ${
                             selectedUnitId === unit.id 
                             ? 'bg-white border-primary shadow-xl scale-[1.02] z-10 relative' 
                             : 'bg-card border-border/40 hover:border-primary/30 shadow-sm'
@@ -94,13 +98,13 @@ export default function ProjectUnitsPage() {
                                 <div>
                                     <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight">{unit.type} • Piso {unit.floor}</div>
                                     <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5">
-                                        {unit.isTokenized ? `${unit.totalTokens} tokens equivalents` : 'Tradicional'}
+                                        {unit.isTokenized ? unit.tokenName : 'Tradicional'}
                                     </div>
                                 </div>
                             </div>
                             <div className="text-right">
                                 <div className="text-[17px] font-black text-[#3B2146] leading-tight">{unit.price}</div>
-                                <div className={`text-[10px] font-black uppercase mt-1 ${unit.status === 'Disponible' ? 'text-brand-green' : 'text-brand-pink'}`}>
+                                <div className={`text-[10px] font-black uppercase mt-1 ${unit.status === 'Disponible' ? 'text-brand-green' : 'text-primary'}`}>
                                     {unit.status}
                                 </div>
                             </div>
@@ -131,6 +135,13 @@ export default function ProjectUnitsPage() {
             {selectedUnit && (
                 <div className="fixed bottom-0 left-0 right-0 z-[60] p-4 animate-in slide-in-from-bottom-full duration-300">
                     <div className="bg-card/95 backdrop-blur-2xl border border-primary/20 shadow-[0_-8px_40px_-12px_rgba(0,0,0,0.3)] rounded-[32px] p-6 overflow-hidden relative">
+                        <button 
+                            onClick={() => setSelectedUnitId(null)}
+                            className="absolute top-6 right-6 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-muted text-muted-foreground hover:bg-muted/80 shadow-md transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+
                         {/* Decorative background element */}
                         <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
                         
@@ -139,7 +150,7 @@ export default function ProjectUnitsPage() {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <h3 className="text-2xl font-black tracking-tight">Unidad {selectedUnit.id}</h3>
-                                        <Badge className={`border-0 text-[10px] font-bold ${selectedUnit.status === 'Disponible' ? 'bg-brand-green/20 text-brand-green' : 'bg-brand-pink/20 text-brand-pink'}`}>
+                                        <Badge className={`border-0 text-[10px] font-bold ${selectedUnit.status === 'Disponible' ? 'bg-brand-green/20 text-brand-green' : 'bg-primary/20 text-primary'}`}>
                                             {selectedUnit.status.toUpperCase()}
                                         </Badge>
                                     </div>
@@ -149,7 +160,7 @@ export default function ProjectUnitsPage() {
                                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> Vista {selectedUnit.orientation}</span>
                                     </div>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-right pr-10">
                                     <div className="text-2xl font-black text-foreground">{selectedUnit.price}</div>
                                     {selectedUnit.isTokenized && (
                                         <div className="text-[10px] font-black text-primary uppercase tracking-tighter">o {selectedUnit.totalTokens} Tokens</div>
