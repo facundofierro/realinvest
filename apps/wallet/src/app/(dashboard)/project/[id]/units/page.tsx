@@ -9,12 +9,25 @@ import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 
-const UNITS = [
-    { id: "101", type: "2 Amb", floor: "1", status: "Disponible", price: "$125,000", tokens: 1250, area: "55m²", orientation: "Norte" },
-    { id: "402", type: "3 Amb", floor: "4", status: "Vendido", price: "$210,000", tokens: 2100, area: "85m²", orientation: "Sur" },
-    { id: "805", type: "Studio", floor: "8", status: "Disponible", price: "$95,000", tokens: 950, area: "35m²", orientation: "Este" },
-    { id: "1201", type: "Penth.", floor: "12", status: "Reservado", price: "$450,000", tokens: 4500, area: "145m²", orientation: "Norte" },
-    { id: "302", type: "2 Amb", floor: "3", status: "Disponible", price: "$130,000", tokens: 1300, area: "58m²", orientation: "Oeste" },
+interface Unit {
+    id: string;
+    type: string;
+    floor: string;
+    status: string;
+    price: string;
+    totalTokens?: number;
+    tokensSold?: number;
+    isTokenized: boolean;
+    area: string;
+    orientation: string;
+}
+
+const UNITS: Unit[] = [
+    { id: "101", type: "2 Amb", floor: "1", status: "Disponible", price: "$125,000", totalTokens: 1250, tokensSold: 450, isTokenized: true, area: "55m²", orientation: "Norte" },
+    { id: "402", type: "3 Amb", floor: "4", status: "Vendido", price: "$210,000", totalTokens: 2100, tokensSold: 2100, isTokenized: true, area: "85m²", orientation: "Sur" },
+    { id: "805", type: "Studio", floor: "8", status: "Disponible", price: "$95,000", isTokenized: false, area: "35m²", orientation: "Este" },
+    { id: "1201", type: "Penth.", floor: "12", status: "Reservado", price: "$450,000", totalTokens: 4500, tokensSold: 4500, isTokenized: true, area: "145m²", orientation: "Norte" },
+    { id: "302", type: "2 Amb", floor: "3", status: "Disponible", price: "$130,000", isTokenized: false, area: "58m²", orientation: "Oeste" },
 ];
 
 export default function ProjectUnitsPage() {
@@ -28,14 +41,14 @@ export default function ProjectUnitsPage() {
     return (
         <div className="bg-background min-h-screen flex flex-col pb-40">
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-primary text-primary-foreground px-4 py-8 rounded-b-[40px] shadow-lg">
+            <header className="sticky top-0 z-50 bg-background text-foreground px-4 py-8 rounded-b-[40px] shadow-sm border-b border-border/50">
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full text-primary-foreground hover:bg-white/10">
+                    <Button variant="ghost" size="icon" onClick={() => router.back()} className="rounded-full text-foreground hover:bg-primary/10">
                         <ArrowLeft className="h-6 w-6" />
                     </Button>
                     <div className="text-center flex-1 pr-10">
-                        <h1 className="text-2xl font-black uppercase tracking-tight leading-none">Unidades Etapa 1</h1>
-                        <p className="text-xs font-medium text-white/80 mt-1">Ubicación y disponibilidad en tiempo real</p>
+                        <h1 className="text-3xl font-black uppercase tracking-tight leading-none text-primary">Etapa 1</h1>
+                        <p className="text-sm font-medium text-muted-foreground mt-1 font-serif italic">Torre Libertador 8000</p>
                     </div>
                 </div>
             </header>
@@ -65,36 +78,58 @@ export default function ProjectUnitsPage() {
                     <div 
                         key={unit.id} 
                         onClick={() => setSelectedUnitId(unit.id)}
-                        className={`flex items-center justify-between p-4 rounded-[28px] transition-all cursor-pointer border-2 ${
+                        className={`flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border-2 ${
                             selectedUnitId === unit.id 
                             ? 'bg-white border-primary shadow-xl scale-[1.02] z-10 relative' 
-                            : 'bg-[#F8F7F9] border-transparent hover:border-muted-foreground/10'
+                            : 'bg-card border-border/40 hover:border-primary/30 shadow-sm'
                         }`}
                     >
-                        <div className="flex gap-4 items-center">
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg transition-colors ${
-                                selectedUnitId === unit.id ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-white text-[#3B2146] shadow-sm'
-                            }`}>
-                                {unit.id}
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex gap-4 items-center">
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg transition-colors ${
+                                    selectedUnitId === unit.id ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-muted/30 text-[#3B2146] border border-border/50'
+                                }`}>
+                                    {unit.id}
+                                </div>
+                                <div>
+                                    <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight">{unit.type} • Piso {unit.floor}</div>
+                                    <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5">
+                                        {unit.isTokenized ? `${unit.totalTokens} tokens equivalents` : 'Tradicional'}
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight">{unit.type} • Piso {unit.floor}</div>
-                                <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5">{unit.tokens} tokens equivalents</div>
+                            <div className="text-right">
+                                <div className="text-[17px] font-black text-[#3B2146] leading-tight">{unit.price}</div>
+                                <div className={`text-[10px] font-black uppercase mt-1 ${unit.status === 'Disponible' ? 'text-brand-green' : 'text-brand-pink'}`}>
+                                    {unit.status}
+                                </div>
                             </div>
                         </div>
-                        <div className="text-right">
-                            <div className="text-[17px] font-black text-[#3B2146] leading-tight">{unit.price}</div>
-                            <div className={`text-[10px] font-black uppercase mt-1 ${unit.status === 'Disponible' ? 'text-brand-green' : 'text-brand-pink'}`}>
-                                {unit.status}
+
+                        {unit.isTokenized && (
+                            <div className="mt-2 space-y-2">
+                                <div className="flex justify-between items-end">
+                                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Progreso de Venta</span>
+                                    <span className="text-[11px] font-black text-primary">
+                                        {unit.tokensSold ?? 0} / {unit.totalTokens ?? 0} 
+                                        <span className="text-muted-foreground text-[9px] font-bold ml-1">TOKENS</span>
+                                    </span>
+                                </div>
+                                <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                                    <div 
+                                        className="h-full bg-primary transition-all duration-1000" 
+                                        style={{ width: `${((unit.tokensSold ?? 0) / (unit.totalTokens ?? 1)) * 100}%` }}
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 ))}
             </main>
 
             {/* Action Footer */}
             {selectedUnit && (
-                <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-in slide-in-from-bottom-full duration-300">
+                <div className="fixed bottom-0 left-0 right-0 z-[60] p-4 animate-in slide-in-from-bottom-full duration-300">
                     <div className="bg-card/95 backdrop-blur-2xl border border-primary/20 shadow-[0_-8px_40px_-12px_rgba(0,0,0,0.3)] rounded-[32px] p-6 overflow-hidden relative">
                         {/* Decorative background element */}
                         <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-primary/5 rounded-full blur-3xl" />
@@ -104,7 +139,9 @@ export default function ProjectUnitsPage() {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <h3 className="text-2xl font-black tracking-tight">Unidad {selectedUnit.id}</h3>
-                                        <Badge className="bg-brand-green/20 text-brand-green border-0 text-[10px] font-bold">DISPONIBLE</Badge>
+                                        <Badge className={`border-0 text-[10px] font-bold ${selectedUnit.status === 'Disponible' ? 'bg-brand-green/20 text-brand-green' : 'bg-brand-pink/20 text-brand-pink'}`}>
+                                            {selectedUnit.status.toUpperCase()}
+                                        </Badge>
                                     </div>
                                     <div className="flex items-center gap-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">
                                         <span className="flex items-center gap-1"><Layers className="w-3 h-3" /> {selectedUnit.type}</span>
@@ -114,7 +151,9 @@ export default function ProjectUnitsPage() {
                                 </div>
                                 <div className="text-right">
                                     <div className="text-2xl font-black text-foreground">{selectedUnit.price}</div>
-                                    <div className="text-[10px] font-black text-primary uppercase tracking-tighter">o {selectedUnit.tokens} Tokens</div>
+                                    {selectedUnit.isTokenized && (
+                                        <div className="text-[10px] font-black text-primary uppercase tracking-tighter">o {selectedUnit.totalTokens} Tokens</div>
+                                    )}
                                 </div>
                             </div>
 
@@ -165,7 +204,7 @@ export default function ProjectUnitsPage() {
                             <div className="space-y-1">
                                 <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Orientación</span>
                                 <div className="font-bold flex items-center gap-2">
-                                    <MapPin className="w-4 h-4 text-primary" /> Vista Despejada {selectedUnit?.orientation}
+                                    <MapPin className="w-4 h-4 text-primary" /> Vista {selectedUnit?.orientation}
                                 </div>
                             </div>
                         </div>

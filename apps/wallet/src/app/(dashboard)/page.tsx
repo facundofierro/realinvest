@@ -94,8 +94,8 @@ export default function DashboardPage() {
                             <div className="bg-primary h-full w-[65%]" />
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>Recaudado: 65%</span>
-                            <span>Meta: $2M</span>
+                            <span>Desde: $100.000</span>
+                            <span>Renta fija: 12%</span>
                         </div>
                     </CardContent>
                 </Card>
@@ -133,8 +133,8 @@ export default function DashboardPage() {
                             <div className="bg-primary h-full w-[30%]" />
                         </div>
                         <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>Recaudado: 30%</span>
-                            <span>Meta: $5M</span>
+                            <span>Desde: $100.000</span>
+                            <span>Renta fija: 18%</span>
                         </div>
                     </CardContent>
                 </Card>

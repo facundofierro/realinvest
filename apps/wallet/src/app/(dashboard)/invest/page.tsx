@@ -200,7 +200,7 @@ export default function InvestPage() {
                                                         {opt.type}
                                                     </div>
                                                     <div className="text-[10px] text-muted-foreground font-bold">
-                                                        Min: <span className="text-foreground">{opt.minInvest}</span>
+                                                        Desde: <span className="text-foreground">{opt.minInvest}</span>
                                                     </div>
                                                 </div>
                                                 <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
