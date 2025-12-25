@@ -1,0 +1,36 @@
+[
+  {
+    "id": "torre-libertador-8000-12a",
+    "projectId": "torre-libertador-8000",
+    "unitCode": "12A",
+    "title": "Unidad 12A",
+    "areaM2": 78,
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "floorPlanImage": "/building_floor_layout.png",
+    "tokenSymbol": "VEX-TORRE-L-12-A"
+  },
+  {
+    "id": "barrio-el-ceibo-p1-04",
+    "projectId": "barrio-el-ceibo",
+    "unitCode": "P1",
+    "title": "Parcela P1-04",
+    "areaM2": 310,
+    "bedrooms": 0,
+    "bathrooms": 0,
+    "floorPlanImage": "/building_floor_layout.png",
+    "tokenSymbol": "VEX-CEIBO-P1-04"
+  },
+  {
+    "id": "complex-office-jr-02",
+    "projectId": "complex-office-jr",
+    "unitCode": "JR",
+    "title": "Oficina JR-02",
+    "areaM2": 54,
+    "bedrooms": 0,
+    "bathrooms": 1,
+    "floorPlanImage": "/building_floor_layout.png",
+    "tokenSymbol": "VEX-OFFICE-JR-02"
+  }
+]
+

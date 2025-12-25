@@ -1,0 +1,38 @@
+[
+  {
+    "id": "holding-1",
+    "tokenId": "torre-libertador-8000-12a",
+    "unitCode": "12A",
+    "tokenSymbol": "VEX-TORRE-L-12-A",
+    "projectTitle": "Torre Libertador 8000",
+    "location": "Nuñez, BA",
+    "tokens": 500,
+    "marketPriceUsd": 104,
+    "costBasisPriceUsd": 100,
+    "changePct": 5.2
+  },
+  {
+    "id": "holding-2",
+    "tokenId": "barrio-el-ceibo-p1-04",
+    "unitCode": "P1",
+    "tokenSymbol": "VEX-CEIBO-P1-04",
+    "projectTitle": "Barrio El Ceibo",
+    "location": "Pilar, BA",
+    "tokens": 3500,
+    "marketPriceUsd": 11,
+    "changePct": 12.1
+  },
+  {
+    "id": "holding-3",
+    "tokenId": "complex-office-jr-02",
+    "unitCode": "JR",
+    "tokenSymbol": "VEX-OFFICE-JR-02",
+    "projectTitle": "Complex Office Jr",
+    "location": "Palermo, BA",
+    "tokens": 120,
+    "marketPriceUsd": 125,
+    "costBasisPriceUsd": 118,
+    "changePct": 1.8
+  }
+]
+

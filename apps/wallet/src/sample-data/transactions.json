@@ -1,0 +1,28 @@
+[
+  {
+    "id": "txn-1",
+    "type": "DEPOSIT",
+    "status": "COMPLETED",
+    "createdAt": "2025-12-10T14:05:00.000Z",
+    "amount": { "currencyCode": "USDT", "amount": 5000 },
+    "description": "Depósito USDT (TRC20)"
+  },
+  {
+    "id": "txn-2",
+    "type": "BUY",
+    "status": "COMPLETED",
+    "createdAt": "2025-12-12T11:22:00.000Z",
+    "amount": { "currencyCode": "USDT", "amount": 1200 },
+    "description": "Compra VEX-TORRE-L-12-A"
+  },
+  {
+    "id": "txn-3",
+    "type": "WITHDRAWAL",
+    "status": "PENDING",
+    "createdAt": "2025-12-20T09:18:00.000Z",
+    "amount": { "currencyCode": "USDT", "amount": 750 },
+    "description": "Retiro USDT (TRC20)",
+    "metadata": { "network": "TRC20" }
+  }
+]
+

@@ -1,0 +1,25 @@
+[
+  {
+    "id": "position-1",
+    "tokenId": "token-1",
+    "tokenSymbol": "VEX-ALAMOS-B3-522",
+    "side": "BUY",
+    "totalAmount": 400,
+    "filledAmount": 220,
+    "orderPriceUsd": 1.22,
+    "marketPriceUsd": 1.25,
+    "status": "PARTIALLY_FILLED"
+  },
+  {
+    "id": "position-2",
+    "tokenId": "token-3",
+    "tokenSymbol": "VEX-VIVERO-A1-302",
+    "side": "SELL",
+    "totalAmount": 100,
+    "filledAmount": 0,
+    "orderPriceUsd": 2.15,
+    "marketPriceUsd": 2.1,
+    "status": "OPEN"
+  }
+]
+

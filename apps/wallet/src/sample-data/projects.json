@@ -1,0 +1,42 @@
+[
+  {
+    "id": "torre-libertador-8000",
+    "title": "Torre Libertador 8000",
+    "location": "Nuñez, BA",
+    "image": "/projects/torre-libertador.png",
+    "status": "PRE_SALE",
+    "roiPct": 12.4,
+    "progressPct": 35,
+    "priceRangeUsd": "$80k-$150k",
+    "fixedRentPct": 8.5,
+    "tokensTotal": 1000000,
+    "launchDate": "2025-01-15"
+  },
+  {
+    "id": "barrio-el-ceibo",
+    "title": "Barrio El Ceibo",
+    "location": "Pilar, BA",
+    "image": "/projects/barrio-el-ceibo.png",
+    "status": "IN_CONSTRUCTION",
+    "roiPct": 10.8,
+    "progressPct": 62,
+    "priceRangeUsd": "$35k-$90k",
+    "fixedRentPct": 7.2,
+    "tokensTotal": 2500000,
+    "launchDate": "2024-10-05"
+  },
+  {
+    "id": "complex-office-jr",
+    "title": "Complex Office Jr",
+    "location": "Palermo, BA",
+    "image": "/projects/header-tower.png",
+    "status": "COMPLETED",
+    "roiPct": 9.5,
+    "progressPct": 100,
+    "priceRangeUsd": "$60k-$120k",
+    "fixedRentPct": 6.8,
+    "tokensTotal": 900000,
+    "launchDate": "2024-03-20"
+  }
+]
+

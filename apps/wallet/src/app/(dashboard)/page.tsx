@@ -119,7 +119,9 @@ export default function DashboardPage() {
                     <CardContent className="p-4">
                          <div className="flex justify-between items-start mb-2">
                             <div>
-                                <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">Barrio Privado "El Ceibo"</h3>
+                                <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">
+                                  {"Barrio Privado \"El Ceibo\""}
+                                </h3>
                                 <p className="text-xs text-muted-foreground flex items-center">
                                     <Building2 className="h-3 w-3 mr-1" /> Pilar, Buenos Aires
                                 </p>
