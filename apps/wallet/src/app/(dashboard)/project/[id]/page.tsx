@@ -8,7 +8,7 @@ import { ArrowLeft, MapPin, Calendar, FileText, Info, ChevronRight,
     ShoppingBag, Layers, Home, Play, Maximize2, TrendingUp, 
     BarChart3, PieChart, DollarSign, Wallet, Building2, 
     ArrowUpRight, Download, Calculator,
-    X
+    X, Heart
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -69,6 +69,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
              <Link href="/dashboard" className="absolute top-4 left-4 bg-background/30 backdrop-blur-md p-2 rounded-full hover:bg-background/50 transition-colors z-10 border border-white/10 text-white">
                 <ArrowLeft className="h-6 w-6" />
              </Link>
+
+             <button className="absolute top-4 right-4 bg-background/30 backdrop-blur-md p-2 rounded-full hover:bg-background/50 transition-colors z-10 border border-white/10 text-white group">
+                <Heart className="h-6 w-6 group-active:fill-red-500 group-active:text-red-500 transition-all" />
+             </button>
              
              <div className="absolute bottom-16 left-4 right-4 z-10">
                 <div className="space-y-1">

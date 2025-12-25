@@ -43,7 +43,7 @@ export default function ProjectUnitsPage() {
     return (
         <div className="bg-background min-h-screen flex flex-col pb-40">
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white px-4 py-8 rounded-b-[40px] shadow-xl border-none overflow-hidden">
+            <header className="sticky top-0 z-50 bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white px-4 py-6 rounded-b-[40px] shadow-xl border-none overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
                 <div className="absolute -right-10 -top-10 h-32 w-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
                 
@@ -59,7 +59,7 @@ export default function ProjectUnitsPage() {
             </header>
 
             {/* Filter Bar */}
-            <div className="px-4 py-2 border-b border-border/50 bg-muted/10 overflow-x-auto scrollbar-hide">
+            <div className="px-4 pt-6 pb-3 border-b border-border/50 bg-muted/10 overflow-x-auto scrollbar-hide">
                 <div className="flex items-center gap-1.5 min-w-max">
                     <button className="h-7 px-3 rounded-full bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary whitespace-nowrap">
                         Solo en Venta
@@ -106,7 +106,7 @@ export default function ProjectUnitsPage() {
 
                             {unit.isTokenized && unit.negotiatedAmount && (
                                 <div className="flex flex-col items-center mx-2 min-w-max">
-                                    <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Tokens en venta...</span>
+                                    <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Tokens en venta</span>
                                     <div className="w-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white text-[10px] font-black py-1 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center">
                                         {unit.negotiatedAmount} USDT
                                     </div>
