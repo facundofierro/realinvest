@@ -5,7 +5,8 @@ import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
 import { cn } from "@repo/ui/lib/utils";
 import { 
-  Search, 
+  ArrowLeft,
+  Search,
   ArrowUpDown, 
   TrendingUp, 
   TrendingDown, 
@@ -40,6 +41,7 @@ import { Label } from "@repo/ui/components/ui/label";
 
 interface TokenData {
   id: string;
+  unitId?: string;
   name: string;
   project: string;
   price: number;
@@ -52,6 +54,8 @@ interface TokenData {
   isFavorite: boolean;
   tokensAvailable?: string;
   roi?: string;
+  buyPrice?: number;
+  sellPrice?: number;
 }
 
 interface PositionData {
@@ -67,6 +71,7 @@ interface PositionData {
 const INITIAL_TOKENS: TokenData[] = [
   { 
     id: "1", 
+    unitId: "522",
     name: "VEX-ALAMOS-B3-522", 
     project: "Los Álamos T1", 
     price: 1.25, 
@@ -78,10 +83,13 @@ const INITIAL_TOKENS: TokenData[] = [
     liveSince: "6 meses",
     isFavorite: true,
     tokensAvailable: "1,250",
-    roi: "12.4"
+    roi: "12.4",
+    buyPrice: 1.25,
+    sellPrice: 1.24
   },
   { 
     id: "2", 
+    unitId: "105",
     name: "VEX-HORIZON-T2-105", 
     project: "Horizonte T2", 
     price: 0.98, 
@@ -93,10 +101,13 @@ const INITIAL_TOKENS: TokenData[] = [
     liveSince: "3 meses",
     isFavorite: false,
     tokensAvailable: "840",
-    roi: "8.2"
+    roi: "8.2",
+    buyPrice: 0.98,
+    sellPrice: 0.97
   },
   { 
     id: "3", 
+    unitId: "302",
     name: "VEX-VIVERO-A1-302", 
     project: "Vivero BSAS", 
     price: 2.10, 
@@ -108,10 +119,13 @@ const INITIAL_TOKENS: TokenData[] = [
     liveSince: "1 año",
     isFavorite: false,
     tokensAvailable: "600",
-    roi: "15.0"
+    roi: "15.0",
+    buyPrice: 2.10,
+    sellPrice: 2.08
   },
   { 
     id: "4", 
+    unitId: "211",
     name: "VEX-CASA-L4-211", 
     project: "Casas Lomas", 
     price: 1.05, 
@@ -123,7 +137,9 @@ const INITIAL_TOKENS: TokenData[] = [
     liveSince: "2 meses",
     isFavorite: true,
     tokensAvailable: "1,100",
-    roi: "10.5"
+    roi: "10.5",
+    buyPrice: 1.05,
+    sellPrice: 1.04
   },
 ];
 
@@ -193,241 +209,298 @@ export default function ExchangePage() {
   const favorites = tokens.filter(t => t.isFavorite);
 
   const TokenRow = ({ token }: { token: TokenData }) => (
-    <Card 
+    <div 
         key={token.id} 
         onClick={() => setSelectedTokenId(token.id)}
         className={cn(
-            "hover:bg-muted/30 transition-all cursor-pointer border-muted/20 overflow-hidden",
-            selectedTokenId === token.id ? "ring-2 ring-primary border-transparent" : ""
+            "flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border",
+            selectedTokenId === token.id 
+            ? "bg-white border-primary shadow-xl scale-[1.02] z-10 relative" 
+            : "bg-card border-border/40 hover:border-primary/30 shadow-sm"
         )}
     >
-      <CardContent className="p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className={`h-8 w-8 -ml-2 shrink-0 ${token.isFavorite ? 'text-yellow-500 hover:text-yellow-600' : 'text-muted-foreground'}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleFavorite(token.id);
-            }}
-          >
-            <Star className={`h-4 w-4 ${token.isFavorite ? 'fill-current' : ''}`} />
-          </Button>
-          <div className="space-y-1 min-w-0">
-            <div className="font-bold flex items-center gap-2">
-              <span className="truncate text-sm">{token.name}</span>
-              <Badge variant="outline" className="font-normal text-[9px] py-0 h-4 border-muted/50 bg-muted/50 px-1">
-                {token.liveSince}
-              </Badge>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex gap-4 items-center">
+            <div className={cn(
+                "w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg transition-colors",
+                selectedTokenId === token.id 
+                ? "bg-primary text-white shadow-lg shadow-primary/30" 
+                : "bg-muted/30 text-[#3B2146] border border-border/50"
+            )}>
+                {token.unitId || token.id}
             </div>
-            <div className="text-[11px] text-muted-foreground truncate">{token.project}</div>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-4 shrink-0">
-          <div className="text-right flex items-center gap-4">
-            <div className="w-20">
-              <div className="font-bold text-base leading-tight">${token.price.toFixed(2)}</div>
-              <div className={`text-xs flex items-center justify-end font-bold ${token.changeAll >= 0 ? 'text-brand-green' : 'text-brand-pink'}`}>
-                {token.changeAll >= 0 ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-                {token.changeAll > 0 ? '+' : ''}{token.changeAll}%
-              </div>
-              <div className="text-[8px] text-muted-foreground uppercase font-medium">All Time</div>
+            <div className="min-w-0">
+                <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight truncate">
+                    {token.name}
+                </div>
+                <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5 truncate">
+                    {token.project}
+                </div>
             </div>
-          </div>
         </div>
-      </CardContent>
-    </Card>
+
+        {token.negotiatedAmount && (
+            <div className="flex flex-col items-center mx-2 min-w-max">
+                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Tokens en venta</span>
+                <div className="w-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white py-1.5 px-3 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center gap-1">
+                    <span className="text-[14px] font-black leading-none">{token.negotiatedAmount}</span>
+                    <span className="text-[8px] font-black leading-none opacity-80 uppercase tracking-tighter">USDT</span>
+                </div>
+            </div>
+        )}
+
+        <div className="text-right">
+            <div className="text-[17px] font-black text-[#3B2146] leading-tight text-right">
+                ${token.price.toFixed(2)}
+            </div>
+            <div className={`text-[10px] font-black uppercase mt-1 flex items-center justify-end ${token.changeAll >= 0 ? 'text-brand-green' : 'text-brand-pink'}`}>
+                {token.changeAll >= 0 ? '+' : ''}{token.changeAll}%
+            </div>
+        </div>
+      </div>
+
+      <div className="mt-2 space-y-2">
+          <div className="flex justify-between items-end">
+              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Progreso de Venta</span>
+              <span className="text-[11px] font-black text-primary">
+                  {token.tokensSold ?? 0} / {token.totalTokens ?? 0} 
+                  <span className="text-muted-foreground text-[9px] font-bold ml-1">TOKENS</span>
+              </span>
+          </div>
+          <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+              <div 
+                  className="h-full bg-primary transition-all duration-1000" 
+                  style={{ width: `${((token.tokensSold ?? 0) / (token.totalTokens ?? 1)) * 100}%` }}
+              />
+          </div>
+      </div>
+    </div>
   );
 
   return (
-    <div className="p-4 space-y-4 min-h-screen pb-48 bg-background/50">
-      {/* Header removed as requested, keeping only essential Tabs */}
-      
-      <Tabs defaultValue="market" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 p-1.5 bg-muted/20 backdrop-blur-xl rounded-2xl h-14 border border-white/5">
-          <TabsTrigger value="market" className="rounded-xl data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-lg transition-all font-bold text-xs uppercase tracking-wider">Mercado</TabsTrigger>
-          <TabsTrigger value="favorites" className="rounded-xl data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-lg transition-all font-bold text-xs uppercase tracking-wider">Favoritos</TabsTrigger>
-          <TabsTrigger value="positions" className="rounded-xl data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-lg transition-all font-bold text-xs uppercase tracking-wider">Mis Posiciones</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="market" className="space-y-4 pt-4">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-              <Button 
-                variant={sortBy === "marketCap" ? "secondary" : "ghost"} 
-                size="sm" 
-                className={cn(
-                    "rounded-full gap-1 shrink-0 h-9 transition-all text-xs border border-white/5",
-                    sortBy === "marketCap" ? "shadow-md bg-primary text-primary-foreground font-bold" : "bg-white/5"
-                )}
-                onClick={() => setSortBy("marketCap")}
-              >
-                <CircleDollarSign className="h-4 w-4" />
-                Marketcap
+    <div className="bg-background min-h-screen flex flex-col pb-48">
+      {/* Premium Header from Units Page */}
+      <header className="sticky top-0 z-50 bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white px-4 py-5 rounded-b-[40px] shadow-xl border-none overflow-hidden">
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
+          <div className="absolute -right-10 -top-10 h-32 w-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <div className="flex items-center gap-4 relative z-10">
+              <Button variant="ghost" size="icon" onClick={() => window.history.back()} className="rounded-full text-white hover:bg-white/10">
+                  <ArrowLeft className="h-6 w-6" />
               </Button>
-              <Button 
-                variant={sortBy === "change" ? "secondary" : "ghost"} 
-                size="sm" 
-                className={cn(
-                    "rounded-full gap-1 shrink-0 h-9 transition-all text-xs border border-white/5",
-                    sortBy === "change" ? "shadow-md bg-primary text-primary-foreground font-bold" : "bg-white/5"
-                )}
-                onClick={() => setSortBy("change")}
+              <div className="text-center flex-1 pr-10">
+                  <h1 className="text-3xl font-black uppercase tracking-tight leading-none text-white">Exchange</h1>
+                  <p className="text-sm font-medium text-white/70 mt-1 font-serif italic">Mercado de Tokens</p>
+              </div>
+          </div>
+      </header>
+
+      <div className="flex-1 flex flex-col">
+        <Tabs defaultValue="market" className="w-full">
+          {/* Custom Tabs List that looks like the Units Filter Bar */}
+          <div className="px-4 pt-8 pb-3 border-b border-border/50 bg-muted/10 overflow-x-auto scrollbar-hide">
+            <TabsList className="flex items-center gap-1.5 min-w-max h-auto bg-transparent p-0 border-none">
+              <TabsTrigger 
+                value="market" 
+                className="h-7 px-3 rounded-full bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary whitespace-nowrap"
               >
-                <TrendingUp className="h-4 w-4" />
-                % Variación
-              </Button>
-              <div className="h-4 w-px bg-muted/30 mx-1 shrink-0" />
-              <div className="flex gap-1">
-                {(["24h", "7d", "30d", "all"] as const).map((tf) => (
-                  <Button 
-                    key={tf}
-                    variant={timeframe === tf ? "secondary" : "ghost"} 
-                    size="sm" 
-                    className={cn(
-                        "rounded-full px-3 h-9 text-[10px] uppercase font-bold tracking-wider transition-all border border-white/5",
-                        timeframe === tf ? "shadow-md bg-primary text-primary-foreground" : "bg-white/5"
-                    )}
-                    onClick={() => setTimeframe(tf)}
-                  >
-                    {tf}
-                  </Button>
-                ))}
+                Mercado
+              </TabsTrigger>
+              <TabsTrigger 
+                value="favorites" 
+                className="h-7 px-3 rounded-full bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary whitespace-nowrap"
+              >
+                Favoritos
+              </TabsTrigger>
+              <TabsTrigger 
+                value="positions" 
+                className="h-7 px-3 rounded-full bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary whitespace-nowrap"
+              >
+                Mis Posiciones
+              </TabsTrigger>
+              <div className="h-3 w-px bg-border/50 mx-1" />
+              <button className="h-7 px-3 rounded-full bg-secondary/30 text-[9px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+                <Filter className="w-2.5 h-2.5" /> Más Filtros
+              </button>
+            </TabsList>
+          </div>
+          
+          <TabsContent value="market" className="space-y-4 p-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                <Button 
+                  variant={sortBy === "marketCap" ? "secondary" : "ghost"} 
+                  size="sm" 
+                  className={cn(
+                      "rounded-full gap-1 shrink-0 h-9 transition-all text-xs border border-white/5",
+                      sortBy === "marketCap" ? "shadow-md bg-primary text-primary-foreground font-bold" : "bg-white/5"
+                  )}
+                  onClick={() => setSortBy("marketCap")}
+                >
+                  <CircleDollarSign className="h-4 w-4" />
+                  Marketcap
+                </Button>
+                <Button 
+                  variant={sortBy === "change" ? "secondary" : "ghost"} 
+                  size="sm" 
+                  className={cn(
+                      "rounded-full gap-1 shrink-0 h-9 transition-all text-xs border border-white/5",
+                      sortBy === "change" ? "shadow-md bg-primary text-primary-foreground font-bold" : "bg-white/5"
+                  )}
+                  onClick={() => setSortBy("change")}
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  % Variación
+                </Button>
+                <div className="h-4 w-px bg-muted/30 mx-1 shrink-0" />
+                <div className="flex gap-1">
+                  {(["24h", "7d", "30d", "all"] as const).map((tf) => (
+                    <Button 
+                      key={tf}
+                      variant={timeframe === tf ? "secondary" : "ghost"} 
+                      size="sm" 
+                      className={cn(
+                          "rounded-full px-3 h-9 text-[10px] uppercase font-bold tracking-wider transition-all border border-white/5",
+                          timeframe === tf ? "shadow-md bg-primary text-primary-foreground" : "bg-white/5"
+                      )}
+                      onClick={() => setTimeframe(tf)}
+                    >
+                      {tf}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="grid gap-3">
-            {filteredTokens.length > 0 ? (
-              filteredTokens.map((token) => (
-                <TokenRow key={token.id} token={token} />
-              ))
-            ) : (
-              <div className="py-20 text-center text-muted-foreground bg-muted/5 rounded-3xl border border-dashed border-muted/20">
-                <Search className="h-10 w-10 mx-auto mb-3 opacity-20" />
-                <p className="font-medium text-sm">No se encontraron tokens</p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+            <div className="grid gap-4">
+              {filteredTokens.length > 0 ? (
+                filteredTokens.map((token) => (
+                  <TokenRow key={token.id} token={token} />
+                ))
+              ) : (
+                <div className="py-20 text-center text-muted-foreground bg-muted/5 rounded-3xl border border-dashed border-muted/20">
+                  <Search className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                  <p className="font-medium text-sm">No se encontraron tokens</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
 
-        {/* Other tabs content remains mostly same but styled */}
-        <TabsContent value="favorites" className="space-y-4 pt-4">
-          <div className="grid gap-3">
-            {favorites.length > 0 ? (
-              favorites.map((token) => (
-                <TokenRow key={token.id} token={token} />
-              ))
-            ) : (
-              <div className="py-20 text-center text-muted-foreground bg-muted/5 rounded-3xl border border-dashed border-muted/20">
-                <Star className="h-10 w-10 mx-auto mb-3 opacity-20" />
-                <p className="font-medium text-sm">No tienes favoritos aún</p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+          <TabsContent value="favorites" className="space-y-4 p-4">
+            <div className="grid gap-4">
+              {favorites.length > 0 ? (
+                favorites.map((token) => (
+                  <TokenRow key={token.id} token={token} />
+                ))
+              ) : (
+                <div className="py-20 text-center text-muted-foreground bg-muted/5 rounded-3xl border border-dashed border-muted/20">
+                  <Star className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                  <p className="font-medium text-sm">No tienes favoritos aún</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
 
-        <TabsContent value="positions" className="space-y-4 pt-4">
-          <Card className="bg-linear-to-br from-primary/20 via-primary/5 to-transparent border-primary/10 overflow-hidden relative shadow-lg">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                <LayoutGrid className="h-3.5 w-3.5" /> Patrimoninio Estimado
-              </CardTitle>
-              <div className="text-3xl font-black tracking-tighter text-foreground">$4,250.00</div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-[10px] font-black flex items-center text-brand-green bg-brand-green/10 w-fit px-2.5 py-1 rounded-full border border-brand-green/20">
-                <TrendingUp className="h-3 w-3 mr-1" /> +$245.00 (5.8%) hoy
-              </div>
-            </CardContent>
-          </Card>
+          <TabsContent value="positions" className="space-y-4 p-4">
+            <Card className="bg-linear-to-br from-primary/20 via-primary/5 to-transparent border-primary/10 overflow-hidden relative shadow-lg rounded-[28px] mb-4">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                  <LayoutGrid className="h-3.5 w-3.5" /> Patrimoninio Estimado
+                </CardTitle>
+                <div className="text-3xl font-black tracking-tighter text-foreground">$4,250.00</div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-[10px] font-black flex items-center text-brand-green bg-brand-green/10 w-fit px-2.5 py-1 rounded-full border border-brand-green/20">
+                  <TrendingUp className="h-3 w-3 mr-1" /> +$245.00 (5.8%) hoy
+                </div>
+              </CardContent>
+            </Card>
 
-          <div className="grid gap-4">
-            {positions
-                .sort((a, b) => Math.abs(a.orderPrice - a.marketPrice) - Math.abs(b.orderPrice - b.marketPrice))
-                .map((pos) => {
-                    const expectedGain = (pos.marketPrice - pos.orderPrice) * pos.totalAmount;
-                    const marketValue = pos.filledAmount * pos.marketPrice;
-                    const progress = (pos.filledAmount / pos.totalAmount) * 100;
-                    
-                    return (
-                        <Card key={pos.id} className="bg-linear-to-br from-muted/20 via-muted/5 to-transparent border-muted/20 overflow-hidden group shadow-md transition-all hover:scale-[1.02]">
-                            <CardContent className="p-0">
-                                <div className="p-5 space-y-4">
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex items-center gap-3">
-                                            <div className={cn("h-12 w-12 rounded-2xl bg-linear-to-br flex items-center justify-center text-white shadow-lg", pos.logoColor)}>
-                                                <Layers className="h-6 w-6" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-black text-base tracking-tight">{pos.tokenName}</h4>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
-                                                        {pos.filledAmount} / {pos.totalAmount} TOKENS
-                                                    </span>
-                                                    <Badge variant="secondary" className="text-[8px] h-4 px-1 bg-primary/10 text-primary border-none">
-                                                        {Math.round(progress)}%
-                                                    </Badge>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">Valor Actual</div>
-                                            <div className="text-xl font-black tracking-tighter text-foreground">${marketValue.toLocaleString()}</div>
-                                        </div>
-                                    </div>
+            <div className="grid gap-4">
+              {positions
+                  .sort((a, b) => Math.abs(a.orderPrice - a.marketPrice) - Math.abs(b.orderPrice - b.marketPrice))
+                  .map((pos) => {
+                      const expectedGain = (pos.marketPrice - pos.orderPrice) * pos.totalAmount;
+                      const marketValue = pos.filledAmount * pos.marketPrice;
+                      const progress = (pos.filledAmount / pos.totalAmount) * 100;
+                      
+                      return (
+                          <Card key={pos.id} className="border-muted/20 overflow-hidden shadow-md rounded-[28px] bg-card">
+                              <CardContent className="p-0">
+                                  <div className="p-5 space-y-4">
+                                      <div className="flex justify-between items-start">
+                                          <div className="flex items-center gap-3">
+                                              <div className={cn("h-12 w-12 rounded-2xl bg-linear-to-br flex items-center justify-center text-white shadow-lg", pos.logoColor)}>
+                                                  <Layers className="h-6 w-6" />
+                                              </div>
+                                              <div>
+                                                  <h4 className="font-black text-base tracking-tight">{pos.tokenName}</h4>
+                                                  <div className="flex items-center gap-2">
+                                                      <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                                                          {pos.filledAmount} / {pos.totalAmount} TOKENS
+                                                      </span>
+                                                      <Badge variant="secondary" className="text-[8px] h-4 px-1 bg-primary/10 text-primary border-none">
+                                                          {Math.round(progress)}%
+                                                      </Badge>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div className="text-right">
+                                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">Valor Actual</div>
+                                              <div className="text-xl font-black tracking-tighter text-foreground">${marketValue.toLocaleString()}</div>
+                                          </div>
+                                      </div>
 
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="bg-background/40 backdrop-blur-sm p-3 rounded-2xl border border-white/5">
-                                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">Tu Orden</div>
-                                            <div className="text-sm font-black">${pos.orderPrice.toFixed(2)}</div>
-                                        </div>
-                                        <div className="bg-background/40 backdrop-blur-sm p-3 rounded-2xl border border-white/5">
-                                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">Mercado</div>
-                                            <div className="text-sm font-black">${pos.marketPrice.toFixed(2)}</div>
-                                        </div>
-                                    </div>
+                                      <div className="grid grid-cols-2 gap-3">
+                                          <div className="bg-background/40 backdrop-blur-sm p-3 rounded-2xl border border-border/50">
+                                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">Tu Orden</div>
+                                              <div className="text-sm font-black">${pos.orderPrice.toFixed(2)}</div>
+                                          </div>
+                                          <div className="bg-background/40 backdrop-blur-sm p-3 rounded-2xl border border-border/50">
+                                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">Mercado</div>
+                                              <div className="text-sm font-black">${pos.marketPrice.toFixed(2)}</div>
+                                          </div>
+                                      </div>
 
-                                    <div className="space-y-3 pt-1">
-                                        <div className="flex justify-between items-end">
-                                            <div className="flex flex-col">
-                                                <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">Ganancia Esperada</span>
-                                                <span className="text-xs font-black text-brand-green">
-                                                    +{expectedGain > 0 ? '$' : '-$'}{Math.abs(expectedGain).toFixed(2)}
-                                                </span>
-                                            </div>
-                                            <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
-                                                Progresión
-                                            </div>
-                                        </div>
-                                        <div className="h-2.5 w-full bg-muted/30 rounded-full overflow-hidden p-0.5 border border-white/5">
-                                            <div 
-                                                className="h-full bg-linear-to-r from-primary to-primary/60 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(var(--primary),0.3)]" 
-                                                style={{ width: `${progress}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    );
-                })
-            }
-          </div>
-        </TabsContent>
-      </Tabs>
+                                      <div className="space-y-3 pt-1">
+                                          <div className="flex justify-between items-end">
+                                              <div className="flex flex-col">
+                                                  <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">Ganancia Esperada</span>
+                                                  <span className="text-xs font-black text-brand-green">
+                                                      +{expectedGain > 0 ? '$' : '-$'}{Math.abs(expectedGain).toFixed(2)}
+                                                  </span>
+                                              </div>
+                                              <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
+                                                  Progresión
+                                              </div>
+                                          </div>
+                                          <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden p-0">
+                                              <div 
+                                                  className="h-full bg-primary transition-all duration-1000 ease-out" 
+                                                  style={{ width: `${progress}%` }}
+                                              />
+                                          </div>
+                                      </div>
+                                  </div>
+                              </CardContent>
+                          </Card>
+                      );
+                  })
+              }
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
 
       {/* Floating Stats Bar near bottom */}
       {!selectedToken && (
         <div className="fixed bottom-20 left-4 right-4 z-40 animate-in slide-in-from-bottom-2 duration-500">
           <div className="bg-background/80 backdrop-blur-xl border border-white/10 rounded-2xl p-3 flex justify-between items-center shadow-2xl">
             <div className="flex gap-4 overflow-x-auto text-[9px] uppercase font-black tracking-widest no-scrollbar w-full justify-around">
-              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Proyectos</span><span className="text-foreground">24</span></div>
-              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Cap. Total</span><span className="text-foreground">$12.4M</span></div>
-              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Vol 24h</span><span className="text-brand-green">$1.2M</span></div>
-              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Tokens</span><span className="text-foreground">156</span></div>
+              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Proyectos</span><span className="text-foreground text-[11px] font-black">24</span></div>
+              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Cap. Total</span><span className="text-foreground text-[11px] font-black">$12.4M</span></div>
+              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Vol 24h</span><span className="text-brand-green text-[11px] font-black">$1.2M</span></div>
+              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Tokens</span><span className="text-foreground text-[11px] font-black">156</span></div>
             </div>
           </div>
         </div>

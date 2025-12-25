@@ -99,7 +99,7 @@ export default function ProjectUnitsPage() {
                                 <div>
                                     <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight">{unit.type} • Piso {unit.floor}</div>
                                     <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5">
-                                        {unit.isTokenized ? unit.tokenName : 'Tradicional'}
+                                        {unit.isTokenized ? unit.tokenName : 'Venta tradicional no tokenizada'}
                                     </div>
                                 </div>
                             </div>
@@ -107,8 +107,9 @@ export default function ProjectUnitsPage() {
                             {unit.isTokenized && unit.negotiatedAmount && (
                                 <div className="flex flex-col items-center mx-2 min-w-max">
                                     <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Tokens en venta</span>
-                                    <div className="w-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white text-[10px] font-black py-1 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center">
-                                        {unit.negotiatedAmount} USDT
+                                    <div className="w-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white py-1.5 px-3 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center gap-1">
+                                        <span className="text-[14px] font-black leading-none">{unit.negotiatedAmount}</span>
+                                        <span className="text-[8px] font-black leading-none opacity-80 uppercase tracking-tighter">USDT</span>
                                     </div>
                                 </div>
                             )}
