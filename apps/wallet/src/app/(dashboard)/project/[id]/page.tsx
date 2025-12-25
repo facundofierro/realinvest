@@ -50,7 +50,9 @@ const UNITS = [
     { id: "302", type: "2 Amb", floor: "3", status: "Disponible", price: "$130,000", tokens: 1300 },
 ];
 
-export default function ProjectPage() {
+export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   return (
     <div className="bg-background min-h-screen pb-32 relative">
         {/* Header Image */}
@@ -232,45 +234,11 @@ export default function ProjectPage() {
                                     </div>
 
                                     {stage.status === 'active' && (
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button className="w-full font-bold uppercase tracking-widest text-xs h-10 group" variant="secondary">
-                                                    Explorar Unidades <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="max-w-md w-full max-h-[80vh] overflow-y-auto p-0 gap-0 border-none shadow-2xl">
-                                                <DialogHeader className="p-6 bg-primary text-primary-foreground">
-                                                    <DialogTitle className="text-2xl font-black uppercase tracking-tight">Unidades Etapa 1</DialogTitle>
-                                                    <DialogDescription className="text-primary-foreground/80 font-medium">
-                                                        Ubicación y disponibilidad en tiempo real
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <div className="p-4 space-y-3">
-                                                    {UNITS.map(unit => (
-                                                        <div key={unit.id} className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border/50 hover:bg-muted/50 transition-colors cursor-pointer group">
-                                                            <div className="flex gap-4 items-center">
-                                                                <div className="w-12 h-12 rounded-xl bg-background flex items-center justify-center font-black text-primary border border-border/50 shadow-sm">
-                                                                    {unit.id}
-                                                                </div>
-                                                                <div>
-                                                                    <div className="font-black text-sm uppercase">{unit.type} • Piso {unit.floor}</div>
-                                                                    <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase">{unit.tokens} Tokens equivalents</div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <div className="text-sm font-black text-foreground">{unit.price}</div>
-                                                                <Badge variant="ghost" className={`text-[9px] font-black uppercase p-0 ${unit.status === 'Disponible' ? 'text-brand-green' : 'text-brand-pink'}`}>
-                                                                    {unit.status}
-                                                                </Badge>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                                <DialogFooter className="p-4 bg-muted/10 border-t border-border/50">
-                                                    <Button className="w-full font-black uppercase tracking-widest">Invertir en esta etapa</Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
+                                        <Link href={`/project/${id}/units`} className="block w-full">
+                                            <Button className="w-full font-bold uppercase tracking-widest text-xs h-10 group" variant="secondary">
+                                                Explorar Unidades <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                                            </Button>
+                                        </Link>
                                     )}
                                 </CardContent>
                             </Card>
