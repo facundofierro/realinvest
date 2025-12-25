@@ -16,6 +16,20 @@ export function ProjectStories({ stories }: { stories: Story[] }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
 
+  useEffect(() => {
+    if (activeIndex !== null) {
+      document.body.style.overflow = 'hidden';
+      window.dispatchEvent(new CustomEvent('story-active', { detail: true }));
+    } else {
+      document.body.style.overflow = '';
+      window.dispatchEvent(new CustomEvent('story-active', { detail: false }));
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.dispatchEvent(new CustomEvent('story-active', { detail: false }));
+    };
+  }, [activeIndex]);
+
   const nextStory = useCallback(() => {
     setActiveIndex((prev) => {
       if (prev === null) return null;

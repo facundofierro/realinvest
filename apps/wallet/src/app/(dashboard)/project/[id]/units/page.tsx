@@ -205,9 +205,9 @@ export default function ProjectUnitsPage() {
                 <DialogContent className="max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
                     <div className="h-48 bg-muted relative">
                         <Image 
-                            src="https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&q=80&w=800" 
+                            src="/building_floor_layout.png" 
                             fill
-                            className="object-cover"
+                            className="object-contain bg-white"
                             alt="Plano"
                         />
                         <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
