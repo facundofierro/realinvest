@@ -54,7 +54,7 @@ export default function ProjectPage() {
   return (
     <div className="bg-background min-h-screen pb-32 relative">
         {/* Header Image */}
-        <div className="h-72 relative w-full overflow-hidden">
+        <div className="h-[420px] relative w-full overflow-hidden">
              <Image 
                 src="/projects/header-tower.png" 
                 alt="Torre Libertador" 
@@ -62,65 +62,65 @@ export default function ProjectPage() {
                 className="object-cover"
                 priority
              />
-             <div className="absolute inset-0 bg-linear-to-t from-background via-background/20 to-transparent" />
+             <div className="absolute inset-0 bg-linear-to-t from-background via-background/80 to-transparent" />
              
              <Link href="/dashboard" className="absolute top-4 left-4 bg-background/30 backdrop-blur-md p-2 rounded-full hover:bg-background/50 transition-colors z-10 border border-white/10 text-white">
                 <ArrowLeft className="h-6 w-6" />
              </Link>
              
-             <div className="absolute bottom-6 left-4 right-4 z-10">
-                <div className="flex justify-between items-end">
-                    <div className="space-y-1">
-                        <Badge variant="pink" className="shadow-lg border-0 text-[10px] font-bold tracking-widest uppercase">En Construcción</Badge>
-                        <h1 className="text-3xl font-bold text-foreground drop-shadow-sm">Torre Libertador 8000</h1>
-                        <div className="flex items-center text-sm text-foreground/80 font-medium">
-                            <MapPin className="h-4 w-4 mr-1 text-primary" /> Av. del Libertador 8000, Nuñez
-                        </div>
+             <div className="absolute bottom-16 left-4 right-4 z-10">
+                <div className="space-y-1">
+                    <Badge variant="pink" className="shadow-lg border-0 text-[10px] font-bold tracking-widest uppercase">En Construcción</Badge>
+                    <h1 className="text-3xl font-bold text-foreground drop-shadow-sm">Torre Libertador 8000</h1>
+                    <div className="flex items-center text-sm text-foreground/80 font-medium">
+                        <MapPin className="h-4 w-4 mr-1 text-primary" /> Av. del Libertador 8000, Nuñez
                     </div>
-                    <GradientButton size="lg" className="rounded-2xl px-8 shadow-xl">
-                        Invertir
-                    </GradientButton>
                 </div>
              </div>
         </div>
 
-        <div className="px-4 -mt-4 relative z-20 space-y-8">
-            {/* Gallery Stories */}
-            <div className="overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
-                <div className="flex gap-4 min-w-max">
-                    {STORIES.map((story) => (
-                        <Dialog key={story.id}>
-                            <DialogTrigger asChild>
-                                <button className="flex flex-col items-center gap-2 group transition-transform active:scale-95">
-                                    <div className={`p-[3px] rounded-full bg-linear-to-tr ${story.color} shadow-lg ring-2 ring-transparent group-hover:ring-primary/20 transition-all`}>
-                                        <Avatar className="w-16 h-16 border-2 border-background shadow-inner">
-                                            <AvatarImage src={story.image} className="object-cover" />
-                                            <AvatarFallback>{story.title[0]}</AvatarFallback>
-                                        </Avatar>
+        <div className="px-4 -mt-12 relative z-20 space-y-8">
+            {/* Gallery Stories & Action */}
+            <div className="flex items-center gap-4">
+                <div className="flex-1 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
+                    <div className="flex gap-4 min-w-max">
+                        {STORIES.map((story) => (
+                            <Dialog key={story.id}>
+                                <DialogTrigger asChild>
+                                    <button className="flex flex-col items-center gap-2 group transition-transform active:scale-95">
+                                        <div className="p-[2.5px] rounded-full bg-linear-to-tr from-brand-lime via-brand-green to-brand-teal shadow-sm group-hover:scale-105 transition-all">
+                                            <Avatar className="w-16 h-16 border-2 border-background">
+                                                <AvatarImage src={story.image} className="object-cover" />
+                                                <AvatarFallback>{story.title[0]}</AvatarFallback>
+                                            </Avatar>
+                                        </div>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight group-hover:text-primary transition-colors">{story.title}</span>
+                                    </button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl w-full h-[85vh] p-0 overflow-hidden bg-black/95 border-none">
+                                    <DialogHeader className="p-4 absolute top-0 left-0 right-0 z-50 bg-linear-to-b from-black/80 to-transparent">
+                                        <DialogTitle className="text-white flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-linear-to-tr from-brand-lime via-brand-green to-brand-teal" />
+                                            {story.title}
+                                        </DialogTitle>
+                                        <DialogDescription className="sr-only">Imagen de {story.title}</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="relative w-full h-full flex items-center justify-center">
+                                        <Image 
+                                            src={story.image} 
+                                            alt={story.title} 
+                                            fill 
+                                            className="object-contain"
+                                        />
                                     </div>
-                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight group-hover:text-primary transition-colors">{story.title}</span>
-                                </button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-4xl w-full h-[85vh] p-0 overflow-hidden bg-black/95 border-none">
-                                <DialogHeader className="p-4 absolute top-0 left-0 right-0 z-50 bg-linear-to-b from-black/80 to-transparent">
-                                    <DialogTitle className="text-white flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full bg-linear-to-tr ${story.color}`} />
-                                        {story.title}
-                                    </DialogTitle>
-                                    <DialogDescription className="sr-only">Imagen de {story.title}</DialogDescription>
-                                </DialogHeader>
-                                <div className="relative w-full h-full flex items-center justify-center">
-                                    <Image 
-                                        src={story.image} 
-                                        alt={story.title} 
-                                        fill 
-                                        className="object-contain"
-                                    />
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    ))}
+                                </DialogContent>
+                            </Dialog>
+                        ))}
+                    </div>
                 </div>
+                <GradientButton size="lg" className="rounded-2xl px-8 shadow-xl h-14 min-w-[120px]">
+                    Invertir
+                </GradientButton>
             </div>
 
             {/* Key Metrics Dashboard */}

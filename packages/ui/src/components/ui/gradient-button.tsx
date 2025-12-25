@@ -8,7 +8,7 @@ const gradientButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-gradient-to-r from-[#B6F129] to-[#6CDA33] text-[#1A1A1A] hover:opacity-90",
+        default: "bg-gradient-to-r from-brand-lime via-brand-green to-brand-teal text-[#1A1A1A] hover:opacity-90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
