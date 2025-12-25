@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, PieChart, Search, User, Plus } from 'lucide-react';
+import { Home, PieChart, ArrowLeftRight, MessageSquare, Plus } from 'lucide-react';
 import { Button } from '@repo/ui/components/ui/button';
 import { cn } from '@repo/ui/lib/utils';
 
@@ -33,14 +33,14 @@ export function BottomNav() {
              </Button>
           </div>
 
-          <Link href="/search" className={cn("flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors", isActive('/search') ? "text-primary" : "text-muted-foreground hover:text-foreground")}>
-             <Search className="h-5 w-5" />
-            <span className="text-[10px] font-medium">Explorar</span>
+          <Link href="/exchange" className={cn("flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors", isActive('/exchange') ? "text-primary" : "text-muted-foreground hover:text-foreground")}>
+             <ArrowLeftRight className="h-5 w-5" />
+            <span className="text-[10px] font-medium">Exchange</span>
           </Link>
 
-          <Link href="/profile" className={cn("flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors", isActive('/profile') ? "text-primary" : "text-muted-foreground hover:text-foreground")}>
-            <User className="h-5 w-5" />
-            <span className="text-[10px] font-medium">Perfil</span>
+          <Link href="/chat" className={cn("flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors", isActive('/chat') ? "text-primary" : "text-muted-foreground hover:text-foreground")}>
+            <MessageSquare className="h-5 w-5" />
+            <span className="text-[10px] font-medium">Chat</span>
           </Link>
         </div>
       </nav>

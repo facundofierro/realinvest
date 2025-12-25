@@ -58,7 +58,7 @@ export default function DashboardPage() {
       <section className="space-y-3">
          <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">Oportunidades Destacadas</h2>
-            <Link href="/search" className="text-sm text-primary font-medium hover:underline">Ver todas</Link>
+            <Link href="/invest" className="text-sm text-primary font-medium hover:underline">Ver todas</Link>
          </div>
          <div className="flex gap-4 overflow-x-auto pb-4 snap-x -mx-4 px-4 scrollbar-hide">
             {/* Project Card 1 */}
