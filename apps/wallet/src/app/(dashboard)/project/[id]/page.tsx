@@ -4,15 +4,15 @@ import { Badge } from "@repo/ui/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@repo/ui/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/components/ui/avatar";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogHeader, DialogDescription, DialogFooter } from "@repo/ui/components/ui/dialog";
-import { 
-    ArrowLeft, MapPin, Calendar, FileText, Info, ChevronRight, 
+import { ArrowLeft, MapPin, Calendar, FileText, Info, ChevronRight, 
     ShoppingBag, Layers, Home, Play, Maximize2, TrendingUp, 
     BarChart3, PieChart, DollarSign, Wallet, Building2, 
-    ArrowUpRight, Download, Calculator
+    ArrowUpRight, Download, Calculator,
+    X
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { ProjectStories } from "@/components/project/stories-section";
 
 const STORIES = [
   { id: 1, title: "Exterior", image: "/projects/header-tower.png", color: "from-blue-500 to-cyan-400" },
@@ -83,46 +83,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
         <div className="px-4 -mt-12 relative z-20 space-y-8">
             {/* Gallery Stories & Action */}
-            <div className="flex items-center gap-4">
-                <div className="flex-1 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
-                    <div className="flex gap-4 min-w-max">
-                        {STORIES.map((story) => (
-                            <Dialog key={story.id}>
-                                <DialogTrigger asChild>
-                                    <button className="flex flex-col items-center gap-2 group transition-transform active:scale-95">
-                                        <div className="p-[2.5px] rounded-full bg-linear-to-tr from-brand-lime via-brand-green to-brand-teal shadow-sm group-hover:scale-105 transition-all">
-                                            <Avatar className="w-16 h-16 border-2 border-background">
-                                                <AvatarImage src={story.image} className="object-cover" />
-                                                <AvatarFallback>{story.title[0]}</AvatarFallback>
-                                            </Avatar>
-                                        </div>
-                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight group-hover:text-primary transition-colors">{story.title}</span>
-                                    </button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-4xl w-full h-[85vh] p-0 overflow-hidden bg-black/95 border-none">
-                                    <DialogHeader className="p-4 absolute top-0 left-0 right-0 z-50 bg-linear-to-b from-black/80 to-transparent">
-                                        <DialogTitle className="text-white flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full bg-linear-to-tr from-brand-lime via-brand-green to-brand-teal" />
-                                            {story.title}
-                                        </DialogTitle>
-                                        <DialogDescription className="sr-only">Imagen de {story.title}</DialogDescription>
-                                    </DialogHeader>
-                                    <div className="relative w-full h-full flex items-center justify-center">
-                                        <Image 
-                                            src={story.image} 
-                                            alt={story.title} 
-                                            fill 
-                                            className="object-contain"
-                                        />
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
-                        ))}
-                    </div>
+            <div className="flex items-start gap-4">
+                <div className="flex-1 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 pl-8">
+                    <ProjectStories stories={STORIES} />
                 </div>
-                <GradientButton size="lg" className="rounded-2xl px-8 shadow-xl h-14 min-w-[120px]">
-                    Invertir
-                </GradientButton>
+                <div className="pt-1.5 pr-2">
+                    <GradientButton size="lg" className="rounded-2xl px-6 shadow-xl h-14 min-w-[120px] font-black uppercase tracking-widest text-sm">
+                        Invertir
+                    </GradientButton>
+                </div>
             </div>
 
             {/* Key Metrics Dashboard */}
