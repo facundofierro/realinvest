@@ -172,21 +172,24 @@ export default function InvestPage() {
         </div>
       </div>
       
-      {/* Categories Tabs-like horizontal selection */}
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+      {/* Categories Grid Selection */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {categories.map((cat) => (
             <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
                 className={cn(
-                    "flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap border shrink-0",
+                    "flex items-center gap-3 px-4 py-4 rounded-2xl text-[13px] font-black transition-all border shadow-sm relative overflow-hidden group",
                     selectedCategory === cat.id 
-                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-105" 
-                        : "bg-card border-muted/20 text-muted-foreground hover:border-muted-foreground/30"
+                        ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10" 
+                        : "bg-card border-muted/20 text-muted-foreground hover:border-muted-foreground/30 hover:scale-[1.02]"
                 )}
             >
-                <cat.icon className="h-3.5 w-3.5" />
-                {cat.label}
+                <cat.icon className={cn(
+                    "h-5 w-5 shrink-0 transition-transform group-hover:scale-110",
+                    selectedCategory === cat.id ? "text-white" : "text-primary/60"
+                )} />
+                <span className="truncate">{cat.label}</span>
             </button>
         ))}
       </div>
@@ -279,7 +282,7 @@ export default function InvestPage() {
                                     )}
                                     {project.rentaFija && (
                                         <div className="bg-secondary/40 rounded-xl p-2 flex-1 min-w-0 border border-muted/5 flex flex-col items-center justify-center">
-                                            <p className="text-[7px] text-muted-foreground font-extrabold uppercase tracking-wider mb-0.5 truncate">Renta Fija</p>
+                                            <p className="text-[7px] text-muted-foreground font-extrabold uppercase tracking-wider mb-0.5 truncate">Renta</p>
                                             <p className="text-[9px] font-black text-foreground truncate">{project.rentaFija}</p>
                                         </div>
                                     )}

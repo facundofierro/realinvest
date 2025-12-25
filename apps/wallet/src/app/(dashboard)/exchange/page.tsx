@@ -103,7 +103,7 @@ const INITIAL_TOKENS: TokenData[] = [
     tokensAvailable: "840",
     roi: "8.2",
     buyPrice: 0.98,
-    sellPrice: 0.97
+    sellPrice: undefined
   },
   { 
     id: "3", 
@@ -120,7 +120,7 @@ const INITIAL_TOKENS: TokenData[] = [
     isFavorite: false,
     tokensAvailable: "600",
     roi: "15.0",
-    buyPrice: 2.10,
+    buyPrice: undefined,
     sellPrice: 2.08
   },
   { 
@@ -138,8 +138,8 @@ const INITIAL_TOKENS: TokenData[] = [
     isFavorite: true,
     tokensAvailable: "1,100",
     roi: "10.5",
-    buyPrice: 1.05,
-    sellPrice: 1.04
+    buyPrice: undefined,
+    sellPrice: undefined
   },
 ];
 
@@ -219,10 +219,10 @@ export default function ExchangePage() {
             : "bg-card border-border/40 hover:border-primary/30 shadow-sm"
         )}
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex gap-4 items-center">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex gap-4 items-center min-w-0">
             <div className={cn(
-                "w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg transition-colors",
+                "w-12 h-12 rounded-2xl flex items-center justify-center font-black text-base transition-colors shrink-0",
                 selectedTokenId === token.id 
                 ? "bg-primary text-white shadow-lg shadow-primary/30" 
                 : "bg-muted/30 text-[#3B2146] border border-border/50"
@@ -230,7 +230,7 @@ export default function ExchangePage() {
                 {token.unitId || token.id}
             </div>
             <div className="min-w-0">
-                <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight truncate">
+                <div className="font-black text-[14px] uppercase text-[#3B2146] leading-tight truncate">
                     {token.name}
                 </div>
                 <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5 truncate">
@@ -239,41 +239,30 @@ export default function ExchangePage() {
             </div>
         </div>
 
-        {token.negotiatedAmount && (
-            <div className="flex flex-col items-center mx-2 min-w-max">
-                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Tokens en venta</span>
-                <div className="w-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white py-1.5 px-3 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center gap-1">
-                    <span className="text-[14px] font-black leading-none">{token.negotiatedAmount}</span>
-                    <span className="text-[8px] font-black leading-none opacity-80 uppercase tracking-tighter">USDT</span>
-                </div>
-            </div>
-        )}
-
-        <div className="text-right">
-            <div className="text-[17px] font-black text-[#3B2146] leading-tight text-right">
+        <div className="text-right shrink-0">
+            <div className="text-[16px] font-black text-[#3B2146] leading-tight">
                 ${token.price.toFixed(2)}
             </div>
-            <div className={`text-[10px] font-black uppercase mt-1 flex items-center justify-end ${token.changeAll >= 0 ? 'text-brand-green' : 'text-brand-pink'}`}>
+            <div className={`text-[10px] font-black uppercase mt-0.5 flex items-center justify-end ${token.changeAll >= 0 ? 'text-brand-green' : 'text-brand-pink'}`}>
                 {token.changeAll >= 0 ? '+' : ''}{token.changeAll}%
             </div>
         </div>
       </div>
 
-      <div className="mt-2 space-y-2">
-          <div className="flex justify-between items-end">
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Progreso de Venta</span>
-              <span className="text-[11px] font-black text-primary">
-                  {token.tokensSold ?? 0} / {token.totalTokens ?? 0} 
-                  <span className="text-muted-foreground text-[9px] font-bold ml-1">TOKENS</span>
-              </span>
-          </div>
-          <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-              <div 
-                  className="h-full bg-primary transition-all duration-1000" 
-                  style={{ width: `${((token.tokensSold ?? 0) / (token.totalTokens ?? 1)) * 100}%` }}
-              />
-          </div>
-      </div>
+      {(token.buyPrice || token.sellPrice) && (
+        <div className="flex justify-end gap-2 mt-3">
+            {token.buyPrice && (
+                <Badge className="bg-brand-green/10 text-brand-green border-brand-green/20 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-tighter border h-auto">
+                    Compra: ${token.buyPrice.toFixed(2)}
+                </Badge>
+            )}
+            {token.sellPrice && (
+                <Badge className="bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-tighter border h-auto">
+                    Venta: ${token.sellPrice.toFixed(2)}
+                </Badge>
+            )}
+        </div>
+      )}
     </div>
   );
 
@@ -297,73 +286,72 @@ export default function ExchangePage() {
 
       <div className="flex-1 flex flex-col">
         <Tabs defaultValue="market" className="w-full">
-          {/* Custom Tabs List that looks like the Units Filter Bar */}
-          <div className="px-4 pt-8 pb-3 border-b border-border/50 bg-muted/10 overflow-x-auto scrollbar-hide">
-            <TabsList className="flex items-center gap-1.5 min-w-max h-auto bg-transparent p-0 border-none">
+          {/* Custom Tabs List modernized for Mobile (Adjusts to width, larger touch targets) */}
+          <div className="px-4 py-4 border-b border-border/50 bg-muted/10">
+            <TabsList className="flex items-center gap-1.5 w-full h-auto bg-transparent p-0 border-none">
               <TabsTrigger 
                 value="market" 
-                className="h-7 px-3 rounded-full bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary whitespace-nowrap"
+                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary"
               >
                 Mercado
               </TabsTrigger>
               <TabsTrigger 
                 value="favorites" 
-                className="h-7 px-3 rounded-full bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary whitespace-nowrap"
+                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary"
               >
                 Favoritos
               </TabsTrigger>
               <TabsTrigger 
                 value="positions" 
-                className="h-7 px-3 rounded-full bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary whitespace-nowrap"
+                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary"
               >
                 Mis Posiciones
               </TabsTrigger>
-              <div className="h-3 w-px bg-border/50 mx-1" />
-              <button className="h-7 px-3 rounded-full bg-secondary/30 text-[9px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                <Filter className="w-2.5 h-2.5" /> Más Filtros
+              <button className="h-11 w-11 shrink-0 rounded-2xl bg-secondary/30 text-muted-foreground flex items-center justify-center border border-border/30">
+                <Filter className="w-4 h-4" />
               </button>
             </TabsList>
           </div>
           
           <TabsContent value="market" className="space-y-4 p-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-1.5 w-full">
                 <Button 
                   variant={sortBy === "marketCap" ? "secondary" : "ghost"} 
                   size="sm" 
                   className={cn(
-                      "rounded-full gap-1 shrink-0 h-9 transition-all text-xs border border-white/5",
-                      sortBy === "marketCap" ? "shadow-md bg-primary text-primary-foreground font-bold" : "bg-white/5"
+                      "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border border-white/5",
+                      sortBy === "marketCap" ? "shadow-md bg-primary text-primary-foreground" : "bg-white/5"
                   )}
                   onClick={() => setSortBy("marketCap")}
                 >
-                  <CircleDollarSign className="h-4 w-4" />
-                  Marketcap
+                  <CircleDollarSign className="h-3.5 w-3.5" />
+                  <span className="truncate">Marketcap</span>
                 </Button>
                 <Button 
                   variant={sortBy === "change" ? "secondary" : "ghost"} 
                   size="sm" 
                   className={cn(
-                      "rounded-full gap-1 shrink-0 h-9 transition-all text-xs border border-white/5",
-                      sortBy === "change" ? "shadow-md bg-primary text-primary-foreground font-bold" : "bg-white/5"
+                      "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border border-white/5",
+                      sortBy === "change" ? "shadow-md bg-primary text-primary-foreground" : "bg-white/5"
                   )}
                   onClick={() => setSortBy("change")}
                 >
-                  <TrendingUp className="h-4 w-4" />
-                  % Variación
+                  <TrendingUp className="h-3.5 w-3.5" />
+                  <span className="truncate">% Var.</span>
                 </Button>
-                <div className="h-4 w-px bg-muted/30 mx-1 shrink-0" />
-                <div className="flex gap-1">
-                  {(["24h", "7d", "30d", "all"] as const).map((tf) => (
+                
+                <div className="flex items-center gap-1 bg-muted/20 p-1 rounded-2xl border border-border/30 h-11">
+                  {(["24H", "7D", "30D", "ALL"] as const).map((tf) => (
                     <Button 
                       key={tf}
-                      variant={timeframe === tf ? "secondary" : "ghost"} 
+                      variant={timeframe === tf.toLowerCase() ? "secondary" : "ghost"} 
                       size="sm" 
                       className={cn(
-                          "rounded-full px-3 h-9 text-[10px] uppercase font-bold tracking-wider transition-all border border-white/5",
-                          timeframe === tf ? "shadow-md bg-primary text-primary-foreground" : "bg-white/5"
+                          "rounded-xl px-2 h-full text-[9px] font-black tracking-tighter transition-all border-none",
+                          timeframe === tf.toLowerCase() ? "shadow-sm bg-background text-foreground" : "text-muted-foreground hover:bg-white/5"
                       )}
-                      onClick={() => setTimeframe(tf)}
+                      onClick={() => setTimeframe(tf.toLowerCase() as any)}
                     >
                       {tf}
                     </Button>
@@ -491,20 +479,6 @@ export default function ExchangePage() {
           </TabsContent>
         </Tabs>
       </div>
-
-      {/* Floating Stats Bar near bottom */}
-      {!selectedToken && (
-        <div className="fixed bottom-20 left-4 right-4 z-40 animate-in slide-in-from-bottom-2 duration-500">
-          <div className="bg-background/80 backdrop-blur-xl border border-white/10 rounded-2xl p-3 flex justify-between items-center shadow-2xl">
-            <div className="flex gap-4 overflow-x-auto text-[9px] uppercase font-black tracking-widest no-scrollbar w-full justify-around">
-              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Proyectos</span><span className="text-foreground text-[11px] font-black">24</span></div>
-              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Cap. Total</span><span className="text-foreground text-[11px] font-black">$12.4M</span></div>
-              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Vol 24h</span><span className="text-brand-green text-[11px] font-black">$1.2M</span></div>
-              <div className="flex flex-col items-center"><span className="text-muted-foreground opacity-60">Tokens</span><span className="text-foreground text-[11px] font-black">156</span></div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Token Quick Action Panel - Shows OVER Bottom Nav as requested */}
       {selectedToken && (

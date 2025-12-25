@@ -60,19 +60,19 @@ export default function ProjectUnitsPage() {
 
             {/* Filter Bar */}
             <div className="px-4 pt-8 pb-3 border-b border-border/50 bg-muted/10 overflow-x-auto scrollbar-hide">
-                <div className="flex items-center gap-1.5 min-w-max">
-                    <button className="h-7 px-3 rounded-full bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary whitespace-nowrap">
+                <div className="flex items-center gap-2 min-w-max">
+                    <button className="h-10 px-4 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-black uppercase tracking-wider text-primary whitespace-nowrap">
                         Solo en Venta
                     </button>
-                    <button className="h-7 px-3 rounded-full bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                    <button className="h-10 px-4 rounded-full bg-secondary/50 border border-border/50 text-[10px] font-black uppercase tracking-wider text-muted-foreground whitespace-nowrap">
                         Etapa 1
                     </button>
-                    <button className="h-7 px-3 rounded-full bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground whitespace-nowrap">
+                    <button className="h-10 px-4 rounded-full bg-secondary/50 border border-border/50 text-[10px] font-black uppercase tracking-wider text-muted-foreground whitespace-nowrap">
                         Tokenizado
                     </button>
-                    <div className="h-3 w-px bg-border/50 mx-1" />
-                    <button className="h-7 px-3 rounded-full bg-secondary/30 text-[9px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                        <Filter className="w-2.5 h-2.5" /> Más Filtros
+                    <div className="h-4 w-px bg-border/50 mx-1" />
+                    <button className="h-10 px-4 rounded-full bg-secondary/30 text-[10px] font-black uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                        <Filter className="w-3 h-3" /> Más Filtros
                     </button>
                 </div>
             </div>
@@ -89,7 +89,7 @@ export default function ProjectUnitsPage() {
                             : 'bg-card border-border/40 hover:border-primary/30 shadow-sm'
                         }`}
                     >
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center justify-between mb-1">
                             <div className="flex gap-4 items-center">
                                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg transition-colors ${
                                     selectedUnitId === unit.id ? 'bg-primary text-white shadow-lg shadow-primary/30' : 'bg-muted/30 text-[#3B2146] border border-border/50'
@@ -104,16 +104,6 @@ export default function ProjectUnitsPage() {
                                 </div>
                             </div>
 
-                            {unit.isTokenized && unit.negotiatedAmount && (
-                                <div className="flex flex-col items-center mx-2 min-w-max">
-                                    <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Tokens en venta</span>
-                                    <div className="w-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white py-1.5 px-3 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center gap-1">
-                                        <span className="text-[14px] font-black leading-none">{unit.negotiatedAmount}</span>
-                                        <span className="text-[8px] font-black leading-none opacity-80 uppercase tracking-tighter">USDT</span>
-                                    </div>
-                                </div>
-                            )}
-
                             <div className="text-right">
                                 <div className="text-[17px] font-black text-[#3B2146] leading-tight">{unit.price}</div>
                                 <div className={`text-[10px] font-black uppercase mt-1 ${unit.status === 'Disponible' ? 'text-brand-green' : 'text-primary'}`}>
@@ -123,20 +113,31 @@ export default function ProjectUnitsPage() {
                         </div>
 
                         {unit.isTokenized && (
-                            <div className="mt-2 space-y-2">
-                                <div className="flex justify-between items-end">
-                                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Progreso de Venta</span>
-                                    <span className="text-[11px] font-black text-primary">
-                                        {unit.tokensSold ?? 0} / {unit.totalTokens ?? 0} 
-                                        <span className="text-muted-foreground text-[9px] font-bold ml-1">TOKENS</span>
-                                    </span>
+                            <div className="mt-4 flex items-end gap-6">
+                                <div className="flex-1 space-y-2">
+                                    <div className="flex justify-between items-end">
+                                        <span className="text-[11px] font-black text-primary">
+                                            {unit.tokensSold ?? 0} / {unit.totalTokens ?? 0} 
+                                            <span className="text-muted-foreground text-[9px] font-bold ml-1 uppercase">Tokens</span>
+                                        </span>
+                                    </div>
+                                    <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                                        <div 
+                                            className="h-full bg-primary transition-all duration-1000" 
+                                            style={{ width: `${((unit.tokensSold ?? 0) / (unit.totalTokens ?? 1)) * 100}%` }}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                                    <div 
-                                        className="h-full bg-primary transition-all duration-1000" 
-                                        style={{ width: `${((unit.tokensSold ?? 0) / (unit.totalTokens ?? 1)) * 100}%` }}
-                                    />
-                                </div>
+                                
+                                {unit.negotiatedAmount && (
+                                    <div className="flex flex-col items-center gap-1.5 shrink-0">
+                                        <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest leading-none">Tokens en venta</span>
+                                        <div className="bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white py-1.5 px-3 rounded-full shadow-md shadow-brand-green/20 flex items-center gap-1.5">
+                                            <span className="text-[13px] font-black leading-none">{unit.negotiatedAmount}</span>
+                                            <span className="text-[8px] font-black leading-none opacity-80 uppercase tracking-tighter">USDT</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

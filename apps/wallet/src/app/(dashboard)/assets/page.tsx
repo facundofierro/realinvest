@@ -18,6 +18,7 @@ export default function AssetsPage() {
   const myTokens = [
     { 
         id: "1",
+        unitId: "12A",
         tokenName: "VEX-TORRE-L-12-A",
         projectName: "Torre Libertador 8000", 
         location: "Nuñez, BA", 
@@ -26,10 +27,12 @@ export default function AssetsPage() {
         change: "+5.2%", 
         marketPrice: "104.00",
         orderPrice: "100.00",
-        color: "bg-blue-500" 
+        color: "bg-blue-500",
+        borderColor: "border-blue-500" 
     },
     { 
         id: "2",
+        unitId: "P1",
         tokenName: "VEX-CEIBO-P1-04",
         projectName: "Barrio El Ceibo", 
         location: "Pilar, BA", 
@@ -38,10 +41,12 @@ export default function AssetsPage() {
         change: "+12.1%", 
         marketPrice: "11.00",
         orderPrice: null,
-        color: "bg-emerald-500" 
+        color: "bg-emerald-500",
+        borderColor: "border-emerald-500" 
     },
     { 
         id: "3",
+        unitId: "JR",
         tokenName: "VEX-OFFICE-JR-02",
         projectName: "Complex Office Jr", 
         location: "Palermo, BA", 
@@ -50,7 +55,8 @@ export default function AssetsPage() {
         change: "+1.8%", 
         marketPrice: "125.00",
         orderPrice: "118.00",
-        color: "bg-orange-500" 
+        color: "bg-orange-500",
+        borderColor: "border-orange-500" 
     }
   ];
 
@@ -122,57 +128,48 @@ export default function AssetsPage() {
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
             <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Mis Tokens</h2>
-            <Button variant="ghost" size="icon" className="h-6 w-6">
-                <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-            </Button>
         </div>
         
-        <div className="space-y-3">
+        <div className="space-y-4">
             {myTokens.map((asset) => (
-                <Card key={asset.id} className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all group">
-                    <CardContent className="p-0">
-                        <Link href={`/project/${asset.id}`} className="flex items-stretch">
-                            <div className={cn("w-1.5", asset.color)} />
-                            <div className="p-4 flex-1">
-                                <div className="flex items-start justify-between mb-3">
-                                    <div className="space-y-0.5">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-mono text-[11px] font-bold bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
-                                                {asset.tokenName}
-                                            </span>
-                                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-emerald-100 bg-emerald-50 text-emerald-600 font-bold">
-                                                {asset.change}
-                                            </Badge>
-                                        </div>
-                                        <h3 className="font-bold text-sm text-foreground">{asset.projectName}</h3>
-                                        <p className="text-[10px] text-muted-foreground flex items-center">
-                                            <Building2 className="h-3 w-3 mr-1" /> {asset.location}
-                                        </p>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="font-bold text-base tracking-tight">$ {asset.value}</div>
-                                        <div className="text-[10px] text-muted-foreground font-medium">{asset.tokens} Tokens</div>
-                                    </div>
+                <Card key={asset.id} className="overflow-hidden border border-border/40 shadow-sm hover:shadow-md transition-all group rounded-[28px] bg-card">
+                    <CardContent className="p-5">
+                        <div className="grid grid-cols-[1fr_120px] items-center gap-x-6">
+                            <div className="flex gap-4 items-center min-w-0">
+                                <div className={cn(
+                                    "w-11 h-11 rounded-xl flex items-center justify-center font-black text-base transition-colors shrink-0",
+                                    "bg-muted/30 text-[#3B2146] border border-border/50"
+                                )}>
+                                    {asset.unitId}
                                 </div>
-                                
-                                <div className="flex items-center justify-between pt-3 border-t border-muted/50">
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] text-muted-foreground uppercase font-bold tracking-tighter">Precio de Mercado</span>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs font-bold text-brand-green">${asset.marketPrice}</span>
-                                            {asset.orderPrice && (
-                                                <Badge className="bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[9px] px-1.5 py-0 h-4 font-bold">
-                                                    Posición: ${asset.orderPrice}
-                                                </Badge>
-                                            )}
-                                        </div>
+                                <div className="min-w-0">
+                                    <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight truncate">
+                                        {asset.tokenName}
                                     </div>
-                                    <Button variant="ghost" size="sm" className="h-8 px-2 text-xs text-primary font-bold group-hover:bg-primary/5">
-                                        Operar <ChevronRight className="h-3 w-3 ml-1" />
-                                    </Button>
+                                    <div className="flex items-center gap-2 mt-0.5">
+                                        <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase truncate">
+                                            {asset.projectName}
+                                        </div>
+                                        <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 border-brand-green/20 bg-brand-green/10 text-brand-green font-black shrink-0">
+                                            {asset.change}
+                                        </Badge>
+                                    </div>
+                                    <p className="text-[10px] font-bold text-muted-foreground/60 flex items-center tracking-widest uppercase mt-0.5">
+                                        <Building2 className="h-2.5 w-2.5 mr-1" /> {asset.location}
+                                    </p>
                                 </div>
                             </div>
-                        </Link>
+
+                            <div className="flex flex-col items-end text-right">
+                                <div className="text-xl font-black text-[#3B2146] tracking-tighter">$ {asset.value}</div>
+                                <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">{asset.tokens} Tokens</div>
+                                {asset.orderPrice && (
+                                    <Badge className="mt-1 bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[9px] px-2 py-0.5 h-auto font-black uppercase tracking-tighter">
+                                        Posición: ${asset.orderPrice}
+                                    </Badge>
+                                )}
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             ))}
