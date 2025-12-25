@@ -21,13 +21,14 @@ interface Unit {
     isTokenized: boolean;
     area: string;
     orientation: string;
+    negotiatedAmount?: string;
 }
 
 const UNITS: Unit[] = [
-    { id: "101", type: "2 Amb", floor: "1", status: "Disponible", price: "$125,000", tokenName: "RIV-LIB8000-101", totalTokens: 1250, tokensSold: 450, isTokenized: true, area: "55m²", orientation: "Norte" },
-    { id: "402", type: "3 Amb", floor: "4", status: "Vendido", price: "$210,000", tokenName: "RIV-LIB8000-402", totalTokens: 2100, tokensSold: 2100, isTokenized: true, area: "85m²", orientation: "Sur" },
+    { id: "101", type: "2 Amb", floor: "1", status: "Disponible", price: "$125,000", tokenName: "RIV-LIB8000-101", totalTokens: 1250, tokensSold: 450, isTokenized: true, area: "55m²", orientation: "Norte", negotiatedAmount: "125K" },
+    { id: "402", type: "3 Amb", floor: "4", status: "Vendido", price: "$210,000", tokenName: "RIV-LIB8000-402", totalTokens: 2100, tokensSold: 2100, isTokenized: true, area: "85m²", orientation: "Sur", negotiatedAmount: "900K" },
     { id: "805", type: "Studio", floor: "8", status: "Disponible", price: "$95,000", isTokenized: false, area: "35m²", orientation: "Este" },
-    { id: "1201", type: "Penth.", floor: "12", status: "Vendido", price: "$450,000", tokenName: "RIV-LIB8000-1201", totalTokens: 4500, tokensSold: 4500, isTokenized: true, area: "145m²", orientation: "Norte" },
+    { id: "1201", type: "Penth.", floor: "12", status: "Vendido", price: "$450,000", tokenName: "RIV-LIB8000-1201", totalTokens: 4500, tokensSold: 4500, isTokenized: true, area: "145m²", orientation: "Norte", negotiatedAmount: "5M" },
     { id: "302", type: "2 Amb", floor: "3", status: "Disponible", price: "$130,000", isTokenized: false, area: "58m²", orientation: "Oeste" },
 ];
 
@@ -102,6 +103,16 @@ export default function ProjectUnitsPage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {unit.isTokenized && unit.negotiatedAmount && (
+                                <div className="flex flex-col items-center mx-2 min-w-max">
+                                    <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Tokens en venta...</span>
+                                    <div className="w-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white text-[10px] font-black py-1 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center">
+                                        {unit.negotiatedAmount} USDT
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="text-right">
                                 <div className="text-[17px] font-black text-[#3B2146] leading-tight">{unit.price}</div>
                                 <div className={`text-[10px] font-black uppercase mt-1 ${unit.status === 'Disponible' ? 'text-brand-green' : 'text-primary'}`}>
