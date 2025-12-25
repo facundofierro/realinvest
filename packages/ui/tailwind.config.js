@@ -37,7 +37,9 @@ module.exports = {
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
-  			}
+  			},
+  			'brand-green': '#6CDA33',
+  			'brand-pink': '#FF3366',
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

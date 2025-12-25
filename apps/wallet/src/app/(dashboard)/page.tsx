@@ -34,7 +34,7 @@ export default function DashboardPage() {
             <div className="space-y-1">
                 <span className="text-primary-foreground/80 text-sm font-medium">Balance Total</span>
                  <div className="text-4xl font-bold tracking-tighter">$ 124,500.00</div>
-                 <div className="flex items-center text-accent text-sm font-medium">
+                 <div className="flex items-center text-brand-green text-sm font-medium">
                     <TrendingUp className="h-4 w-4 mr-1" />
                     +12.5% este mes
                  </div>
