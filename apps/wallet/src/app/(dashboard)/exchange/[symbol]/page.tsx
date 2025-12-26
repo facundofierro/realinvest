@@ -375,8 +375,8 @@ export default function ExchangeTokenPage() {
   const price = token.priceUsd;
 
   return (
-    <div className="flex flex-col pb-24 min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white px-4 py-5 rounded-b-[40px] shadow-xl border-none overflow-hidden">
+    <div className="flex flex-col pb-24 min-h-screen duration-500 bg-background animate-in fade-in slide-in-from-bottom-4">
+      <header className="overflow-hidden sticky top-0 z-50 px-4 pt-8 pb-6 text-white from-gray-900 rounded-none border-none shadow-xl bg-linear-to-br via-slate-900 to-violet-950">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
         <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10"></div>
 

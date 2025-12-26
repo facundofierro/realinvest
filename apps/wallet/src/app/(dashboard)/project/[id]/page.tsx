@@ -1,5 +1,4 @@
 import { Button } from "@repo/ui/components/ui/button";
-import { GradientButton } from "@repo/ui/components/ui/gradient-button";
 import { Badge } from "@repo/ui/components/ui/badge";
 import {
   Tabs,
@@ -10,26 +9,15 @@ import {
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@repo/ui/components/ui/card";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@repo/ui/components/ui/avatar";
 import {
   ArrowLeft,
   MapPin,
   Calendar,
-  FileText,
-  Info,
   ChevronRight,
   ShoppingBag,
   Layers,
   Home,
-  Play,
   Maximize2,
   TrendingUp,
   BarChart3,
@@ -38,10 +26,8 @@ import {
   Wallet,
   Building2,
   ArrowUpRight,
-  Download,
-  Calculator,
-  X,
   Heart,
+  Calculator,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -99,49 +85,6 @@ const STAGES = [
   },
 ];
 
-const UNITS = [
-  {
-    id: "101",
-    type: "2 Amb",
-    floor: "1",
-    status: "Disponible",
-    price: "$125,000",
-    tokens: 1250,
-  },
-  {
-    id: "402",
-    type: "3 Amb",
-    floor: "4",
-    status: "Vendido",
-    price: "$210,000",
-    tokens: 2100,
-  },
-  {
-    id: "805",
-    type: "Studio",
-    floor: "8",
-    status: "Disponible",
-    price: "$95,000",
-    tokens: 950,
-  },
-  {
-    id: "1201",
-    type: "Penth.",
-    floor: "12",
-    status: "Reservado",
-    price: "$450,000",
-    tokens: 4500,
-  },
-  {
-    id: "302",
-    type: "2 Amb",
-    floor: "3",
-    status: "Disponible",
-    price: "$130,000",
-    tokens: 1300,
-  },
-];
-
 export default async function ProjectPage({
   params,
   searchParams,
@@ -151,7 +94,7 @@ export default async function ProjectPage({
     | { returnTo?: string }
     | Promise<{ returnTo?: string }>;
 }) {
-  await params;
+  const { id } = await params;
   const resolvedSearchParams =
     await searchParams;
   const returnToRaw =
@@ -432,7 +375,7 @@ export default async function ProjectPage({
                   Mapa General del
                   Proyecto
                 </h4>
-                <Card className="overflow-hidden relative border-border/50 bg-white group">
+                <Card className="overflow-hidden relative bg-white border-border/50 group">
                   <Image
                     src="/building_floor_layout.png"
                     alt="Site Plan"
