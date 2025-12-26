@@ -144,10 +144,23 @@ const UNITS = [
 
 export default async function ProjectPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?:
+    | { returnTo?: string }
+    | Promise<{ returnTo?: string }>;
 }) {
-  const { id } = await params;
+  await params;
+  const resolvedSearchParams =
+    await searchParams;
+  const returnToRaw =
+    resolvedSearchParams?.returnTo;
+  const backHref =
+    typeof returnToRaw === "string" &&
+    returnToRaw.startsWith("/")
+      ? returnToRaw
+      : "/dashboard";
 
   return (
     <div className="relative pb-32 min-h-screen bg-background">
@@ -163,7 +176,7 @@ export default async function ProjectPage({
         <div className="absolute inset-0 to-transparent bg-linear-to-t from-background via-background/80" />
 
         <Link
-          href="/dashboard"
+          href={backHref}
           className="absolute top-4 left-4 z-10 p-2 text-white rounded-full border backdrop-blur-md transition-colors bg-background/30 hover:bg-background/50 border-white/10"
         >
           <ArrowLeft className="w-6 h-6" />

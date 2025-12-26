@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
 import { cn } from "@repo/ui/lib/utils";
@@ -188,6 +189,7 @@ const INITIAL_POSITIONS: PositionData[] =
   ];
 
 export default function ExchangePage() {
+  const router = useRouter();
   const [tokens, setTokens] = useState<
     TokenData[]
   >(INITIAL_TOKENS);
@@ -298,7 +300,7 @@ export default function ExchangePage() {
         <div className="flex gap-4 items-center min-w-0">
           <div
             className={cn(
-              "w-12 h-12 rounded-2xl flex items-center justify-center font-black text-base transition-colors shrink-0",
+              "w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs transition-colors shrink-0",
               selectedTokenId ===
                 token.id
                 ? "bg-primary text-white shadow-lg shadow-primary/30"
@@ -317,42 +319,44 @@ export default function ExchangePage() {
           </div>
         </div>
 
-        <div className="text-right shrink-0">
-          <div className="text-[16px] font-black text-[#3B2146] leading-tight">
-            ${token.price.toFixed(2)}
-          </div>
-          <div
-            className={`text-[10px] font-black uppercase mt-0.5 flex items-center justify-end ${token.changeAll >= 0 ? "text-brand-green" : "text-brand-pink"}`}
-          >
-            {token.changeAll >= 0
-              ? "+"
-              : ""}
-            {token.changeAll}%
+        <div className="flex gap-3 items-center shrink-0">
+          {(token.buyPrice ||
+            token.sellPrice) && (
+            <div className="flex flex-col gap-1 items-end">
+              {token.sellPrice && (
+                <Badge className="bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto">
+                  $
+                  {token.sellPrice.toFixed(
+                    2
+                  )}
+                </Badge>
+              )}
+              {token.buyPrice && (
+                <Badge className="bg-brand-green/10 text-brand-green border-brand-green/20 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto">
+                  $
+                  {token.buyPrice.toFixed(
+                    2
+                  )}
+                </Badge>
+              )}
+            </div>
+          )}
+
+          <div className="text-right">
+            <div className="text-[16px] font-black text-[#3B2146] leading-tight">
+              ${token.price.toFixed(2)}
+            </div>
+            <div
+              className={`text-[10px] font-black uppercase mt-0.5 flex items-center justify-end ${token.changeAll >= 0 ? "text-brand-green" : "text-brand-pink"}`}
+            >
+              {token.changeAll >= 0
+                ? "+"
+                : ""}
+              {token.changeAll}%
+            </div>
           </div>
         </div>
       </div>
-
-      {(token.buyPrice ||
-        token.sellPrice) && (
-        <div className="flex gap-2 justify-end mt-3">
-          {token.sellPrice && (
-            <Badge className="bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-tighter border h-auto">
-              Venta: $
-              {token.sellPrice.toFixed(
-                2
-              )}
-            </Badge>
-          )}
-          {token.buyPrice && (
-            <Badge className="bg-brand-green/10 text-brand-green border-brand-green/20 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-tighter border h-auto">
-              Compra: $
-              {token.buyPrice.toFixed(
-                2
-              )}
-            </Badge>
-          )}
-        </div>
-      )}
     </div>
   );
 
@@ -762,27 +766,24 @@ export default function ExchangePage() {
                         selectedToken.name
                       }
                     </span>
-                    <Badge className="bg-brand-green/20 text-brand-green border-0 text-[9px] font-black uppercase">
-                      DISPONIBLE
-                    </Badge>
                   </div>
                   <h3 className="text-xl font-black text-foreground">
                     {
                       selectedToken.project
                     }
                   </h3>
-                  <div className="flex items-center gap-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                    <span className="flex gap-1 items-center">
-                      <Layers className="w-3 h-3" />{" "}
+                  <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                    <span className="flex gap-1.5 items-center">
+                      <MapPin className="w-3.5 h-3.5" />{" "}
+                      Nuñez, BA
+                    </span>
+                    <span className="flex gap-1.5 items-center">
+                      <Layers className="w-3.5 h-3.5" />{" "}
                       ROI Est:{" "}
                       {
                         selectedToken.roi
                       }
                       %
-                    </span>
-                    <span className="flex gap-1 items-center">
-                      <MapPin className="w-3 h-3" />{" "}
-                      Nuñez, BA
                     </span>
                   </div>
                 </div>
@@ -803,16 +804,62 @@ export default function ExchangePage() {
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  className="flex-1 h-14 text-xs font-black tracking-widest uppercase rounded-2xl border-white/10 hover:bg-white/5"
+                  className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
+                  onClick={() => {
+                    const symbol =
+                      encodeURIComponent(
+                        selectedToken.name
+                      );
+                    const returnTo =
+                      encodeURIComponent(
+                        `/exchange/${symbol}`
+                      );
+                    router.push(
+                      `/project/1?returnTo=${returnTo}`
+                    );
+                  }}
                 >
-                  <Info className="mr-2 w-4 h-4" />{" "}
-                  Detalles
+                  PROYECTO
                 </Button>
-                <Button className="flex-[1.5] h-14 rounded-2xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-xs">
-                  Comprar Ahora
+                <Button
+                  disabled={
+                    !positions.some(
+                      (p) =>
+                        p.tokenName ===
+                          selectedToken.name &&
+                        p.filledAmount >
+                          0
+                    )
+                  }
+                  className="flex-1 h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px] disabled:opacity-30 disabled:scale-100"
+                  onClick={() => {
+                    const symbol =
+                      encodeURIComponent(
+                        selectedToken.name
+                      );
+                    router.push(
+                      `/exchange/${symbol}`
+                    );
+                  }}
+                >
+                  VENDER
+                </Button>
+                <Button
+                  className="flex-[1.5] h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
+                  onClick={() => {
+                    const symbol =
+                      encodeURIComponent(
+                        selectedToken.name
+                      );
+                    router.push(
+                      `/exchange/${symbol}`
+                    );
+                  }}
+                >
+                  COMPRAR
                 </Button>
               </div>
             </div>
