@@ -1,6 +1,12 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "HOST",
+    "LOG_LEVEL",
+    "PORT",
+    "RIPIO_MOCK_DATA_DIR"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

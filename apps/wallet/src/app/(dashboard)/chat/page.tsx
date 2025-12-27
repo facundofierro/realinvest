@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
 import { Send, Bot, User, Search, Settings } from "lucide-react";
-import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/components/ui/avatar";
 
 export default function ChatPage() {

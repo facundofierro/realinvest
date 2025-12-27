@@ -7,11 +7,8 @@ import {
   Building2,
   Wallet,
   TrendingUp,
-  Tag,
   ArrowUpRight,
   ArrowDownLeft,
-  ChevronRight,
-  MoreHorizontal,
 } from "lucide-react";
 import { Badge } from "@repo/ui/components/ui/badge";
 import Link from "next/link";

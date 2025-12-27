@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Real Invest Wallet
 
-## Getting Started
+The **Wallet** application is the core investment and portfolio management interface for the Real Invest platform. It allows users to track their holdings, invest in real estate projects, and manage their transactions.
 
-First, run the development server:
+## 🚀 Getting Started
+
+This project is part of a monorepo managed by **pnpm** and **Turborepo**.
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (>= 18)
+- [pnpm](https://pnpm.io/) (>= 9.0.0)
+
+### Installation
+
+To install dependencies for the entire monorepo, run from the root:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To start the development server for the wallet app:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# From the root of the monorepo
+pnpm dev --filter wallet
 
-## Learn More
+# Or from this directory
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+The application will be available at `http://localhost:3000`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The source code is located in the `src` directory and follows the Next.js App Router convention:
 
-## Deploy on Vercel
+```text
+src/
+├── app/                  # Next.js App Router (Routes, Layouts, APIs)
+│   ├── (auth)/           # Authentication-related routes (e.g., login)
+│   ├── (dashboard)/      # Core application features (protected routes)
+│   │   ├── assets/       # Portfolio assets view
+│   │   ├── chat/         # Support or communication channel
+│   │   ├── deposit/      # Wallet funding flow
+│   │   ├── exchange/     # Token exchange and trading
+│   │   ├── invest/       # Project discovery and investment
+│   │   ├── project/      # Detailed project views
+│   │   └── withdraw/     # Fund withdrawal flow
+│   └── api/              # Internal API endpoints and route handlers
+├── components/           # Shared React components
+│   └── project/          # Components specific to project displays
+├── lib/                  # Utilities, constants, and helper functions
+├── sample-data/          # Mock data for development and testing
+└── types/                # TypeScript type definitions
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠 Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `pnpm dev`: Starts the development server.
+- `pnpm build`: Builds the application for production.
+- `pnpm start`: Starts the production server.
+- `pnpm lint`: Runs ESLint for code quality.
+
+## 🧰 Tech Stack
+
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **UI Components**: Shared library from `@repo/ui`
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Package Manager**: [pnpm](https://pnpm.io/)
+- **Monorepo Tooling**: [Turborepo](https://turbo.build/)
