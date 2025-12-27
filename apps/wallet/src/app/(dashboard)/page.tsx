@@ -59,7 +59,7 @@ const SIMILAR_PROJECTS = [
 
 export default function DashboardPage() {
   return (
-    <div className="p-4 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="p-4 space-y-6 duration-500 animate-in fade-in slide-in-from-bottom-4">
       {/* Header */}
       <header className="flex justify-between items-center">
         <div>
@@ -70,13 +70,13 @@ export default function DashboardPage() {
             Bienvenido de nuevo
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex gap-3 items-center">
           <Button
             variant="ghost"
             size="icon"
             className="rounded-full"
           >
-            <Bell className="h-5 w-5" />
+            <Bell className="w-5 h-5" />
           </Button>
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" />
@@ -88,20 +88,20 @@ export default function DashboardPage() {
       </header>
 
       {/* Balance Card */}
-      <Card className="bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white border-none shadow-xl relative overflow-hidden rounded-3xl">
+      <Card className="overflow-hidden relative text-white from-gray-900 rounded-3xl border-none shadow-xl bg-linear-to-br via-slate-900 to-violet-950">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
-        <div className="absolute -right-10 -top-10 h-32 w-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10"></div>
 
-        <CardContent className="p-6 space-y-4 relative z-10">
+        <CardContent className="relative z-10 p-6 space-y-4">
           <div className="space-y-1">
-            <span className="text-primary-foreground/80 text-sm font-medium">
+            <span className="text-sm font-medium text-primary-foreground/80">
               Balance Total
             </span>
             <div className="text-4xl font-bold tracking-tighter">
               $ 124,500.00
             </div>
-            <div className="flex items-center text-brand-green text-sm font-medium">
-              <TrendingUp className="h-4 w-4 mr-1" />
+            <div className="flex items-center text-sm font-medium text-brand-green">
+              <TrendingUp className="mr-1 w-4 h-4" />
               +12.5% este mes
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function DashboardPage() {
               asChild
             >
               <Link href="/deposit">
-                <ArrowDownLeft className="mr-2 h-4 w-4" />{" "}
+                <ArrowDownLeft className="mr-2 w-4 h-4" />{" "}
                 Ingresar
               </Link>
             </Button>
@@ -120,7 +120,7 @@ export default function DashboardPage() {
               asChild
             >
               <Link href="/withdraw">
-                <ArrowUpRight className="mr-2 h-4 w-4" />{" "}
+                <ArrowUpRight className="mr-2 w-4 h-4" />{" "}
                 Retirar
               </Link>
             </Button>
@@ -136,7 +136,7 @@ export default function DashboardPage() {
           </h2>
           <Link
             href="/invest"
-            className="text-sm text-primary font-medium hover:underline"
+            className="text-sm font-medium text-primary hover:underline"
           >
             Ver todas
           </Link>
@@ -156,18 +156,18 @@ export default function DashboardPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="flex items-center justify-between p-3 bg-card rounded-2xl shadow-sm border hover:bg-muted/50 transition-colors"
+              className="flex justify-between items-center p-3 rounded-2xl border shadow-sm transition-colors bg-card hover:bg-muted/50"
             >
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/10">
+              <div className="flex gap-3 items-center">
+                <div className="flex justify-center items-center w-10 h-10 rounded-2xl border bg-primary/10 text-primary border-primary/10">
                   {i === 1 ? (
-                    <ArrowDownLeft className="h-5 w-5" />
+                    <ArrowDownLeft className="w-5 h-5" />
                   ) : (
-                    <Building2 className="h-5 w-5" />
+                    <Building2 className="w-5 h-5" />
                   )}
                 </div>
                 <div>
-                  <p className="font-medium text-sm">
+                  <p className="text-sm font-medium">
                     {i === 1
                       ? "Depósito USD"
                       : "Compra Token Torre L."}
