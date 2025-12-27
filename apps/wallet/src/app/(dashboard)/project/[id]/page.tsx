@@ -1,3 +1,6 @@
+"use client";
+
+import { use } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Badge } from "@repo/ui/components/ui/badge";
 import {
@@ -10,6 +13,12 @@ import {
   Card,
   CardContent,
 } from "@repo/ui/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@repo/ui/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import {
   ArrowLeft,
   MapPin,
@@ -25,9 +34,9 @@ import {
   DollarSign,
   Wallet,
   Building2,
-  ArrowUpRight,
   Heart,
   Calculator,
+  Hammer,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -85,7 +94,7 @@ const STAGES = [
   },
 ];
 
-export default async function ProjectPage({
+export default function ProjectPage({
   params,
   searchParams,
 }: {
@@ -94,9 +103,11 @@ export default async function ProjectPage({
     | { returnTo?: string }
     | Promise<{ returnTo?: string }>;
 }) {
-  const { id } = await params;
+  const { id } = use(params);
   const resolvedSearchParams =
-    await searchParams;
+    searchParams instanceof Promise
+      ? use(searchParams)
+      : searchParams;
   const returnToRaw =
     resolvedSearchParams?.returnTo;
   const backHref =
@@ -159,89 +170,162 @@ export default async function ProjectPage({
           </div>
         </div>
 
-        {/* Key Metrics Dashboard */}
-        <div className="grid grid-cols-3 gap-3">
-          <Card className="overflow-hidden shadow-sm backdrop-blur-md transition-colors border-border/50 bg-card/60 group hover:border-primary/50">
-            <CardContent className="p-3 text-center">
-              <div className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">
-                ROI Est.
-              </div>
-              <div className="flex gap-1 justify-center items-center text-xl font-black text-brand-green">
-                12.4%{" "}
-                <ArrowUpRight className="w-3 h-3" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="overflow-hidden shadow-sm backdrop-blur-md transition-colors border-border/50 bg-card/60 group hover:border-primary/50">
-            <CardContent className="p-3 text-center">
-              <div className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">
-                Plazo
-              </div>
-              <div className="text-xl font-black text-foreground">
-                24 m
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="overflow-hidden shadow-sm backdrop-blur-md transition-colors border-border/50 bg-card/60 group hover:border-primary/50">
-            <CardContent className="p-3 text-center">
-              <div className="text-[10px] text-muted-foreground uppercase font-black tracking-widest mb-1">
-                Liquidez
-              </div>
-              <div className="flex gap-1 justify-center items-center text-xl font-black text-brand-green">
-                High
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Purchase Options Carousel */}
+        <Carousel
+          className="w-full"
+          opts={{
+            loop: true,
+          }}
+          plugins={[
+            Autoplay({
+              delay: 4000,
+            }),
+          ]}
+        >
+          <CarouselContent>
+            {/* 1. Comprar tokens de propiedad en lanzamiento */}
+            <CarouselItem>
+              <Card className="bg-linear-to-br from-primary/10 via-background to-secondary/5 border-primary/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
+                <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                  <ShoppingBag className="w-48 h-48 -rotate-12" />
+                </div>
+                <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="space-y-1">
+                      <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
+                        <Wallet className="w-5 h-5 text-primary" />
+                        Tokens en
+                        Lanzamiento
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                        Comprar tokens
+                        de propiedad en
+                        lanzamiento
+                      </p>
+                    </div>
+                    <Badge className="text-blue-500 bg-blue-500/10 border-blue-500/20">
+                      Nuevo
+                    </Badge>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                      Precio Inicial
+                    </span>
+                    <div className="text-2xl font-black text-foreground">
+                      $100.00
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CarouselItem>
 
-        {/* EXCHANGE GATEWAY */}
-        <Card className="bg-linear-to-br from-primary/10 via-background to-secondary/5 border-primary/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all">
-          <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-            <ShoppingBag className="w-48 h-48 -rotate-12" />
-          </div>
-          <CardContent className="relative z-10 p-5">
-            <div className="flex justify-between items-start mb-4">
-              <div className="space-y-1">
-                <h3 className="flex gap-2 items-center text-xl font-black text-foreground">
-                  <Wallet className="w-5 h-5 text-primary" />{" "}
-                  Mercado Secundario
-                </h3>
-                <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
-                  Comprá o vendé tokens
-                  de este proyecto ahora
-                </p>
-              </div>
-              <Badge className="animate-pulse bg-brand-green/10 text-brand-green border-brand-green/20">
-                Live
-              </Badge>
-            </div>
+            {/* 2. Comprar tokens con renta fija */}
+            <CarouselItem>
+              <Card className="bg-linear-to-br from-green-500/10 via-background to-secondary/5 border-green-500/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
+                <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                  <TrendingUp className="w-48 h-48 -rotate-12" />
+                </div>
+                <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="space-y-1">
+                      <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
+                        <DollarSign className="w-5 h-5 text-green-500" />
+                        Renta Fija
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                        Comprar tokens
+                        con renta fija
+                        garantizada
+                      </p>
+                    </div>
+                    <Badge className="text-green-500 bg-green-500/10 border-green-500/20">
+                      Estable
+                    </Badge>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                      Retorno Anual
+                    </span>
+                    <div className="text-2xl font-black text-foreground">
+                      12%
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CarouselItem>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                  Precio de Mercado
-                </span>
-                <div className="text-2xl font-black text-foreground">
-                  $114.20
+            {/* 3. Comprar propiedad en lanzamiento */}
+            <CarouselItem>
+              <Card className="bg-linear-to-br from-purple-500/10 via-background to-secondary/5 border-purple-500/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
+                <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                  <Home className="w-48 h-48 -rotate-12" />
                 </div>
-                <div className="text-[10px] text-brand-green font-bold">
-                  +2.4% vs Lanzamiento
+                <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="space-y-1">
+                      <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
+                        <Building2 className="w-5 h-5 text-purple-500" />
+                        Propiedad
+                        Completa
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                        Comprar
+                        propiedad entera
+                        en lanzamiento
+                      </p>
+                    </div>
+                    <Badge className="text-purple-500 bg-purple-500/10 border-purple-500/20">
+                      Exclusivo
+                    </Badge>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                      Desde
+                    </span>
+                    <div className="text-2xl font-black text-foreground">
+                      $120,000
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CarouselItem>
+
+            {/* 4. Comprar tokens de propiedad en construccion */}
+            <CarouselItem>
+              <Card className="bg-linear-to-br from-orange-500/10 via-background to-secondary/5 border-orange-500/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
+                <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                  <Layers className="w-48 h-48 -rotate-12" />
                 </div>
-              </div>
-              <div className="space-y-1 text-right">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                  Tokens en Venta
-                </span>
-                <div className="text-2xl font-black text-foreground">
-                  1,420
-                </div>
-                <div className="text-[10px] text-muted-foreground font-bold italic underline">
-                  Ver todas las órdenes
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="space-y-1">
+                      <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
+                        <Hammer className="w-5 h-5 text-orange-500" />
+                        En Construcción
+                      </h3>
+                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                        Comprar tokens
+                        de propiedad en
+                        construcción
+                      </p>
+                    </div>
+                    <Badge className="text-orange-500 bg-orange-500/10 border-orange-500/20">
+                      Oportunidad
+                    </Badge>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                      Plusvalía Est.
+                    </span>
+                    <div className="text-2xl font-black text-foreground">
+                      15%
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CarouselItem>
+          </CarouselContent>
+        </Carousel>
 
         {/* MAIN CONTENT TABS */}
         <Tabs
