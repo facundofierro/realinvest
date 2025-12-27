@@ -6,6 +6,8 @@
     "side": "BUY",
     "totalAmount": 400,
     "filledAmount": 220,
+    "openedAt": "2025-12-12T11:22:00.000Z",
+    "openedMarketPriceUsd": 1.2,
     "orderPriceUsd": 1.22,
     "marketPriceUsd": 1.25,
     "status": "PARTIALLY_FILLED"
@@ -14,12 +16,26 @@
     "id": "position-2",
     "tokenId": "token-3",
     "tokenSymbol": "VEX-VIVERO-A1-302",
-    "side": "SELL",
-    "totalAmount": 100,
+    "side": "BUY",
+    "totalAmount": 200,
     "filledAmount": 0,
-    "orderPriceUsd": 2.15,
+    "openedAt": "2025-12-18T09:30:00.000Z",
+    "openedMarketPriceUsd": 2.05,
+    "orderPriceUsd": 2.08,
     "marketPriceUsd": 2.1,
     "status": "OPEN"
+  },
+  {
+    "id": "position-3",
+    "tokenId": "token-4",
+    "tokenSymbol": "VEX-CASA-L4-211",
+    "side": "BUY",
+    "totalAmount": 1000,
+    "filledAmount": 450,
+    "openedAt": "2025-12-22T18:42:00.000Z",
+    "openedMarketPriceUsd": 1.01,
+    "orderPriceUsd": 1.03,
+    "marketPriceUsd": 1.05,
+    "status": "PARTIALLY_FILLED"
   }
 ]
-

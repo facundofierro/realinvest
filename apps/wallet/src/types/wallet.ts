@@ -92,6 +92,8 @@ export interface Position {
   side: PositionSide;
   totalAmount: number;
   filledAmount: number;
+  openedAt?: string;
+  openedMarketPriceUsd?: number;
   orderPriceUsd: number;
   marketPriceUsd: number;
   status: PositionStatus;

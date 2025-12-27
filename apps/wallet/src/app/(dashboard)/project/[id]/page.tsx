@@ -31,7 +31,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { ProjectStories } from "@/components/project/stories-section";
+import {
+  ProjectStories,
+  SimilarProjectsCarousel,
+} from "@/components/project/stories-section";
 
 const STORIES = [
   {
@@ -104,6 +107,47 @@ export default async function ProjectPage({
     returnToRaw.startsWith("/")
       ? returnToRaw
       : "/dashboard";
+
+  // Sample similar projects for the carousel
+  const SIMILAR_PROJECTS = [
+    {
+      id: "barrio-el-ceibo",
+      title:
+        'Barrio Privado "El Ceibo"',
+      location: "Pilar, Buenos Aires",
+      image:
+        "/projects/barrio-el-ceibo.png",
+      status: "PRE-VENTA",
+      roi: 18,
+      progress: 0,
+      priceRange: "$100K",
+      fixedRent: 18,
+    },
+    {
+      id: "residencial-las-heras",
+      title: "Residencial Las Heras",
+      location: "Recoleta, BSAS",
+      image:
+        "/projects/torre-libertador.png",
+      status: "EN CONSTRUCCION",
+      roi: 18,
+      progress: 85,
+      priceRange: "$150K",
+      fixedRent: 14,
+    },
+    {
+      id: "oficinas-madero",
+      title: "Oficinas Madero",
+      location: "Puerto Madero, CABA",
+      image:
+        "/projects/barrio-el-ceibo.png",
+      status: "COMPLETADO",
+      roi: 10,
+      progress: 100,
+      priceRange: "$250K+",
+      fixedRent: 8.5,
+    },
+  ];
 
   return (
     <div className="relative pb-32 min-h-screen bg-background">
@@ -192,6 +236,25 @@ export default async function ProjectPage({
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* SIMILAR PROJECTS CAROUSEL */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center px-2">
+            <h3 className="text-lg font-black tracking-tight">
+              Oportunidades Destacadas
+            </h3>
+            <Link
+              href="/invest"
+              className="text-xs font-bold text-primary hover:underline"
+            >
+              Ver todas
+            </Link>
+          </div>
+          <SimilarProjectsCarousel
+            projects={SIMILAR_PROJECTS}
+            delay={4000}
+          />
         </div>
 
         {/* EXCHANGE GATEWAY */}

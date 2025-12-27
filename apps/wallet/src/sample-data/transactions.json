@@ -4,7 +4,10 @@
     "type": "DEPOSIT",
     "status": "COMPLETED",
     "createdAt": "2025-12-10T14:05:00.000Z",
-    "amount": { "currencyCode": "USDT", "amount": 5000 },
+    "amount": {
+      "currencyCode": "USDT",
+      "amount": 5000
+    },
     "description": "Depósito USDT (TRC20)"
   },
   {
@@ -12,17 +15,62 @@
     "type": "BUY",
     "status": "COMPLETED",
     "createdAt": "2025-12-12T11:22:00.000Z",
-    "amount": { "currencyCode": "USDT", "amount": 1200 },
-    "description": "Compra VEX-TORRE-L-12-A"
+    "amount": {
+      "currencyCode": "USDT",
+      "amount": 1200
+    },
+    "description": "Compra VEX-ALAMOS-B3-522",
+    "metadata": {
+      "positionId": "position-1",
+      "tokenSymbol": "VEX-ALAMOS-B3-522",
+      "filledAmount": 200,
+      "priceUsd": 1.2
+    }
+  },
+  {
+    "id": "txn-4",
+    "type": "BUY",
+    "status": "COMPLETED",
+    "createdAt": "2025-12-15T16:10:00.000Z",
+    "amount": {
+      "currencyCode": "USDT",
+      "amount": 24
+    },
+    "description": "Fill parcial VEX-ALAMOS-B3-522",
+    "metadata": {
+      "positionId": "position-1",
+      "tokenSymbol": "VEX-ALAMOS-B3-522",
+      "filledAmount": 20,
+      "priceUsd": 1.2
+    }
   },
   {
     "id": "txn-3",
     "type": "WITHDRAWAL",
     "status": "PENDING",
     "createdAt": "2025-12-20T09:18:00.000Z",
-    "amount": { "currencyCode": "USDT", "amount": 750 },
+    "amount": {
+      "currencyCode": "USDT",
+      "amount": 750
+    },
     "description": "Retiro USDT (TRC20)",
     "metadata": { "network": "TRC20" }
+  },
+  {
+    "id": "txn-5",
+    "type": "BUY",
+    "status": "COMPLETED",
+    "createdAt": "2025-12-22T18:42:00.000Z",
+    "amount": {
+      "currencyCode": "USDT",
+      "amount": 454.5
+    },
+    "description": "Compra VEX-CASA-L4-211",
+    "metadata": {
+      "positionId": "position-3",
+      "tokenSymbol": "VEX-CASA-L4-211",
+      "filledAmount": 450,
+      "priceUsd": 1.01
+    }
   }
 ]
-

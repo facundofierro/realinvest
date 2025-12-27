@@ -1,29 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
-import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
 import { cn } from "@repo/ui/lib/utils";
 import {
   ArrowLeft,
   Search,
-  ArrowUpDown,
   TrendingUp,
-  TrendingDown,
   Star,
-  Settings2,
   LayoutGrid,
-  List,
-  Clock,
   CircleDollarSign,
-  ChevronDown,
   Filter,
-  Info,
   Layers,
   MapPin,
   X,
-  ChevronRight,
 } from "lucide-react";
 import {
   Card,
@@ -41,328 +36,459 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogFooter,
 } from "@repo/ui/components/ui/dialog";
-import { Checkbox } from "@repo/ui/components/ui/checkbox";
-import { Label } from "@repo/ui/components/ui/label";
+import type {
+  MarketToken,
+  Position,
+  Transaction,
+} from "@/types/wallet";
 
-interface TokenData {
-  id: string;
-  unitId?: string;
-  name: string;
-  project: string;
-  price: number;
-  marketCap: string;
-  change24h: number;
-  change7d: number;
-  change30d: number;
-  changeAll: number;
-  liveSince: string;
-  isFavorite: boolean;
-  tokensAvailable?: string;
-  roi?: string;
-  buyPrice?: number;
-  sellPrice?: number;
+type SortBy = "marketCap" | "change";
+type Timeframe =
+  | "24h"
+  | "7d"
+  | "30d"
+  | "all";
+
+function formatUsd(
+  value: number
+): string {
+  return value.toLocaleString(
+    undefined,
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  );
 }
 
-interface PositionData {
-  id: string;
-  tokenName: string;
-  totalAmount: number;
-  filledAmount: number;
-  orderPrice: number;
-  marketPrice: number;
-  logoColor: string;
+function getChangePct(
+  token: MarketToken,
+  timeframe: Timeframe
+): number {
+  if (timeframe === "24h")
+    return token.change24hPct;
+  if (timeframe === "7d")
+    return token.change7dPct;
+  if (timeframe === "30d")
+    return token.change30dPct;
+  return token.changeAllPct;
 }
 
-const INITIAL_TOKENS: TokenData[] = [
-  {
-    id: "1",
-    unitId: "522",
-    name: "VEX-ALAMOS-B3-522",
-    project: "Los Álamos T1",
-    price: 1.25,
-    marketCap: "520K",
-    change24h: 0.5,
-    change7d: 2.1,
-    change30d: 5.4,
-    changeAll: 12.4,
-    liveSince: "6 meses",
-    isFavorite: true,
-    tokensAvailable: "1,250",
-    roi: "12.4",
-    buyPrice: 1.25,
-    sellPrice: 1.24,
-  },
-  {
-    id: "2",
-    unitId: "105",
-    name: "VEX-HORIZON-T2-105",
-    project: "Horizonte T2",
-    price: 0.98,
-    marketCap: "840K",
-    change24h: -0.2,
-    change7d: -1.5,
-    change30d: -0.5,
-    changeAll: 4.2,
-    liveSince: "3 meses",
-    isFavorite: false,
-    tokensAvailable: "840",
-    roi: "8.2",
-    buyPrice: 0.98,
-    sellPrice: undefined,
-  },
-  {
-    id: "3",
-    unitId: "302",
-    name: "VEX-VIVERO-A1-302",
-    project: "Vivero BSAS",
-    price: 2.1,
-    marketCap: "1.2M",
-    change24h: 1.2,
-    change7d: 3.5,
-    change30d: 1.2,
-    changeAll: 8.9,
-    liveSince: "1 año",
-    isFavorite: false,
-    tokensAvailable: "600",
-    roi: "15.0",
-    buyPrice: undefined,
-    sellPrice: 2.08,
-  },
-  {
-    id: "4",
-    unitId: "211",
-    name: "VEX-CASA-L4-211",
-    project: "Casas Lomas",
-    price: 1.05,
-    marketCap: "310K",
-    change24h: -0.1,
-    change7d: 0.8,
-    change30d: 2.2,
-    changeAll: 5.1,
-    liveSince: "2 meses",
-    isFavorite: true,
-    tokensAvailable: "1,100",
-    roi: "10.5",
-    buyPrice: undefined,
-    sellPrice: undefined,
-  },
-];
+function getUnitLabelFromSymbol(
+  symbol: string
+): string {
+  const parts = symbol.split("-");
+  const last = parts.at(-1);
+  return last && last.length <= 6
+    ? last
+    : symbol.slice(0, 6).toUpperCase();
+}
 
-const INITIAL_POSITIONS: PositionData[] =
-  [
-    {
-      id: "1",
-      tokenName: "VEX-ALAMOS-B3-522",
-      totalAmount: 1000,
-      filledAmount: 450,
-      orderPrice: 1.22,
-      marketPrice: 1.25,
-      logoColor:
-        "from-blue-500 to-blue-600",
-    },
-    {
-      id: "2",
-      tokenName: "VEX-HORIZON-T2-105",
-      totalAmount: 500,
-      filledAmount: 500,
-      orderPrice: 0.97,
-      marketPrice: 0.98,
-      logoColor:
-        "from-emerald-500 to-emerald-600",
-    },
-    {
-      id: "3",
-      tokenName: "VEX-VIVERO-A1-302",
-      totalAmount: 200,
-      filledAmount: 0,
-      orderPrice: 2.08,
-      marketPrice: 2.1,
-      logoColor:
-        "from-purple-500 to-purple-600",
-    },
-  ];
+function isActivePosition(
+  position: Position
+): boolean {
+  return (
+    position.status === "OPEN" ||
+    position.status ===
+      "PARTIALLY_FILLED"
+  );
+}
 
 export default function ExchangePage() {
   const router = useRouter();
   const [tokens, setTokens] = useState<
-    TokenData[]
-  >(INITIAL_TOKENS);
+    MarketToken[]
+  >([]);
   const [positions, setPositions] =
-    useState<PositionData[]>(
-      INITIAL_POSITIONS
-    );
-  const [search, setSearch] =
-    useState("");
-  const [sortBy, setSortBy] = useState<
-    "marketCap" | "change"
-  >("marketCap");
+    useState<Position[]>([]);
+  const [
+    transactions,
+    setTransactions,
+  ] = useState<Transaction[]>([]);
+  const [sortBy, setSortBy] =
+    useState<SortBy>("marketCap");
   const [timeframe, setTimeframe] =
-    useState<
-      "24h" | "7d" | "30d" | "all"
-    >("all");
+    useState<Timeframe>("all");
   const [
     selectedTokenId,
     setSelectedTokenId,
   ] = useState<string | null>(null);
+  const [
+    selectedPositionId,
+    setSelectedPositionId,
+  ] = useState<string | null>(null);
+  const [
+    isOrderDetailsOpen,
+    setIsOrderDetailsOpen,
+  ] = useState(false);
+  const [
+    isClosingOrder,
+    setIsClosingOrder,
+  ] = useState(false);
+  const [loadError, setLoadError] =
+    useState<string | null>(null);
 
-  const toggleFavorite = (
-    id: string
-  ) => {
-    setTokens(
-      tokens.map((t) =>
-        t.id === id
-          ? {
-              ...t,
-              isFavorite: !t.isFavorite,
+  useEffect(() => {
+    const controller =
+      new AbortController();
+
+    async function load() {
+      try {
+        setLoadError(null);
+
+        const [
+          tokensRes,
+          positionsRes,
+          transactionsRes,
+        ] = await Promise.all([
+          fetch("/api/market/tokens", {
+            signal: controller.signal,
+          }),
+          fetch(
+            "/api/wallet/positions",
+            {
+              signal: controller.signal,
             }
-          : t
-      )
-    );
-  };
+          ),
+          fetch("/api/transactions", {
+            signal: controller.signal,
+          }),
+        ]);
 
-  const selectedToken = tokens.find(
-    (t) => t.id === selectedTokenId
-  );
+        if (!tokensRes.ok)
+          throw new Error(
+            "Failed to load tokens"
+          );
+        if (!positionsRes.ok)
+          throw new Error(
+            "Failed to load positions"
+          );
+        if (!transactionsRes.ok)
+          throw new Error(
+            "Failed to load transactions"
+          );
 
-  const filteredTokens = tokens
-    .filter(
-      (t) =>
-        t.name
-          .toLowerCase()
-          .includes(
-            search.toLowerCase()
-          ) ||
-        t.project
-          .toLowerCase()
-          .includes(
-            search.toLowerCase()
-          )
-    )
-    .sort((a, b) => {
-      if (sortBy === "marketCap") {
-        const valA = parseFloat(
-          a.marketCap
-            .replace("K", "")
-            .replace("M", "000")
+        const tokensJson =
+          (await tokensRes.json()) as {
+            tokens: MarketToken[];
+          };
+        const positionsJson =
+          (await positionsRes.json()) as {
+            positions: Position[];
+          };
+        const transactionsJson =
+          (await transactionsRes.json()) as {
+            transactions: Transaction[];
+          };
+
+        setTokens(
+          tokensJson.tokens ?? []
         );
-        const valB = parseFloat(
-          b.marketCap
-            .replace("K", "")
-            .replace("M", "000")
+        setPositions(
+          positionsJson.positions ?? []
         );
-        return valB - valA;
-      } else {
-        const getChange = (
-          t: TokenData
-        ) => {
-          if (timeframe === "24h")
-            return t.change24h;
-          if (timeframe === "7d")
-            return t.change7d;
-          if (timeframe === "30d")
-            return t.change30d;
-          return t.changeAll;
-        };
-        return (
-          getChange(b) - getChange(a)
+        setTransactions(
+          transactionsJson.transactions ??
+            []
+        );
+      } catch (error) {
+        if (controller.signal.aborted)
+          return;
+        setLoadError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load data"
         );
       }
-    });
+    }
 
-  const favorites = tokens.filter(
-    (t) => t.isFavorite
+    void load();
+    return () => controller.abort();
+  }, []);
+
+  const tokenBySymbol = useMemo(
+    () =>
+      new Map(
+        tokens.map((t) => [t.symbol, t])
+      ),
+    [tokens]
   );
+
+  const selectedToken = useMemo(
+    () =>
+      tokens.find(
+        (t) => t.id === selectedTokenId
+      ) ?? null,
+    [tokens, selectedTokenId]
+  );
+
+  const selectedPosition = useMemo(
+    () =>
+      positions.find(
+        (p) =>
+          p.id === selectedPositionId
+      ) ?? null,
+    [positions, selectedPositionId]
+  );
+
+  const filteredTokens = useMemo(() => {
+    const list = [...tokens];
+    list.sort((a, b) => {
+      if (sortBy === "marketCap")
+        return (
+          b.marketCapUsd -
+          a.marketCapUsd
+        );
+      return (
+        getChangePct(b, timeframe) -
+        getChangePct(a, timeframe)
+      );
+    });
+    return list;
+  }, [tokens, sortBy, timeframe]);
+
+  const favorites = useMemo(
+    () =>
+      tokens.filter(
+        (t) => t.isFavorite
+      ),
+    [tokens]
+  );
+
+  const activePositions = useMemo(
+    () =>
+      positions.filter(
+        isActivePosition
+      ),
+    [positions]
+  );
+
+  const summary = useMemo(() => {
+    const rows = activePositions.filter(
+      (p) => p.filledAmount > 0
+    );
+    const totalValueUsd = rows.reduce(
+      (acc, p) =>
+        acc +
+        p.filledAmount *
+          p.marketPriceUsd,
+      0
+    );
+    const totalCostUsd = rows.reduce(
+      (acc, p) => {
+        const opened =
+          p.openedMarketPriceUsd ??
+          p.orderPriceUsd;
+        return (
+          acc + p.filledAmount * opened
+        );
+      },
+      0
+    );
+    const totalGainUsd = rows.reduce(
+      (acc, p) => {
+        const opened =
+          p.openedMarketPriceUsd ??
+          p.orderPriceUsd;
+        const raw =
+          p.marketPriceUsd - opened;
+        const gain =
+          (p.side === "SELL"
+            ? -raw
+            : raw) * p.filledAmount;
+        return acc + gain;
+      },
+      0
+    );
+    const gainPct =
+      totalCostUsd > 0
+        ? (totalGainUsd /
+            totalCostUsd) *
+          100
+        : 0;
+    return {
+      totalValueUsd,
+      totalGainUsd,
+      gainPct,
+    };
+  }, [activePositions]);
+
+  const selectedPositionTransactions =
+    useMemo(() => {
+      if (!selectedPositionId)
+        return [];
+      return transactions.filter(
+        (t) => {
+          const meta = t.metadata as
+            | Record<string, unknown>
+            | undefined;
+          return (
+            meta?.positionId ===
+            selectedPositionId
+          );
+        }
+      );
+    }, [
+      transactions,
+      selectedPositionId,
+    ]);
+
+  async function closeSelectedOrder() {
+    if (!selectedPosition) return;
+    if (
+      !isActivePosition(
+        selectedPosition
+      )
+    )
+      return;
+    if (isClosingOrder) return;
+
+    try {
+      setIsClosingOrder(true);
+      const res = await fetch(
+        "/api/wallet/positions",
+        {
+          method: "POST",
+          headers: {
+            "content-type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            positionId:
+              selectedPosition.id,
+          }),
+        }
+      );
+      if (!res.ok)
+        throw new Error(
+          "Failed to close order"
+        );
+
+      setPositions((prev) =>
+        prev.map((p) =>
+          p.id === selectedPosition.id
+            ? {
+                ...p,
+                status: "CANCELLED",
+              }
+            : p
+        )
+      );
+      setSelectedPositionId(null);
+      setIsOrderDetailsOpen(false);
+    } finally {
+      setIsClosingOrder(false);
+    }
+  }
 
   const TokenRow = ({
     token,
   }: {
-    token: TokenData;
-  }) => (
-    <div
-      key={token.id}
-      onClick={() =>
-        setSelectedTokenId(token.id)
-      }
-      className={cn(
-        "flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border",
-        selectedTokenId === token.id
-          ? "bg-white border-primary shadow-xl scale-[1.02] z-10 relative"
-          : "bg-card border-border/40 hover:border-primary/30 shadow-sm"
-      )}
-    >
-      <div className="flex gap-4 justify-between items-center">
-        <div className="flex gap-4 items-center min-w-0">
-          <div
-            className={cn(
-              "w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs transition-colors shrink-0",
-              selectedTokenId ===
-                token.id
-                ? "bg-primary text-white shadow-lg shadow-primary/30"
-                : "bg-muted/30 text-[#3B2146] border border-border/50"
-            )}
-          >
-            {token.unitId || token.id}
-          </div>
-          <div className="min-w-0">
-            <div className="font-black text-[14px] uppercase text-[#3B2146] leading-tight truncate">
-              {token.name}
-            </div>
-            <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5 truncate">
-              {token.project}
-            </div>
-          </div>
-        </div>
+    token: MarketToken;
+  }) => {
+    const unitLabel =
+      token.unitId ??
+      getUnitLabelFromSymbol(
+        token.symbol
+      );
+    const change = getChangePct(
+      token,
+      timeframe
+    );
+    const isUp = change >= 0;
 
-        <div className="flex gap-3 items-center shrink-0">
-          {(token.buyPrice ||
-            token.sellPrice) && (
-            <div className="flex flex-col gap-1 items-end">
-              {token.sellPrice && (
-                <Badge className="bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto">
-                  $
-                  {token.sellPrice.toFixed(
-                    2
-                  )}
-                </Badge>
-              )}
-              {token.buyPrice && (
-                <Badge className="bg-brand-green/10 text-brand-green border-brand-green/20 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto">
-                  $
-                  {token.buyPrice.toFixed(
-                    2
-                  )}
-                </Badge>
-              )}
-            </div>
-          )}
-
-          <div className="text-right">
-            <div className="text-[16px] font-black text-[#3B2146] leading-tight">
-              ${token.price.toFixed(2)}
-            </div>
+    return (
+      <div
+        key={token.id}
+        onClick={() => {
+          setSelectedTokenId(token.id);
+          setSelectedPositionId(null);
+        }}
+        className={cn(
+          "flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border",
+          selectedTokenId === token.id
+            ? "bg-white border-primary shadow-xl scale-[1.02] z-10 relative"
+            : "bg-card border-border/40 hover:border-primary/30 shadow-sm"
+        )}
+      >
+        <div className="flex gap-4 justify-between items-center">
+          <div className="flex gap-4 items-center min-w-0">
             <div
-              className={`text-[10px] font-black uppercase mt-0.5 flex items-center justify-end ${token.changeAll >= 0 ? "text-brand-green" : "text-brand-pink"}`}
+              className={cn(
+                "w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs transition-colors shrink-0",
+                selectedTokenId ===
+                  token.id
+                  ? "bg-primary text-white shadow-lg shadow-primary/30"
+                  : "bg-muted/30 text-[#3B2146] border border-border/50"
+              )}
             >
-              {token.changeAll >= 0
-                ? "+"
-                : ""}
-              {token.changeAll}%
+              {unitLabel}
+            </div>
+            <div className="min-w-0">
+              <div className="font-black text-[14px] uppercase text-[#3B2146] leading-tight truncate">
+                {token.symbol}
+              </div>
+              <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5 truncate">
+                {token.projectTitle}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3 items-center shrink-0">
+            {(token.buyPriceUsd ||
+              token.sellPriceUsd) && (
+              <div className="flex flex-col gap-1 items-end">
+                {typeof token.sellPriceUsd ===
+                  "number" && (
+                  <Badge className="bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto">
+                    $
+                    {token.sellPriceUsd.toFixed(
+                      2
+                    )}
+                  </Badge>
+                )}
+                {typeof token.buyPriceUsd ===
+                  "number" && (
+                  <Badge className="bg-brand-green/10 text-brand-green border-brand-green/20 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto">
+                    $
+                    {token.buyPriceUsd.toFixed(
+                      2
+                    )}
+                  </Badge>
+                )}
+              </div>
+            )}
+
+            <div className="text-right">
+              <div className="text-[16px] font-black text-[#3B2146] leading-tight">
+                $
+                {token.priceUsd.toFixed(
+                  2
+                )}
+              </div>
+              <div
+                className={cn(
+                  "text-[10px] font-black uppercase mt-0.5 flex items-center justify-end",
+                  isUp
+                    ? "text-brand-green"
+                    : "text-brand-pink"
+                )}
+              >
+                {isUp ? "+" : ""}
+                {change.toFixed(1)}%
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="flex flex-col pb-48 min-h-screen bg-background">
-      {/* Premium Header from Units Page */}
       <header className="sticky top-0 z-50 bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white px-4 py-5 rounded-b-[40px] shadow-xl border-none overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
         <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10"></div>
@@ -394,7 +520,6 @@ export default function ExchangePage() {
           defaultValue="market"
           className="w-full"
         >
-          {/* Custom Tabs List modernized for Mobile (Adjusts to width, larger touch targets) */}
           <div className="px-4 py-4 border-b border-border/50 bg-muted/10">
             <TabsList className="flex items-center gap-1.5 w-full h-auto bg-transparent p-0 border-none">
               <TabsTrigger
@@ -571,181 +696,605 @@ export default function ExchangePage() {
             value="positions"
             className="p-4 space-y-4"
           >
+            {loadError && (
+              <div className="p-4 rounded-[28px] border border-dashed text-muted-foreground bg-muted/5 border-muted/20 text-sm">
+                {loadError}
+              </div>
+            )}
+
             <Card className="bg-linear-to-br from-primary/20 via-primary/5 to-transparent border-primary/10 overflow-hidden relative shadow-lg rounded-[28px] mb-4">
               <CardHeader className="pb-2">
                 <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                  <LayoutGrid className="h-3.5 w-3.5" />{" "}
-                  Patrimoninio Estimado
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                  Posiciones Activas
                 </CardTitle>
                 <div className="text-3xl font-black tracking-tighter text-foreground">
-                  $4,250.00
+                  $
+                  {formatUsd(
+                    summary.totalValueUsd
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-[10px] font-black flex items-center text-brand-green bg-brand-green/10 w-fit px-2.5 py-1 rounded-full border border-brand-green/20">
-                  <TrendingUp className="mr-1 w-3 h-3" />{" "}
-                  +$245.00 (5.8%) hoy
+                <div
+                  className={cn(
+                    "text-[10px] font-black flex items-center w-fit px-2.5 py-1 rounded-full border",
+                    summary.totalGainUsd >=
+                      0
+                      ? "text-brand-green bg-brand-green/10 border-brand-green/20"
+                      : "text-brand-pink bg-brand-pink/10 border-brand-pink/20"
+                  )}
+                >
+                  <TrendingUp className="mr-1 w-3 h-3" />
+                  {summary.totalGainUsd >=
+                  0
+                    ? "+"
+                    : "-"}
+                  $
+                  {formatUsd(
+                    Math.abs(
+                      summary.totalGainUsd
+                    )
+                  )}{" "}
+                  (
+                  {Math.abs(
+                    summary.gainPct
+                  ).toFixed(1)}
+                  %)
                 </div>
               </CardContent>
             </Card>
 
             <div className="grid gap-4">
-              {positions
-                .sort(
-                  (a, b) =>
-                    Math.abs(
-                      a.orderPrice -
-                        a.marketPrice
-                    ) -
-                    Math.abs(
-                      b.orderPrice -
-                        b.marketPrice
-                    )
-                )
-                .map((pos) => {
-                  const expectedGain =
-                    (pos.marketPrice -
-                      pos.orderPrice) *
-                    pos.totalAmount;
-                  const marketValue =
-                    pos.filledAmount *
-                    pos.marketPrice;
-                  const progress =
-                    (pos.filledAmount /
-                      pos.totalAmount) *
-                    100;
+              {activePositions.length >
+              0 ? (
+                [...activePositions]
+                  .sort((a, b) => {
+                    const openedA =
+                      a.openedMarketPriceUsd ??
+                      a.orderPriceUsd;
+                    const openedB =
+                      b.openedMarketPriceUsd ??
+                      b.orderPriceUsd;
+                    const gainA =
+                      (a.side === "SELL"
+                        ? -1
+                        : 1) *
+                      (a.marketPriceUsd -
+                        openedA) *
+                      a.filledAmount;
+                    const gainB =
+                      (b.side === "SELL"
+                        ? -1
+                        : 1) *
+                      (b.marketPriceUsd -
+                        openedB) *
+                      b.filledAmount;
+                    return (
+                      Math.abs(gainB) -
+                      Math.abs(gainA)
+                    );
+                  })
+                  .map((pos) => {
+                    const token =
+                      tokenBySymbol.get(
+                        pos.tokenSymbol
+                      );
+                    const unitLabel =
+                      getUnitLabelFromSymbol(
+                        pos.tokenSymbol
+                      );
+                    const openedPrice =
+                      pos.openedMarketPriceUsd ??
+                      pos.orderPriceUsd;
+                    const raw =
+                      pos.marketPriceUsd -
+                      openedPrice;
+                    const gainUsd =
+                      (pos.side ===
+                      "SELL"
+                        ? -raw
+                        : raw) *
+                      pos.filledAmount;
+                    const marketValueUsd =
+                      pos.filledAmount *
+                      pos.marketPriceUsd;
+                    const progress =
+                      pos.totalAmount >
+                      0
+                        ? (pos.filledAmount /
+                            pos.totalAmount) *
+                          100
+                        : 0;
+                    const isSelected =
+                      selectedPositionId ===
+                      pos.id;
 
-                  return (
-                    <Card
-                      key={pos.id}
-                      className="border-muted/20 overflow-hidden shadow-md rounded-[28px] bg-card"
-                    >
-                      <CardContent className="p-0">
-                        <div className="p-5 space-y-4">
-                          <div className="flex justify-between items-start">
-                            <div className="flex gap-3 items-center">
-                              <div
-                                className={cn(
-                                  "h-12 w-12 rounded-2xl bg-linear-to-br flex items-center justify-center text-white shadow-lg",
-                                  pos.logoColor
-                                )}
-                              >
-                                <Layers className="w-6 h-6" />
+                    return (
+                      <div
+                        key={pos.id}
+                        onClick={() => {
+                          setSelectedPositionId(
+                            pos.id
+                          );
+                          setSelectedTokenId(
+                            null
+                          );
+                        }}
+                        className={cn(
+                          "flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border",
+                          isSelected
+                            ? "bg-white border-primary shadow-xl scale-[1.02] z-10 relative"
+                            : "bg-card border-border/40 hover:border-primary/30 shadow-sm"
+                        )}
+                      >
+                        <div className="flex justify-between items-center mb-1">
+                          <div className="flex gap-4 items-center min-w-0">
+                            <div
+                              className={cn(
+                                "w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg transition-colors shrink-0",
+                                isSelected
+                                  ? "bg-primary text-white shadow-lg shadow-primary/30"
+                                  : "bg-muted/30 text-[#3B2146] border border-border/50"
+                              )}
+                            >
+                              {
+                                unitLabel
+                              }
+                            </div>
+                            <div className="min-w-0">
+                              <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight truncate">
+                                {
+                                  pos.tokenSymbol
+                                }
                               </div>
-                              <div>
-                                <h4 className="text-base font-black tracking-tight">
+                              <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5 truncate">
+                                {token?.projectTitle ??
+                                  "Proyecto"}
+                              </div>
+                              <div className="flex gap-2 items-center mt-1">
+                                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
                                   {
-                                    pos.tokenName
-                                  }
-                                </h4>
-                                <div className="flex gap-2 items-center">
-                                  <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
-                                    {
-                                      pos.filledAmount
-                                    }{" "}
-                                    /{" "}
-                                    {
-                                      pos.totalAmount
-                                    }{" "}
-                                    TOKENS
-                                  </span>
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-[8px] h-4 px-1 bg-primary/10 text-primary border-none"
-                                  >
-                                    {Math.round(
-                                      progress
-                                    )}
-                                    %
-                                  </Badge>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
-                                Valor
-                                Actual
-                              </div>
-                              <div className="text-xl font-black tracking-tighter text-foreground">
-                                $
-                                {marketValue.toLocaleString()}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="p-3 rounded-2xl border backdrop-blur-sm bg-background/40 border-border/50">
-                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">
-                                Tu Orden
-                              </div>
-                              <div className="text-sm font-black">
-                                $
-                                {pos.orderPrice.toFixed(
-                                  2
-                                )}
-                              </div>
-                            </div>
-                            <div className="p-3 rounded-2xl border backdrop-blur-sm bg-background/40 border-border/50">
-                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">
-                                Mercado
-                              </div>
-                              <div className="text-sm font-black">
-                                $
-                                {pos.marketPrice.toFixed(
-                                  2
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="pt-1 space-y-3">
-                            <div className="flex justify-between items-end">
-                              <div className="flex flex-col">
-                                <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
-                                  Ganancia
-                                  Esperada
+                                    pos.filledAmount
+                                  }{" "}
+                                  /{" "}
+                                  {
+                                    pos.totalAmount
+                                  }{" "}
+                                  TOKENS
                                 </span>
-                                <span className="text-xs font-black text-brand-green">
-                                  +
-                                  {expectedGain >
-                                  0
-                                    ? "$"
-                                    : "-$"}
-                                  {Math.abs(
-                                    expectedGain
-                                  ).toFixed(
-                                    2
+                                <Badge className="text-[8px] h-4 px-1 bg-primary/10 text-primary border-none rounded-full font-black">
+                                  {Math.round(
+                                    progress
                                   )}
-                                </span>
-                              </div>
-                              <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
-                                Progresión
+                                  %
+                                </Badge>
                               </div>
                             </div>
-                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden p-0">
-                              <div
-                                className="h-full transition-all duration-1000 ease-out bg-primary"
-                                style={{
-                                  width: `${progress}%`,
-                                }}
-                              />
+                          </div>
+
+                          <div className="text-right shrink-0">
+                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
+                              Valor
+                              Actual
+                            </div>
+                            <div className="text-[17px] font-black text-[#3B2146] leading-tight">
+                              $
+                              {formatUsd(
+                                marketValueUsd
+                              )}
+                            </div>
+                            <div
+                              className={cn(
+                                "text-[10px] font-black uppercase mt-1",
+                                gainUsd >=
+                                  0
+                                  ? "text-brand-green"
+                                  : "text-brand-pink"
+                              )}
+                            >
+                              {gainUsd >=
+                              0
+                                ? "+"
+                                : "-"}
+                              $
+                              {formatUsd(
+                                Math.abs(
+                                  gainUsd
+                                )
+                              )}
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+
+                        <div className="grid grid-cols-2 gap-3 mt-4">
+                          <div className="p-3 rounded-2xl border backdrop-blur-sm bg-background/40 border-border/50">
+                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">
+                              Tu Orden
+                            </div>
+                            <div className="text-sm font-black">
+                              $
+                              {pos.orderPriceUsd.toFixed(
+                                2
+                              )}
+                            </div>
+                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mt-1 opacity-60">
+                              Apertura $
+                              {openedPrice.toFixed(
+                                2
+                              )}
+                            </div>
+                          </div>
+                          <div className="p-3 rounded-2xl border backdrop-blur-sm bg-background/40 border-border/50">
+                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">
+                              Mercado
+                            </div>
+                            <div className="text-sm font-black">
+                              $
+                              {pos.marketPriceUsd.toFixed(
+                                2
+                              )}
+                            </div>
+                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mt-1 opacity-60">
+                              Lado{" "}
+                              {pos.side}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 space-y-3">
+                          <div className="flex justify-between items-end">
+                            <div className="flex flex-col">
+                              <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
+                                Ganancia
+                              </span>
+                              <span
+                                className={cn(
+                                  "text-xs font-black",
+                                  gainUsd >=
+                                    0
+                                    ? "text-brand-green"
+                                    : "text-brand-pink"
+                                )}
+                              >
+                                {gainUsd >=
+                                0
+                                  ? "+"
+                                  : "-"}
+                                $
+                                {formatUsd(
+                                  Math.abs(
+                                    gainUsd
+                                  )
+                                )}
+                              </span>
+                            </div>
+                            <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
+                              Progresión
+                            </div>
+                          </div>
+                          <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                            <div
+                              className="h-full transition-all duration-1000 bg-primary"
+                              style={{
+                                width: `${progress}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+              ) : (
+                <div className="py-20 text-center rounded-3xl border border-dashed text-muted-foreground bg-muted/5 border-muted/20">
+                  <Layers className="mx-auto mb-3 w-10 h-10 opacity-20" />
+                  <p className="text-sm font-medium">
+                    No tenés posiciones
+                    activas
+                  </p>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
       </div>
 
-      {/* Token Quick Action Panel - Shows OVER Bottom Nav as requested */}
+      {selectedPosition && (
+        <div className="fixed bottom-0 left-0 right-0 z-[60] p-4 animate-in slide-in-from-bottom-full duration-300">
+          <div className="bg-card/95 backdrop-blur-2xl border border-primary/20 shadow-[0_-8px_40px_-12px_rgba(0,0,0,0.3)] rounded-[32px] p-6 overflow-hidden relative">
+            <button
+              onClick={() => {
+                setSelectedPositionId(
+                  null
+                );
+                setIsOrderDetailsOpen(
+                  false
+                );
+              }}
+              className="flex absolute top-6 right-6 z-20 justify-center items-center w-8 h-8 rounded-full shadow-md transition-colors bg-muted text-muted-foreground hover:bg-muted/80"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 rounded-full blur-3xl bg-primary/5" />
+
+            <div className="flex flex-col gap-6">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1 min-w-0">
+                  <div className="flex gap-2 items-center min-w-0">
+                    <h3 className="text-2xl font-black tracking-tight truncate">
+                      {
+                        selectedPosition.tokenSymbol
+                      }
+                    </h3>
+                    <Badge
+                      className={cn(
+                        "font-bold tracking-widest uppercase border-0 text-[10px]",
+                        isActivePosition(
+                          selectedPosition
+                        )
+                          ? "bg-brand-green/20 text-brand-green"
+                          : "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      {
+                        selectedPosition.status
+                      }
+                    </Badge>
+                  </div>
+                  <div className="text-xs font-bold tracking-widest uppercase truncate text-muted-foreground">
+                    {tokenBySymbol.get(
+                      selectedPosition.tokenSymbol
+                    )?.projectTitle ??
+                      "Proyecto"}
+                  </div>
+                  <div className="flex items-center gap-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                    <span>
+                      Lado{" "}
+                      {
+                        selectedPosition.side
+                      }
+                    </span>
+                    <span>
+                      {
+                        selectedPosition.filledAmount
+                      }
+                      /
+                      {
+                        selectedPosition.totalAmount
+                      }{" "}
+                      tokens
+                    </span>
+                  </div>
+                </div>
+                <div className="pr-10 text-right">
+                  <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
+                    Valor Actual
+                  </div>
+                  <div className="text-2xl font-black text-foreground">
+                    $
+                    {formatUsd(
+                      selectedPosition.filledAmount *
+                        selectedPosition.marketPriceUsd
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setIsOrderDetailsOpen(
+                      true
+                    )
+                  }
+                  className="flex-1 h-14 text-xs font-black tracking-widest uppercase rounded-2xl border-border/50 hover:bg-muted"
+                >
+                  Ver Detalles
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const symbol =
+                      encodeURIComponent(
+                        selectedPosition.tokenSymbol
+                      );
+                    router.push(
+                      `/exchange/${symbol}`
+                    );
+                  }}
+                  className="flex-1 h-14 text-xs font-black tracking-widest uppercase rounded-2xl border-border/50 hover:bg-muted"
+                >
+                  Ver Token
+                </Button>
+                <Button
+                  disabled={
+                    !isActivePosition(
+                      selectedPosition
+                    ) || isClosingOrder
+                  }
+                  onClick={
+                    closeSelectedOrder
+                  }
+                  className="flex-[1.5] h-14 rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/25 hover:bg-primary/90 font-black uppercase tracking-widest text-xs disabled:opacity-40 disabled:shadow-none"
+                >
+                  Cerrar Orden
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Dialog
+        open={isOrderDetailsOpen}
+        onOpenChange={
+          setIsOrderDetailsOpen
+        }
+      >
+        <DialogContent className="max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
+          <div className="p-6 space-y-6">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black tracking-tight uppercase">
+                Detalles de la orden
+              </DialogTitle>
+            </DialogHeader>
+
+            {selectedPosition ? (
+              <div className="space-y-4">
+                <div className="p-4 rounded-2xl border border-border/50 bg-muted/10">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    Orden
+                  </div>
+                  <div className="mt-1 text-sm font-black">
+                    {
+                      selectedPosition.tokenSymbol
+                    }
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    <div className="p-3 rounded-xl border border-border/50 bg-background/40">
+                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">
+                        Apertura
+                      </div>
+                      <div className="mt-1 text-sm font-black">
+                        $
+                        {(
+                          selectedPosition.openedMarketPriceUsd ??
+                          selectedPosition.orderPriceUsd
+                        ).toFixed(2)}
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-xl border border-border/50 bg-background/40">
+                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">
+                        Orden
+                      </div>
+                      <div className="mt-1 text-sm font-black">
+                        $
+                        {selectedPosition.orderPriceUsd.toFixed(
+                          2
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-xl border border-border/50 bg-background/40">
+                      <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">
+                        Mercado
+                      </div>
+                      <div className="mt-1 text-sm font-black">
+                        $
+                        {selectedPosition.marketPriceUsd.toFixed(
+                          2
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                      Transacciones
+                      completadas
+                    </div>
+                    <Badge className="bg-primary/10 text-primary border-none rounded-full font-black text-[10px]">
+                      {
+                        selectedPositionTransactions.filter(
+                          (t) =>
+                            t.status ===
+                            "COMPLETED"
+                        ).length
+                      }
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    {selectedPositionTransactions.filter(
+                      (t) =>
+                        t.status ===
+                        "COMPLETED"
+                    ).length > 0 ? (
+                      selectedPositionTransactions
+                        .filter(
+                          (t) =>
+                            t.status ===
+                            "COMPLETED"
+                        )
+                        .sort(
+                          (a, b) =>
+                            new Date(
+                              b.createdAt
+                            ).getTime() -
+                            new Date(
+                              a.createdAt
+                            ).getTime()
+                        )
+                        .map((t) => (
+                          <div
+                            key={t.id}
+                            className="flex justify-between items-center p-4 rounded-2xl border border-border/50 bg-background/40"
+                          >
+                            <div className="min-w-0">
+                              <div className="text-sm font-black truncate">
+                                {t.description ??
+                                  t.type}
+                              </div>
+                              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">
+                                {new Date(
+                                  t.createdAt
+                                ).toLocaleString()}
+                              </div>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <div className="text-sm font-black">
+                                {
+                                  t
+                                    .amount
+                                    .currencyCode
+                                }{" "}
+                                {formatUsd(
+                                  t
+                                    .amount
+                                    .amount
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                    ) : (
+                      <div className="py-10 text-sm text-center rounded-2xl border border-dashed text-muted-foreground bg-muted/5 border-muted/20">
+                        No hay
+                        transacciones
+                        completadas para
+                        esta orden
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="py-10 text-sm text-center rounded-2xl border border-dashed text-muted-foreground bg-muted/5 border-muted/20">
+                Seleccioná una orden
+                para ver detalles
+              </div>
+            )}
+
+            <Button
+              variant="secondary"
+              className="w-full h-12 text-xs font-bold tracking-widest uppercase rounded-xl"
+              onClick={() =>
+                setIsOrderDetailsOpen(
+                  false
+                )
+              }
+            >
+              Cerrar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {selectedToken && (
         <div className="fixed inset-x-0 bottom-0 z-[60] p-4 animate-in slide-in-from-bottom-full duration-300">
           <div className="bg-card/95 backdrop-blur-3xl border border-primary/30 shadow-[0_-10px_50px_-15px_rgba(0,0,0,0.4)] rounded-[32px] p-6 overflow-hidden relative">
-            {/* Close Button */}
             <Button
               variant="secondary"
               size="icon"
@@ -763,13 +1312,13 @@ export default function ExchangePage() {
                   <div className="flex gap-2 items-center">
                     <span className="font-mono text-xs font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
                       {
-                        selectedToken.name
+                        selectedToken.symbol
                       }
                     </span>
                   </div>
                   <h3 className="text-xl font-black text-foreground">
                     {
-                      selectedToken.project
+                      selectedToken.projectTitle
                     }
                   </h3>
                   <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
@@ -780,9 +1329,12 @@ export default function ExchangePage() {
                     <span className="flex gap-1.5 items-center">
                       <Layers className="w-3.5 h-3.5" />{" "}
                       ROI Est:{" "}
-                      {
-                        selectedToken.roi
-                      }
+                      {typeof selectedToken.roiPct ===
+                      "number"
+                        ? selectedToken.roiPct.toFixed(
+                            1
+                          )
+                        : "0.0"}
                       %
                     </span>
                   </div>
@@ -790,15 +1342,14 @@ export default function ExchangePage() {
                 <div className="pr-10 text-right">
                   <div className="text-2xl font-black text-foreground">
                     $
-                    {selectedToken.price.toFixed(
+                    {selectedToken.priceUsd.toFixed(
                       2
                     )}
                   </div>
                   <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
                     Stock:{" "}
-                    {
-                      selectedToken.tokensAvailable
-                    }{" "}
+                    {selectedToken.tokensAvailable ??
+                      0}{" "}
                     Tokens
                   </div>
                 </div>
@@ -811,7 +1362,7 @@ export default function ExchangePage() {
                   onClick={() => {
                     const symbol =
                       encodeURIComponent(
-                        selectedToken.name
+                        selectedToken.symbol
                       );
                     const returnTo =
                       encodeURIComponent(
@@ -828,8 +1379,8 @@ export default function ExchangePage() {
                   disabled={
                     !positions.some(
                       (p) =>
-                        p.tokenName ===
-                          selectedToken.name &&
+                        p.tokenSymbol ===
+                          selectedToken.symbol &&
                         p.filledAmount >
                           0
                     )
@@ -838,7 +1389,7 @@ export default function ExchangePage() {
                   onClick={() => {
                     const symbol =
                       encodeURIComponent(
-                        selectedToken.name
+                        selectedToken.symbol
                       );
                     router.push(
                       `/exchange/${symbol}`
@@ -852,7 +1403,7 @@ export default function ExchangePage() {
                   onClick={() => {
                     const symbol =
                       encodeURIComponent(
-                        selectedToken.name
+                        selectedToken.symbol
                       );
                     router.push(
                       `/exchange/${symbol}`
