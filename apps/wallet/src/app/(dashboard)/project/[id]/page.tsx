@@ -207,13 +207,26 @@ export default function ProjectPage({
                       Nuevo
                     </Badge>
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                      Precio Inicial
-                    </span>
-                    <div className="text-2xl font-black text-foreground">
-                      $100.00
+                  <div className="flex justify-between items-end">
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                        Precio Inicial
+                      </span>
+                      <div className="text-2xl font-black text-foreground">
+                        $100.00
+                      </div>
                     </div>
+                    <Button
+                      size="sm"
+                      className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/20 shadow-none"
+                      asChild
+                    >
+                      <Link
+                        href={`/project/${id}/units?filter=tokenized`}
+                      >
+                        Reservar
+                      </Link>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -242,13 +255,26 @@ export default function ProjectPage({
                       Estable
                     </Badge>
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                      Retorno Anual
-                    </span>
-                    <div className="text-2xl font-black text-foreground">
-                      12%
+                  <div className="flex justify-between items-end">
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                        Retorno Anual
+                      </span>
+                      <div className="text-2xl font-black text-foreground">
+                        12%
+                      </div>
                     </div>
+                    <Button
+                      size="sm"
+                      className="h-8 text-[10px] font-black uppercase tracking-widest bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white border border-green-500/20 shadow-none"
+                      asChild
+                    >
+                      <Link
+                        href={`/project/${id}/units?filter=fixed_rent`}
+                      >
+                        Depositar
+                      </Link>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -278,13 +304,26 @@ export default function ProjectPage({
                       Exclusivo
                     </Badge>
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                      Desde
-                    </span>
-                    <div className="text-2xl font-black text-foreground">
-                      $120,000
+                  <div className="flex justify-between items-end">
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                        Desde
+                      </span>
+                      <div className="text-2xl font-black text-foreground">
+                        $120,000
+                      </div>
                     </div>
+                    <Button
+                      size="sm"
+                      className="h-8 text-[10px] font-black uppercase tracking-widest bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white border border-purple-500/20 shadow-none"
+                      asChild
+                    >
+                      <Link
+                        href={`/project/${id}/units?filter=full_property`}
+                      >
+                        Ver Planes
+                      </Link>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -313,13 +352,26 @@ export default function ProjectPage({
                       Oportunidad
                     </Badge>
                   </div>
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                      Plusvalía Est.
-                    </span>
-                    <div className="text-2xl font-black text-foreground">
-                      15%
+                  <div className="flex justify-between items-end">
+                    <div className="space-y-1">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                        Plusvalía Est.
+                      </span>
+                      <div className="text-2xl font-black text-foreground">
+                        15%
+                      </div>
                     </div>
+                    <Button
+                      size="sm"
+                      className="h-8 text-[10px] font-black uppercase tracking-widest bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white border border-orange-500/20 shadow-none"
+                      asChild
+                    >
+                      <Link
+                        href={`/exchange?project=${id}`}
+                      >
+                        Ver Tokens
+                      </Link>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

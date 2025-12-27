@@ -5,7 +5,10 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useRouter } from "next/navigation";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { Button } from "@repo/ui/components/ui/button";
 import { cn } from "@repo/ui/lib/utils";
 import {
@@ -99,6 +102,11 @@ function isActivePosition(
 
 export default function ExchangePage() {
   const router = useRouter();
+  const searchParams =
+    useSearchParams();
+  const projectFilter =
+    searchParams.get("project");
+
   const [tokens, setTokens] = useState<
     MarketToken[]
   >([]);
@@ -235,7 +243,15 @@ export default function ExchangePage() {
   );
 
   const filteredTokens = useMemo(() => {
-    const list = [...tokens];
+    let list = [...tokens];
+
+    if (projectFilter) {
+      list = list.filter(
+        (t) =>
+          t.projectId === projectFilter
+      );
+    }
+
     list.sort((a, b) => {
       if (sortBy === "marketCap")
         return (
@@ -248,7 +264,12 @@ export default function ExchangePage() {
       );
     });
     return list;
-  }, [tokens, sortBy, timeframe]);
+  }, [
+    tokens,
+    sortBy,
+    timeframe,
+    projectFilter,
+  ]);
 
   const favorites = useMemo(
     () =>
