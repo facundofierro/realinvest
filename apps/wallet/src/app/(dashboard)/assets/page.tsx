@@ -68,7 +68,7 @@ export default function AssetsPage() {
     <div className="pb-24 duration-500 animate-in fade-in slide-in-from-bottom-4">
       {/* Main Balance Card - Fixed at top with no margins */}
       <div className="sticky top-0 z-50">
-        <Card className="overflow-hidden relative text-white from-gray-900 border-none shadow-xl bg-linear-to-br via-slate-900 to-violet-950 rounded-none">
+        <Card className="overflow-hidden relative text-white from-gray-900 rounded-none border-none shadow-xl bg-linear-to-br via-slate-900 to-violet-950">
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
           <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10"></div>
 
@@ -93,7 +93,7 @@ export default function AssetsPage() {
 
             <div className="grid grid-cols-2 gap-4 pt-2">
               <Button
-                className="w-full h-11 text-xs border-0 backdrop-blur-sm bg-white/10 hover:bg-white/20"
+                className="w-full h-11 text-xs rounded-2xl border-0 backdrop-blur-sm bg-white/10 hover:bg-white/20"
                 asChild
               >
                 <Link href="/deposit">
@@ -102,7 +102,7 @@ export default function AssetsPage() {
                 </Link>
               </Button>
               <Button
-                className="w-full h-11 text-xs border-0 backdrop-blur-sm bg-white/10 hover:bg-white/20"
+                className="w-full h-11 text-xs rounded-2xl border-0 backdrop-blur-sm bg-white/10 hover:bg-white/20"
                 asChild
               >
                 <Link href="/withdraw">

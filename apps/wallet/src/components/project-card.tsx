@@ -40,7 +40,7 @@ export function ProjectCard({
 
   return (
     <Link href={`/project/${id}`}>
-      <Card className="overflow-hidden h-full border-none shadow-lg group">
+      <Card className="overflow-hidden h-full border-none shadow-lg group rounded-3xl">
         <div className="relative h-32 bg-slate-200">
           <Image
             src={image}

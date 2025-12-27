@@ -114,7 +114,7 @@ export default function ProjectPage({
     typeof returnToRaw === "string" &&
     returnToRaw.startsWith("/")
       ? returnToRaw
-      : "/dashboard";
+      : "/";
 
   return (
     <div className="relative pb-32 min-h-screen bg-background">
@@ -234,7 +234,7 @@ export default function ProjectPage({
 
             {/* 2. Comprar tokens con renta fija */}
             <CarouselItem>
-              <Card className="bg-linear-to-br from-green-500/10 via-background to-secondary/5 border-green-500/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
+              <Card className="bg-linear-to-br from-green-500/10 via-background to-secondary/5 border-primary/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
                 <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
                   <TrendingUp className="w-48 h-48 -rotate-12" />
                 </div>

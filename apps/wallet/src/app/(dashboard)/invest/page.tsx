@@ -234,29 +234,39 @@ export default function InvestPage() {
 
                             {/* Image Legend */}
                             {project.status === "PRE-VENTA" && project.launchDate && (
-                                <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-md py-2 px-3 border-t border-white/10 translate-y-px">
-                                    <p className="text-[9px] font-bold text-white text-center uppercase tracking-wide">
-                                        Lanzamiento {project.launchDate}
-                                    </p>
+                                <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-md py-2 px-3 border-t border-white/10 translate-y-px">
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-[7px] font-bold text-white text-center uppercase tracking-wide opacity-90">
+                                            Lanzamiento
+                                        </span>
+                                        <span className="text-[9px] font-black text-white text-center uppercase tracking-wide">
+                                            {project.launchDate}
+                                        </span>
+                                    </div>
                                 </div>
                             )}
                             {project.status === "EN CONSTRUCCION" && project.nextLaunchDate && (
-                                <div className="absolute bottom-0 left-0 right-0 bg-black/40 backdrop-blur-md py-2 px-3 border-t border-white/10 translate-y-px">
-                                    <p className="text-[9px] font-bold text-white text-center uppercase tracking-wide">
-                                        Próximo lanzamiento {project.nextLaunchDate}
-                                    </p>
+                                <div className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-md py-2 px-3 border-t border-white/10 translate-y-px">
+                                    <div className="flex flex-col items-center">
+                                        <span className="text-[7px] font-bold text-white text-center uppercase tracking-wide opacity-90">
+                                            Próximo Lanzamiento
+                                        </span>
+                                        <span className="text-[9px] font-black text-white text-center uppercase tracking-wide">
+                                            {project.nextLaunchDate}
+                                        </span>
+                                    </div>
                                 </div>
                             )}
                         </div>
                         <CardContent className="p-3 flex flex-col flex-1 gap-3">
                             <div className="space-y-1">
-                                <div className="flex justify-between items-start gap-1">
-                                    <h3 className="font-bold text-[11px] line-clamp-1 group-hover:text-primary transition-colors flex-1">{project.title}</h3>
+                                <h3 className="font-bold text-[11px] line-clamp-1 group-hover:text-primary transition-colors">{project.title}</h3>
+                                <div className="flex justify-between items-center gap-1">
+                                    <p className="text-[9px] text-muted-foreground flex items-center truncate">
+                                        <Building2 className="h-2.5 w-2.5 mr-1 shrink-0" /> {project.location.split(',')[0]}
+                                    </p>
                                     <span className="text-[9px] font-bold text-primary whitespace-nowrap">ROI ~{project.roi}</span>
                                 </div>
-                                <p className="text-[9px] text-muted-foreground flex items-center truncate">
-                                    <Building2 className="h-2.5 w-2.5 mr-1 shrink-0" /> {project.location.split(',')[0]}
-                                </p>
                             </div>
 
                             <div className="mt-auto space-y-3">
@@ -267,21 +277,21 @@ export default function InvestPage() {
                                     />
                                 </div>
                                 
-                                <div className="flex gap-1.5">
+                                <div className="flex justify-center gap-1.5">
                                     {project.precioRange && (
-                                        <div className="bg-secondary/40 rounded-xl p-2 flex-1 min-w-0 border border-muted/5 flex flex-col items-center justify-center">
+                                        <div className="bg-secondary/40 rounded-xl p-2 w-[32%] shrink-0 border border-muted/5 flex flex-col items-center justify-center">
                                             <p className="text-[7px] text-muted-foreground font-extrabold uppercase tracking-wider mb-0.5 truncate">Desde</p>
                                             <p className="text-[9px] font-black text-foreground truncate">{project.precioRange.split(' ')[0]}</p>
                                         </div>
                                     )}
                                     {project.tokensTotal && project.tokensTotal !== "$0" && (
-                                        <div className="bg-primary/5 rounded-xl p-2 flex-1 min-w-0 border border-primary/10 flex flex-col items-center justify-center">
+                                        <div className="bg-primary/10 rounded-xl p-2 w-[32%] shrink-0 border border-primary/10 flex flex-col items-center justify-center">
                                             <p className="text-[7px] text-primary/60 font-extrabold uppercase tracking-wider mb-0.5 truncate">Tokens</p>
                                             <p className="text-[9px] font-black text-primary truncate">{project.tokensTotal}</p>
                                         </div>
                                     )}
                                     {project.rentaFija && (
-                                        <div className="bg-secondary/40 rounded-xl p-2 flex-1 min-w-0 border border-muted/5 flex flex-col items-center justify-center">
+                                        <div className="bg-primary/5 rounded-xl p-2 w-[32%] shrink-0 border border-muted/5 flex flex-col items-center justify-center">
                                             <p className="text-[7px] text-muted-foreground font-extrabold uppercase tracking-wider mb-0.5 truncate">Renta</p>
                                             <p className="text-[9px] font-black text-foreground truncate">{project.rentaFija}</p>
                                         </div>

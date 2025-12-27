@@ -88,7 +88,7 @@ export default function DashboardPage() {
       </header>
 
       {/* Balance Card */}
-      <Card className="bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white border-none shadow-xl relative overflow-hidden">
+      <Card className="bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white border-none shadow-xl relative overflow-hidden rounded-3xl">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
         <div className="absolute -right-10 -top-10 h-32 w-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -107,7 +107,7 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-2 gap-4 pt-2">
             <Button
-              className="w-full bg-white/10 hover:bg-white/20 hover:scale-[1.02] transition-all duration-300 border-0 backdrop-blur-sm h-12"
+              className="w-full bg-white/10 hover:bg-white/20 hover:scale-[1.02] transition-all duration-300 border-0 backdrop-blur-sm h-12 rounded-2xl"
               asChild
             >
               <Link href="/deposit">
@@ -116,7 +116,7 @@ export default function DashboardPage() {
               </Link>
             </Button>
             <Button
-              className="w-full bg-white/10 hover:bg-white/20 hover:scale-[1.02] transition-all duration-300 border-0 backdrop-blur-sm h-12"
+              className="w-full bg-white/10 hover:bg-white/20 hover:scale-[1.02] transition-all duration-300 border-0 backdrop-blur-sm h-12 rounded-2xl"
               asChild
             >
               <Link href="/withdraw">
@@ -156,7 +156,7 @@ export default function DashboardPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="flex items-center justify-between p-3 bg-card rounded-xl shadow-sm border hover:bg-muted/50 transition-colors"
+              className="flex items-center justify-between p-3 bg-card rounded-2xl shadow-sm border hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/10">
