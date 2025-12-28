@@ -47,6 +47,7 @@ import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import type {
   MarketToken,
+  Project,
   Position,
   Transaction,
 } from "@/types/wallet";
@@ -124,6 +125,8 @@ function ExchangePageInner() {
   const [tokens, setTokens] = useState<
     MarketToken[]
   >([]);
+  const [projects, setProjects] =
+    useState<Project[]>([]);
   const [positions, setPositions] =
     useState<Position[]>([]);
   const [
@@ -173,10 +176,14 @@ function ExchangePageInner() {
 
         const [
           tokensRes,
+          projectsRes,
           positionsRes,
           transactionsRes,
         ] = await Promise.all([
           fetch("/api/market/tokens", {
+            signal: controller.signal,
+          }),
+          fetch("/api/projects", {
             signal: controller.signal,
           }),
           fetch(
@@ -194,6 +201,10 @@ function ExchangePageInner() {
           throw new Error(
             "Failed to load tokens"
           );
+        if (!projectsRes.ok)
+          throw new Error(
+            "Failed to load projects"
+          );
         if (!positionsRes.ok)
           throw new Error(
             "Failed to load positions"
@@ -207,6 +218,10 @@ function ExchangePageInner() {
           (await tokensRes.json()) as {
             tokens: MarketToken[];
           };
+        const projectsJson =
+          (await projectsRes.json()) as {
+            projects: Project[];
+          };
         const positionsJson =
           (await positionsRes.json()) as {
             positions: Position[];
@@ -218,6 +233,9 @@ function ExchangePageInner() {
 
         setTokens(
           tokensJson.tokens ?? []
+        );
+        setProjects(
+          projectsJson.projects ?? []
         );
         setPositions(
           positionsJson.positions ?? []
@@ -247,6 +265,14 @@ function ExchangePageInner() {
         tokens.map((t) => [t.symbol, t])
       ),
     [tokens]
+  );
+
+  const projectById = useMemo(
+    () =>
+      new Map(
+        projects.map((p) => [p.id, p])
+      ),
+    [projects]
   );
 
   const selectedToken = useMemo(
@@ -1486,7 +1512,10 @@ function ExchangePageInner() {
                   <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     <span className="flex gap-1.5 items-center">
                       <MapPin className="w-3.5 h-3.5" />{" "}
-                      Nuñez, BA
+                      {projectById.get(
+                        selectedToken.projectId
+                      )?.location ??
+                        "-"}
                     </span>
                     <span className="flex gap-1.5 items-center">
                       <Layers className="w-3.5 h-3.5" />{" "}
@@ -1531,7 +1560,9 @@ function ExchangePageInner() {
                         `/exchange/${symbol}`
                       );
                     router.push(
-                      `/project/1?returnTo=${returnTo}`
+                      `/project/${encodeURIComponent(
+                        selectedToken.projectId
+                      )}?returnTo=${returnTo}`
                     );
                   }}
                 >

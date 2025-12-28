@@ -120,3 +120,17 @@ export interface Transaction {
   description?: string;
   metadata?: Record<string, unknown>;
 }
+
+export interface OrderBookLevel {
+  price: number;
+  amount: number;
+}
+
+export interface MarketOrderBook {
+  asks: OrderBookLevel[];
+  bids: OrderBookLevel[];
+}
+
+export interface MarketSeries {
+  series: number[];
+}

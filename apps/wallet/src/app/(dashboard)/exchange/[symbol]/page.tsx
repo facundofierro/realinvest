@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -13,7 +14,6 @@ import { Card } from "@repo/ui/components/ui/card";
 import { cn } from "@repo/ui/lib/utils";
 import {
   Tabs,
-  TabsContent,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/ui/tabs";
@@ -31,11 +31,14 @@ import {
   CandlestickChart,
   List,
 } from "lucide-react";
-import marketTokens from "@/sample-data/marketTokens.json";
-import walletBalances from "@/sample-data/walletBalances.json";
-import walletHoldings from "@/sample-data/walletHoldings.json";
-import walletPositions from "@/sample-data/walletPositions.json";
-import type { MarketToken } from "@/types/wallet";
+import type {
+  Holding,
+  MarketOrderBook,
+  MarketToken,
+  OrderBookLevel,
+  Position,
+  WalletBalance,
+} from "@/types/wallet";
 
 type Timeframe =
   | "all"
@@ -48,52 +51,20 @@ type ChartView =
   | "ordenes";
 
 function OrderBook({
-  currentPrice,
+  asks,
+  bids,
 }: {
-  currentPrice: number;
+  asks: OrderBookLevel[];
+  bids: OrderBookLevel[];
 }) {
-  // Generate deterministic dummy orders based on current price
-  const { asks, bids } = useMemo(() => {
-    const asks = Array.from({
-      length: 6,
-    })
-      .map((_, i) => ({
-        price:
-          currentPrice *
-          (1 + (i + 1) * 0.005),
-        amount:
-          Math.floor(
-            (Math.sin(i * 123.45) *
-              0.5 +
-              0.5) *
-              500
-          ) + 50,
-        width:
-          (Math.sin(i * 67.89) * 0.5 +
-            0.5) *
-          100,
-      }))
-      .reverse();
-
-    const bids = Array.from({
-      length: 6,
-    }).map((_, i) => ({
-      price:
-        currentPrice *
-        (1 - (i + 1) * 0.005),
-      amount:
-        Math.floor(
-          (Math.cos(i * 123.45) * 0.5 +
-            0.5) *
-            500
-        ) + 50,
-      width:
-        (Math.cos(i * 67.89) * 0.5 +
-          0.5) *
-        100,
-    }));
-    return { asks, bids };
-  }, [currentPrice]);
+  const askMax = Math.max(
+    1,
+    ...asks.map((a) => a.amount)
+  );
+  const bidMax = Math.max(
+    1,
+    ...bids.map((b) => b.amount)
+  );
 
   return (
     <div className="flex gap-4 h-full duration-300 animate-in fade-in zoom-in-95">
@@ -109,7 +80,7 @@ function OrderBook({
             <div
               className="absolute top-0 right-0 bottom-0 rounded-l-sm transition-all bg-red-500/10 group-hover:bg-red-500/20"
               style={{
-                width: `${ask.width}%`,
+                width: `${(ask.amount / askMax) * 100}%`,
               }}
             />
             <span className="relative z-10 font-mono font-medium text-white/70">
@@ -134,7 +105,7 @@ function OrderBook({
             <div
               className="absolute top-0 bottom-0 left-0 rounded-r-sm transition-all bg-emerald-500/10 group-hover:bg-emerald-500/20"
               style={{
-                width: `${bid.width}%`,
+                width: `${(bid.amount / bidMax) * 100}%`,
               }}
             />
             <span className="relative z-10 font-mono font-bold text-emerald-400">
@@ -167,47 +138,6 @@ function getChangePct(
   if (timeframe === "30d")
     return token.change30dPct;
   return token.changeAllPct;
-}
-
-function makeSeries(
-  seed: string,
-  changePct: number,
-  points: number
-): number[] {
-  const base = 100;
-  const seedSum = seed
-    .split("")
-    .reduce(
-      (acc, ch) =>
-        acc + ch.charCodeAt(0),
-      0
-    );
-  const drift = changePct / 100;
-  const out: number[] = [];
-
-  for (let i = 0; i < points; i++) {
-    const t =
-      i / Math.max(1, points - 1);
-    const wave =
-      Math.sin(
-        (t * 5 + seedSum / 37) *
-          Math.PI *
-          2
-      ) *
-        0.35 +
-      Math.sin(
-        (t * 11 + seedSum / 53) *
-          Math.PI *
-          2
-      ) *
-        0.2;
-    const trend = (t - 0.5) * drift * 2;
-    out.push(
-      base * (1 + trend + wave * 0.02)
-    );
-  }
-
-  return out;
 }
 
 function LineChart({
@@ -371,11 +301,9 @@ function LineChart({
 
 function CandlesChart({
   series,
-  isUp,
   currentPrice,
 }: {
   series: number[];
-  isUp: boolean;
   currentPrice: number;
 }) {
   const min = Math.min(...series);
@@ -531,29 +459,6 @@ export default function ExchangeTokenPage() {
     params.symbol
   );
 
-  const token = useMemo(() => {
-    const list =
-      marketTokens as MarketToken[];
-    return (
-      list.find(
-        (t) => t.symbol === symbol
-      ) ?? {
-        id: symbol,
-        symbol,
-        projectId: "1",
-        projectTitle: "Proyecto",
-        priceUsd: 0,
-        marketCapUsd: 0,
-        change24hPct: 0,
-        change7dPct: 0,
-        change30dPct: 0,
-        changeAllPct: 0,
-        liveSince: "-",
-        isFavorite: false,
-      }
-    );
-  }, [symbol]);
-
   const [timeframe, setTimeframe] =
     useState<Timeframe>("all");
   const [view, setView] =
@@ -569,46 +474,233 @@ export default function ExchangeTokenPage() {
       "MARKET"
     );
 
+  const [token, setToken] =
+    useState<MarketToken | null>(null);
+  const [balances, setBalances] =
+    useState<WalletBalance[]>([]);
+  const [holdings, setHoldings] =
+    useState<Holding[]>([]);
+  const [positions, setPositions] =
+    useState<Position[]>([]);
+  const [orderBook, setOrderBook] =
+    useState<MarketOrderBook | null>(
+      null
+    );
+  const [series, setSeries] = useState<
+    number[] | null
+  >(null);
+  const [loadError, setLoadError] =
+    useState<string | null>(null);
+
+  useEffect(() => {
+    const controller =
+      new AbortController();
+
+    async function load() {
+      try {
+        setLoadError(null);
+
+        const [
+          tokensRes,
+          balancesRes,
+          holdingsRes,
+          positionsRes,
+          orderBookRes,
+        ] = await Promise.all([
+          fetch("/api/market/tokens", {
+            signal: controller.signal,
+          }),
+          fetch(
+            "/api/wallet/balances",
+            {
+              signal: controller.signal,
+            }
+          ),
+          fetch(
+            "/api/wallet/holdings",
+            {
+              signal: controller.signal,
+            }
+          ),
+          fetch(
+            "/api/wallet/positions",
+            {
+              signal: controller.signal,
+            }
+          ),
+          fetch(
+            `/api/market/orderbook?symbol=${encodeURIComponent(
+              symbol
+            )}`,
+            {
+              signal: controller.signal,
+            }
+          ),
+        ]);
+
+        if (!tokensRes.ok)
+          throw new Error(
+            "Failed to load tokens"
+          );
+        if (!balancesRes.ok)
+          throw new Error(
+            "Failed to load balances"
+          );
+        if (!holdingsRes.ok)
+          throw new Error(
+            "Failed to load holdings"
+          );
+        if (!positionsRes.ok)
+          throw new Error(
+            "Failed to load positions"
+          );
+        if (!orderBookRes.ok)
+          throw new Error(
+            "Failed to load order book"
+          );
+
+        const tokensJson =
+          (await tokensRes.json()) as {
+            tokens: MarketToken[];
+          };
+        const balancesJson =
+          (await balancesRes.json()) as {
+            balances: WalletBalance[];
+          };
+        const holdingsJson =
+          (await holdingsRes.json()) as {
+            holdings: Holding[];
+          };
+        const positionsJson =
+          (await positionsRes.json()) as {
+            positions: Position[];
+          };
+        const orderBookJson =
+          (await orderBookRes.json()) as MarketOrderBook;
+
+        const nextToken =
+          tokensJson.tokens.find(
+            (t) => t.symbol === symbol
+          ) ?? null;
+
+        setToken(nextToken);
+        setBalances(
+          balancesJson.balances ?? []
+        );
+        setHoldings(
+          holdingsJson.holdings ?? []
+        );
+        setPositions(
+          positionsJson.positions ?? []
+        );
+        setOrderBook(orderBookJson);
+      } catch (error) {
+        if (controller.signal.aborted)
+          return;
+        setLoadError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load data"
+        );
+      }
+    }
+
+    void load();
+    return () => controller.abort();
+  }, [symbol]);
+
+  useEffect(() => {
+    const controller =
+      new AbortController();
+
+    async function loadSeries() {
+      try {
+        const res = await fetch(
+          `/api/market/series?symbol=${encodeURIComponent(
+            symbol
+          )}&timeframe=${encodeURIComponent(
+            timeframe
+          )}&points=34`,
+          { signal: controller.signal }
+        );
+
+        if (!res.ok)
+          throw new Error(
+            "Failed to load series"
+          );
+
+        const json =
+          (await res.json()) as {
+            series: number[];
+          };
+        setSeries(json.series ?? null);
+      } catch {
+        if (controller.signal.aborted)
+          return;
+        setSeries(null);
+      }
+    }
+
+    void loadSeries();
+    return () => controller.abort();
+  }, [symbol, timeframe]);
+
+  const effectiveToken: MarketToken =
+    token ?? {
+      id: symbol,
+      symbol,
+      projectId: "-",
+      projectTitle: "-",
+      priceUsd: 0,
+      marketCapUsd: 0,
+      change24hPct: 0,
+      change7dPct: 0,
+      change30dPct: 0,
+      changeAllPct: 0,
+      liveSince: "-",
+      isFavorite: false,
+    };
+
   const changePct = getChangePct(
-    token,
+    effectiveToken,
     timeframe
   );
   const isUp = changePct >= 0;
-  const series = useMemo(
-    () =>
-      makeSeries(symbol, changePct, 34),
-    [symbol, changePct]
-  );
-  const price = token.priceUsd;
-
-  // Get user data
-  const userBalance = useMemo(() => {
-    return (
-      walletBalances.find(
-        (b) => b.currencyCode === "USDT"
-      )?.available ?? 0
+  const price = effectiveToken.priceUsd;
+  const chartSeries =
+    series ??
+    Array.from({ length: 34 }).map(
+      () => 100
     );
-  }, []);
+  const asks = orderBook?.asks ?? [];
+  const bids = orderBook?.bids ?? [];
+
+  const userBalance = useMemo(
+    () =>
+      balances.find(
+        (b) => b.currencyCode === "USDT"
+      )?.available ?? 0,
+    [balances]
+  );
 
   const userHolding = useMemo(() => {
-    const holding = walletHoldings.find(
+    const holding = holdings.find(
       (h) => h.tokenSymbol === symbol
     );
     return holding
       ? holding.tokens * price
       : 0;
-  }, [symbol, price]);
+  }, [holdings, symbol, price]);
 
   const openOrders = useMemo(() => {
-    const positions =
-      walletPositions.filter(
-        (p) =>
-          p.tokenSymbol === symbol &&
-          (p.status === "OPEN" ||
-            p.status ===
-              "PARTIALLY_FILLED")
-      );
-    return positions.reduce(
+    const active = positions.filter(
+      (p) =>
+        p.tokenSymbol === symbol &&
+        (p.status === "OPEN" ||
+          p.status ===
+            "PARTIALLY_FILLED")
+    );
+    return active.reduce(
       (acc, p) =>
         acc +
         (p.totalAmount -
@@ -616,7 +708,7 @@ export default function ExchangeTokenPage() {
           p.orderPriceUsd,
       0
     );
-  }, [symbol]);
+  }, [positions, symbol]);
 
   return (
     <div className="flex flex-col h-[100dvh] -mb-24 pb-24 bg-linear-to-b from-gray-900 via-slate-900 to-black duration-500 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
@@ -637,7 +729,7 @@ export default function ExchangeTokenPage() {
           </Button>
           <div className="flex-1 pr-10 text-center">
             <h1 className="text-xl font-black tracking-tight leading-none text-white uppercase">
-              {token.symbol}
+              {effectiveToken.symbol}
             </h1>
             <p className="text-[10px] italic font-medium text-white/70">
               Mercado de Tokens
@@ -647,6 +739,11 @@ export default function ExchangeTokenPage() {
       </header>
 
       <main className="flex overflow-hidden flex-col flex-1 p-4 space-y-3">
+        {loadError && (
+          <div className="p-4 text-sm text-center rounded-3xl border border-dashed text-white/70 bg-white/5 border-white/10">
+            {loadError}
+          </div>
+        )}
         <Card className="overflow-hidden border-none shadow-sm bg-white shrink-0 rounded-[32px]">
           <div className="flex gap-4 justify-between items-start p-5">
             <div className="flex gap-6 justify-around items-center w-full">
@@ -710,7 +807,7 @@ export default function ExchangeTokenPage() {
               ] as const
             ).map(([label, tf]) => {
               const v = getChangePct(
-                token,
+                effectiveToken,
                 tf
               );
               const up = v >= 0;
@@ -802,19 +899,19 @@ export default function ExchangeTokenPage() {
           <div className="flex-1 p-4 min-h-0">
             {view === "linea" ? (
               <LineChart
-                series={series}
+                series={chartSeries}
                 isUp={isUp}
                 currentPrice={price}
               />
             ) : view === "velas" ? (
               <CandlesChart
-                series={series}
-                isUp={isUp}
+                series={chartSeries}
                 currentPrice={price}
               />
             ) : (
               <OrderBook
-                currentPrice={price}
+                asks={asks}
+                bids={bids}
               />
             )}
           </div>
@@ -835,7 +932,7 @@ export default function ExchangeTokenPage() {
             <span className="text-3xl font-bold tracking-normal normal-case opacity-100">
               $
               {(
-                token.sellPriceUsd ??
+                effectiveToken.sellPriceUsd ??
                 price
               ).toFixed(2)}
             </span>
@@ -854,7 +951,7 @@ export default function ExchangeTokenPage() {
             <span className="text-3xl font-bold tracking-normal normal-case opacity-100">
               $
               {(
-                token.buyPriceUsd ??
+                effectiveToken.buyPriceUsd ??
                 price
               ).toFixed(2)}
             </span>
@@ -874,7 +971,9 @@ export default function ExchangeTokenPage() {
                   {tradeType === "BUY"
                     ? "Comprar"
                     : "Vender"}{" "}
-                  {token?.symbol}
+                  {
+                    effectiveToken.symbol
+                  }
                 </DialogTitle>
               </DialogHeader>
 
@@ -888,7 +987,7 @@ export default function ExchangeTokenPage() {
                   )
                 }
               >
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid grid-cols-2 w-full">
                   <TabsTrigger value="MARKET">
                     Mercado
                   </TabsTrigger>
@@ -953,7 +1052,7 @@ export default function ExchangeTokenPage() {
                   </div>
 
                   <Button
-                    className="w-full h-12 mt-6 rounded-xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/25"
+                    className="mt-6 w-full h-12 text-xs font-black tracking-widest uppercase rounded-xl shadow-xl bg-primary text-primary-foreground shadow-primary/25"
                     size="lg"
                     onClick={() =>
                       setIsTradeDialogOpen(
