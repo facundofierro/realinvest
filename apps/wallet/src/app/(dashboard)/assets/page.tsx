@@ -110,7 +110,7 @@ export default function AssetsPage() {
             <div className="grid grid-cols-2 gap-4 pt-2">
               <Button
                 variant="ghost"
-                className="w-full h-11 text-xs rounded-2xl border border-white/10 backdrop-blur-md bg-white/5 hover:bg-white/10 text-white font-bold shadow-none"
+                className="w-full h-11 text-xs font-bold text-white rounded-2xl border shadow-none backdrop-blur-md border-white/10 bg-white/5 hover:bg-white/5"
                 asChild
               >
                 <Link href="/deposit">
@@ -120,7 +120,7 @@ export default function AssetsPage() {
               </Button>
               <Button
                 variant="ghost"
-                className="w-full h-11 text-xs rounded-2xl border border-white/10 backdrop-blur-md bg-white/5 hover:bg-white/10 text-white font-bold shadow-none"
+                className="w-full h-11 text-xs font-bold text-white rounded-2xl border shadow-none backdrop-blur-md border-white/10 bg-white/5 hover:bg-white/5"
                 asChild
               >
                 <Link href="/withdraw">
@@ -242,7 +242,7 @@ export default function AssetsPage() {
                     </div>
 
                     <div className="flex flex-col items-end text-right">
-                      <div className="text-xl font-black text-[#3B2146] tracking-tighter">
+                      <div className="text-lg font-black text-[#3B2146] tracking-tighter">
                         $ {asset.value}
                       </div>
                       <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
@@ -250,7 +250,10 @@ export default function AssetsPage() {
                         Tokens
                       </div>
                       {asset.orderPrice && (
-                        <Badge className="mt-1 bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[9px] px-2 py-0.5 h-auto font-black uppercase tracking-tighter">
+                        <Badge
+                          variant="outline"
+                          className="mt-1 bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[8px] px-2 py-0.5 h-auto font-black uppercase tracking-tighter"
+                        >
                           Posición: $
                           {
                             asset.orderPrice
@@ -284,13 +287,13 @@ export default function AssetsPage() {
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
                   <div className="flex gap-2 items-center">
-                    <span className="font-mono text-xs font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
+                    <span className="font-mono text-[10px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
                       {
                         selectedToken.tokenName
                       }
                     </span>
                   </div>
-                  <h3 className="text-xl font-black text-foreground">
+                  <h3 className="text-lg font-black text-foreground">
                     {
                       selectedToken.projectName
                     }
@@ -315,7 +318,7 @@ export default function AssetsPage() {
                   <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
                     Valor Total
                   </div>
-                  <div className="text-2xl font-black text-foreground">
+                  <div className="text-xl font-black text-foreground">
                     ${" "}
                     {
                       selectedToken.value

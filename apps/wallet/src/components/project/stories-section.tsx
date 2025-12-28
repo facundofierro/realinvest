@@ -137,7 +137,7 @@ export function ProjectStories({
               setActiveIndex(index);
               setProgress(0);
             }}
-            className="flex flex-col items-center gap-2 group transition-transform active:scale-95"
+            className="flex flex-col items-center gap-2 group transition-transform active:scale-95 focus:outline-none focus-visible:ring-0 appearance-none select-none"
           >
             <div className="p-[2.5px] rounded-full bg-linear-to-tr from-brand-lime via-brand-green to-brand-teal shadow-sm group-hover:scale-105 transition-all">
               <Avatar className="w-16 h-16 border-2 border-background">
@@ -158,9 +158,9 @@ export function ProjectStories({
       </div>
 
       {activeIndex !== null && (
-        <div className="fixed inset-0 z-[100] bg-black animate-in fade-in zoom-in-95 duration-300 select-none flex flex-col items-center justify-center">
+        <div className="fixed inset-0 z-[9999] bg-black animate-in fade-in zoom-in-95 duration-300 select-none flex flex-col items-center justify-center">
           {/* Progress Bars */}
-          <div className="absolute top-4 left-4 right-4 z-[110] flex gap-1.5 h-1">
+          <div className="absolute top-4 left-4 right-4 z-[10002] flex gap-1.5 h-1">
             {stories.map((_, i) => (
               <div
                 key={i}
@@ -188,10 +188,10 @@ export function ProjectStories({
           </div>
 
           {/* Header Gradient */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-linear-to-b from-black/60 to-transparent z-[109]" />
+          <div className="absolute top-0 left-0 right-0 h-32 bg-linear-to-b from-black/60 to-transparent z-[10001]" />
 
           {/* Header */}
-          <div className="absolute top-8 left-4 right-4 z-[110] flex justify-between items-center text-white p-2">
+          <div className="absolute top-8 left-4 right-4 z-[10002] flex justify-between items-center text-white p-2">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden relative shadow-lg">
                 <Image
@@ -221,7 +221,7 @@ export function ProjectStories({
                 e.stopPropagation();
                 setActiveIndex(null);
               }}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors backdrop-blur-md"
+              className="p-2 hover:bg-white/10 rounded-full transition-colors backdrop-blur-md focus:outline-none focus-visible:ring-0"
               aria-label="Cerrar historias"
             >
               <X className="w-6 h-6" />
@@ -229,7 +229,7 @@ export function ProjectStories({
           </div>
 
           {/* Navigation Areas (Invisible overlay) */}
-          <div className="absolute inset-0 z-[105] flex">
+          <div className="absolute inset-0 z-[10000] flex">
             <div
               className="w-1/2 h-full cursor-pointer"
               onClick={prevStory}
@@ -258,7 +258,7 @@ export function ProjectStories({
           </div>
 
           {/* Desktop Navigation Arrows */}
-          <div className="absolute inset-y-0 left-8 hidden md:flex items-center z-[110]">
+          <div className="absolute inset-y-0 left-8 hidden md:flex items-center z-[10002]">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -267,18 +267,18 @@ export function ProjectStories({
               disabled={
                 activeIndex === 0
               }
-              className="p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white disabled:opacity-0 transition-all hover:scale-110 active:scale-90"
+              className="p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white disabled:opacity-0 transition-all hover:scale-110 active:scale-90 focus:outline-none focus-visible:ring-0"
             >
               <ChevronLeft className="w-8 h-8" />
             </button>
           </div>
-          <div className="absolute inset-y-0 right-8 hidden md:flex items-center z-[110]">
+          <div className="absolute inset-y-0 right-8 hidden md:flex items-center z-[10002]">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 nextStory();
               }}
-              className="p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all hover:scale-110 active:scale-90"
+              className="p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all hover:scale-110 active:scale-90 focus:outline-none focus-visible:ring-0"
             >
               <ChevronRight className="w-8 h-8" />
             </button>

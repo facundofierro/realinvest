@@ -107,6 +107,17 @@ function ExchangePageInner() {
     useSearchParams();
   const projectFilter =
     searchParams.get("project");
+  const tabParam =
+    searchParams.get("tab");
+
+  const [activeTab, setActiveTab] =
+    useState(tabParam || "market");
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
 
   const [tokens, setTokens] = useState<
     MarketToken[]
@@ -465,7 +476,10 @@ function ExchangePageInner() {
               <div className="flex flex-col gap-1 items-end">
                 {typeof token.sellPriceUsd ===
                   "number" && (
-                  <Badge className="bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto">
+                  <Badge
+                    variant="outline"
+                    className="bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto"
+                  >
                     $
                     {token.sellPriceUsd.toFixed(
                       2
@@ -474,7 +488,10 @@ function ExchangePageInner() {
                 )}
                 {typeof token.buyPriceUsd ===
                   "number" && (
-                  <Badge className="bg-brand-green/10 text-brand-green border-brand-green/20 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto">
+                  <Badge
+                    variant="outline"
+                    className="bg-brand-green/10 text-brand-green border-brand-green/20 text-[8px] px-2 py-0.5 rounded-full font-black uppercase tracking-tighter border h-auto"
+                  >
                     $
                     {token.buyPriceUsd.toFixed(
                       2
@@ -539,7 +556,8 @@ function ExchangePageInner() {
 
       <div className="flex flex-col flex-1">
         <Tabs
-          defaultValue="market"
+          value={activeTab}
+          onValueChange={setActiveTab}
           className="w-full"
         >
           <div className="px-4 py-4 border-b border-border/50 bg-muted/10">
@@ -1044,7 +1062,7 @@ function ExchangePageInner() {
               <div className="flex justify-between items-start">
                 <div className="space-y-1 min-w-0">
                   <div className="flex gap-2 items-center min-w-0">
-                    <h3 className="text-2xl font-black tracking-tight truncate">
+                    <h3 className="text-xl font-black tracking-tight truncate">
                       {
                         selectedPosition.tokenSymbol
                       }
@@ -1064,7 +1082,7 @@ function ExchangePageInner() {
                       }
                     </Badge>
                   </div>
-                  <div className="text-xs font-bold tracking-widest uppercase truncate text-muted-foreground">
+                  <div className="text-[10px] font-bold tracking-widest uppercase truncate text-muted-foreground">
                     {tokenBySymbol.get(
                       selectedPosition.tokenSymbol
                     )?.projectTitle ??
@@ -1093,7 +1111,7 @@ function ExchangePageInner() {
                   <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
                     Valor Actual
                   </div>
-                  <div className="text-2xl font-black text-foreground">
+                  <div className="text-xl font-black text-foreground">
                     $
                     {formatUsd(
                       selectedPosition.filledAmount *

@@ -106,7 +106,7 @@ const PURCHASE_OPTIONS = [
       "text-brand-pink",
     watermarkIcon: ShoppingBag,
     cardClassName:
-      "bg-transparent border-brand-pink/20",
+      "bg-white border-none",
     badgeText: "Nuevo",
     badgeClassName:
       "text-brand-pink bg-brand-pink/10 border-brand-pink/20",
@@ -116,9 +116,9 @@ const PURCHASE_OPTIONS = [
     getHref: (id: string) =>
       `/project/${id}/units?filter=tokenized`,
     actionClassName:
-      "bg-brand-pink/10 text-brand-pink hover:bg-brand-pink hover:text-white border border-brand-pink/20",
+      "bg-brand-pink text-white hover:bg-brand-pink/90 border-transparent shadow-md shadow-brand-pink/20",
     iconContainerClassName:
-      "bg-brand-pink/10 border-brand-pink text-brand-pink",
+      "bg-brand-pink/10 border-brand-pink/20 text-brand-pink",
   },
   {
     key: "fixed_rent",
@@ -127,22 +127,22 @@ const PURCHASE_OPTIONS = [
       "Tokens con renta fija garantizada",
     headerIcon: DollarSign,
     headerIconClassName:
-      "text-green-500",
+      "text-emerald-500",
     watermarkIcon: TrendingUp,
     cardClassName:
-      "bg-transparent border-primary/20",
+      "bg-white border-none",
     badgeText: "Estable",
     badgeClassName:
-      "text-green-500 bg-green-500/10 border-green-500/20",
+      "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
     valueLabel: "Retorno Anual",
     value: "12%",
     actionText: "Depositar",
     getHref: (id: string) =>
       `/project/${id}/units?filter=fixed_rent`,
     actionClassName:
-      "bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white border border-green-500/20",
+      "bg-emerald-500 text-white hover:bg-emerald-600 border-transparent shadow-md shadow-emerald-500/20",
     iconContainerClassName:
-      "bg-green-500/10 border-green-500 text-green-500",
+      "bg-emerald-500/10 border-emerald-500/20 text-emerald-500",
   },
   {
     key: "full_property",
@@ -154,7 +154,7 @@ const PURCHASE_OPTIONS = [
       "text-purple-500",
     watermarkIcon: Home,
     cardClassName:
-      "bg-transparent border-purple-500/20",
+      "bg-white border-none",
     badgeText: "Exclusivo",
     badgeClassName:
       "text-purple-500 bg-purple-500/10 border-purple-500/20",
@@ -164,9 +164,9 @@ const PURCHASE_OPTIONS = [
     getHref: (id: string) =>
       `/project/${id}/units?filter=full_property`,
     actionClassName:
-      "bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white border border-purple-500/20",
+      "bg-purple-500 text-white hover:bg-purple-600 border-transparent shadow-md shadow-purple-500/20",
     iconContainerClassName:
-      "bg-purple-500/10 border-purple-500 text-purple-500",
+      "bg-purple-500/10 border-purple-500/20 text-purple-500",
   },
   {
     key: "construction_tokens",
@@ -178,7 +178,7 @@ const PURCHASE_OPTIONS = [
       "text-orange-500",
     watermarkIcon: Layers,
     cardClassName:
-      "bg-transparent border-orange-500/20",
+      "bg-white border-none",
     badgeText: "Oportunidad",
     badgeClassName:
       "text-orange-500 bg-orange-500/10 border-orange-500/20",
@@ -188,9 +188,9 @@ const PURCHASE_OPTIONS = [
     getHref: (id: string) =>
       `/exchange?project=${id}`,
     actionClassName:
-      "bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white border border-orange-500/20",
+      "bg-orange-500 text-white hover:bg-orange-600 border-transparent shadow-md shadow-orange-500/20",
     iconContainerClassName:
-      "bg-orange-500/10 border-orange-500 text-orange-500",
+      "bg-orange-500/10 border-orange-500/20 text-orange-500",
   },
 ] as const;
 
@@ -222,6 +222,31 @@ export default function ProjectPage({
 
   const [activeTab, setActiveTab] =
     useState("stages");
+
+  const [
+    isStoryActive,
+    setIsStoryActive,
+  ] = useState(false);
+
+  useEffect(() => {
+    const handleStoryActive = (
+      e: Event
+    ) => {
+      setIsStoryActive(
+        (e as CustomEvent).detail
+      );
+    };
+
+    window.addEventListener(
+      "story-active",
+      handleStoryActive
+    );
+    return () =>
+      window.removeEventListener(
+        "story-active",
+        handleStoryActive
+      );
+  }, []);
 
   useEffect(() => {
     const threshold = 260;
@@ -295,16 +320,13 @@ export default function ProjectPage({
         <div className="absolute inset-0 to-transparent bg-linear-to-t from-background via-background/80" />
         <div className="absolute right-4 left-4 bottom-16 z-10">
           <div className="space-y-1">
-            <Badge
-              variant="pink"
-              className="shadow-lg border-0 text-[10px] font-bold tracking-widest uppercase"
-            >
+            <Badge className="bg-brand-pink text-white shadow-lg border-0 text-[10px] font-black tracking-widest uppercase hover:bg-brand-pink/90">
               En Construcción
             </Badge>
-            <h1 className="text-3xl font-bold drop-shadow-sm text-foreground">
+            <h1 className="text-3xl font-black tracking-tighter uppercase drop-shadow-sm text-foreground">
               Torre Libertador 8000
             </h1>
-            <div className="flex items-center text-sm font-medium text-foreground/80">
+            <div className="flex items-center text-xs font-bold tracking-wider uppercase text-foreground/80">
               <MapPin className="mr-1 w-4 h-4 text-primary" />{" "}
               Av. del Libertador 8000,
               Nuñez
@@ -316,7 +338,11 @@ export default function ProjectPage({
       <div className="relative z-20 px-4 -mt-12 space-y-6">
         {/* Gallery Stories & Action */}
         <div
-          className={`sticky top-[62px] z-40 transition-all duration-300 -mx-4 px-4 pt-5 pb-3 ${
+          className={`sticky top-[62px] transition-all duration-300 -mx-4 px-4 pt-5 pb-3 ${
+            isStoryActive
+              ? "z-[10000]"
+              : "z-40"
+          } ${
             isCollapsed
               ? "border-b backdrop-blur-md bg-background/80 border-border/40"
               : "bg-transparent"
@@ -357,7 +383,7 @@ export default function ProjectPage({
                     className="basis-[88%]"
                   >
                     <Card
-                      className={`${option.cardClassName} shadow-none overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full`}
+                      className={`${option.cardClassName} shadow-sm rounded-[24px] overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full`}
                     >
                       <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
                         <option.watermarkIcon className="w-48 h-48 -rotate-12" />
@@ -428,22 +454,22 @@ export default function ProjectPage({
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <TabsList className="grid grid-cols-3 p-1 w-full h-14 rounded-2xl border backdrop-blur-sm bg-primary/5 border-primary/10">
+          <TabsList className="grid grid-cols-3 p-1 w-full h-14 rounded-2xl border-none bg-muted/50">
             <TabsTrigger
               value="stages"
-              className="rounded-xl text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary text-xs font-bold uppercase tracking-wider"
+              className="rounded-xl text-muted-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm text-xs font-black uppercase tracking-wider"
             >
               Etapas
             </TabsTrigger>
             <TabsTrigger
               value="financials"
-              className="rounded-xl text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary text-xs font-bold uppercase tracking-wider"
+              className="rounded-xl text-muted-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm text-xs font-black uppercase tracking-wider"
             >
               Invertir
             </TabsTrigger>
             <TabsTrigger
               value="overview"
-              className="rounded-xl text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary text-xs font-bold uppercase tracking-wider"
+              className="rounded-xl text-muted-foreground data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:shadow-sm text-xs font-black uppercase tracking-wider"
             >
               Proyecto
             </TabsTrigger>
