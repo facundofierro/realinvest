@@ -57,22 +57,85 @@ function OrderBook({
   asks: OrderBookLevel[];
   bids: OrderBookLevel[];
 }) {
+  const sortedAsks = asks
+    .slice()
+    .sort((a, b) => a.price - b.price);
+  const sortedBids = bids
+    .slice()
+    .sort((a, b) => b.price - a.price);
+
+  const askRowsAsc = sortedAsks.reduce<
+    Array<
+      OrderBookLevel & {
+        levelNotional: number;
+        cumulativeNotional: number;
+      }
+    >
+  >((acc, level) => {
+    const levelNotional =
+      level.amount * level.price;
+    const prevCum =
+      acc.length > 0
+        ? acc[acc.length - 1]
+            .cumulativeNotional
+        : 0;
+    acc.push({
+      ...level,
+      levelNotional,
+      cumulativeNotional:
+        prevCum + levelNotional,
+    });
+    return acc;
+  }, []);
+  const askRows = askRowsAsc
+    .slice()
+    .reverse();
+
+  const bidRows = sortedBids.reduce<
+    Array<
+      OrderBookLevel & {
+        levelNotional: number;
+        cumulativeNotional: number;
+      }
+    >
+  >((acc, level) => {
+    const levelNotional =
+      level.amount * level.price;
+    const prevCum =
+      acc.length > 0
+        ? acc[acc.length - 1]
+            .cumulativeNotional
+        : 0;
+    acc.push({
+      ...level,
+      levelNotional,
+      cumulativeNotional:
+        prevCum + levelNotional,
+    });
+    return acc;
+  }, []);
+
   const askMax = Math.max(
     1,
-    ...asks.map((a) => a.amount)
+    ...askRows.map(
+      (a) => a.levelNotional
+    )
   );
   const bidMax = Math.max(
     1,
-    ...bids.map((b) => b.amount)
+    ...bidRows.map(
+      (b) => b.levelNotional
+    )
   );
 
   return (
     <div className="flex gap-4 h-full duration-300 animate-in fade-in zoom-in-95">
       <div className="flex-1 space-y-2">
-        <div className="text-[10px] font-black text-white/50 uppercase tracking-widest text-right">
-          Precio (USDT)
+        <div className="flex justify-between text-[10px] font-black text-white/50 uppercase tracking-widest">
+          <span>Acum (USDT)</span>
+          <span>Precio</span>
         </div>
-        {asks.map((ask, i) => (
+        {askRows.map((ask, i) => (
           <div
             key={i}
             className="flex relative justify-between items-center h-6 text-xs group"
@@ -80,11 +143,13 @@ function OrderBook({
             <div
               className="absolute top-0 right-0 bottom-0 rounded-l-sm transition-all bg-red-500/10 group-hover:bg-red-500/20"
               style={{
-                width: `${(ask.amount / askMax) * 100}%`,
+                width: `${(ask.levelNotional / askMax) * 100}%`,
               }}
             />
             <span className="relative z-10 font-mono font-medium text-white/70">
-              {ask.amount}
+              {formatCompactNumber(
+                ask.cumulativeNotional
+              )}
             </span>
             <span className="relative z-10 font-mono font-bold text-red-400">
               {ask.price.toFixed(2)}
@@ -94,10 +159,11 @@ function OrderBook({
       </div>
       <div className="w-px bg-white/10" />
       <div className="flex-1 space-y-2">
-        <div className="text-[10px] font-black text-white/50 uppercase tracking-widest">
-          Precio (USDT)
+        <div className="flex justify-between text-[10px] font-black text-white/50 uppercase tracking-widest">
+          <span>Precio</span>
+          <span>Acum (USDT)</span>
         </div>
-        {bids.map((bid, i) => (
+        {bidRows.map((bid, i) => (
           <div
             key={i}
             className="flex relative justify-between items-center h-6 text-xs group"
@@ -105,14 +171,16 @@ function OrderBook({
             <div
               className="absolute top-0 bottom-0 left-0 rounded-r-sm transition-all bg-emerald-500/10 group-hover:bg-emerald-500/20"
               style={{
-                width: `${(bid.amount / bidMax) * 100}%`,
+                width: `${(bid.levelNotional / bidMax) * 100}%`,
               }}
             />
             <span className="relative z-10 font-mono font-bold text-emerald-400">
               {bid.price.toFixed(2)}
             </span>
             <span className="relative z-10 font-mono font-medium text-white/70">
-              {bid.amount}
+              {formatCompactNumber(
+                bid.cumulativeNotional
+              )}
             </span>
           </div>
         ))}
@@ -125,6 +193,28 @@ function formatPct(
   value: number
 ): string {
   return `${Math.abs(value).toFixed(1)}%`;
+}
+
+function formatCompactNumber(
+  value: number
+): string {
+  const abs = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+  if (abs >= 1_000_000_000) {
+    const n = abs / 1_000_000_000;
+    const s = n
+      .toFixed(1)
+      .replace(/\.0$/, "");
+    return `${sign}${s}B`;
+  }
+  if (abs >= 1_000_000) {
+    const n = abs / 1_000_000;
+    const s = n
+      .toFixed(1)
+      .replace(/\.0$/, "");
+    return `${sign}${s}M`;
+  }
+  return `${sign}${Math.round(abs).toLocaleString()}`;
 }
 
 function getChangePct(
@@ -672,8 +762,12 @@ export default function ExchangeTokenPage() {
     Array.from({ length: 34 }).map(
       () => 100
     );
-  const asks = orderBook?.asks ?? [];
-  const bids = orderBook?.bids ?? [];
+  const { asks, bids } = useMemo(() => {
+    return {
+      asks: orderBook?.asks ?? [],
+      bids: orderBook?.bids ?? [],
+    };
+  }, [orderBook]);
 
   const userBalance = useMemo(
     () =>
@@ -709,6 +803,26 @@ export default function ExchangeTokenPage() {
       0
     );
   }, [positions, symbol]);
+
+  const bestAsk = useMemo(() => {
+    if (asks.length === 0) return null;
+    const best = Math.min(
+      ...asks.map((a) => a.price)
+    );
+    return Number.isFinite(best)
+      ? best
+      : null;
+  }, [asks]);
+
+  const bestBid = useMemo(() => {
+    if (bids.length === 0) return null;
+    const best = Math.max(
+      ...bids.map((b) => b.price)
+    );
+    return Number.isFinite(best)
+      ? best
+      : null;
+  }, [bids]);
 
   return (
     <div className="flex flex-col h-[100dvh] -mb-24 pb-24 bg-linear-to-b from-gray-900 via-slate-900 to-black duration-500 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
@@ -932,6 +1046,7 @@ export default function ExchangeTokenPage() {
             <span className="text-3xl font-bold tracking-normal normal-case opacity-100">
               $
               {(
+                bestBid ??
                 effectiveToken.sellPriceUsd ??
                 price
               ).toFixed(2)}
@@ -951,6 +1066,7 @@ export default function ExchangeTokenPage() {
             <span className="text-3xl font-bold tracking-normal normal-case opacity-100">
               $
               {(
+                bestAsk ??
                 effectiveToken.buyPriceUsd ??
                 price
               ).toFixed(2)}
