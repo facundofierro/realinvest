@@ -545,19 +545,19 @@ export default function ExchangePage() {
             <TabsList className="flex items-center gap-1.5 w-full h-auto bg-transparent p-0 border-none">
               <TabsTrigger
                 value="market"
-                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary"
+                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/30 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
               >
                 Mercado
               </TabsTrigger>
               <TabsTrigger
                 value="favorites"
-                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary"
+                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/30 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
               >
                 Favoritos
               </TabsTrigger>
               <TabsTrigger
                 value="positions"
-                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/50 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary/10 data-[state=active]:border-primary/20 data-[state=active]:text-primary"
+                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/30 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
               >
                 Mis Posiciones
               </TabsTrigger>
@@ -1360,7 +1360,7 @@ export default function ExchangePage() {
                     </span>
                   </div>
                 </div>
-                <div className="pr-10 text-right">
+                <div className="text-right mt-10">
                   <div className="text-2xl font-black text-foreground">
                     $
                     {selectedToken.priceUsd.toFixed(
@@ -1368,10 +1368,10 @@ export default function ExchangePage() {
                     )}
                   </div>
                   <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
-                    Stock:{" "}
+                    STOCK:{" "}
                     {selectedToken.tokensAvailable ??
                       0}{" "}
-                    Tokens
+                    TOKENS
                   </div>
                 </div>
               </div>

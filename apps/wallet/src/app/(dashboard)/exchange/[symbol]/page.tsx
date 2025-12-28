@@ -92,15 +92,29 @@ function makeSeries(
 function LineChart({
   series,
   isUp,
+  currentPrice,
 }: {
   series: number[];
   isUp: boolean;
+  currentPrice: number;
 }) {
   const min = Math.min(...series);
   const max = Math.max(...series);
   const w = 320;
   const h = 200;
-  const pad = 0;
+  const padRight = 45;
+  const padTop = 10;
+  const padBottom = 10;
+
+  const getRealPrice = (
+    val: number
+  ) => {
+    const lastVal =
+      series[series.length - 1];
+    return (
+      (val / lastVal) * currentPrice
+    );
+  };
 
   const d = series
     .map((v, i) => {
@@ -110,17 +124,31 @@ function LineChart({
             1,
             series.length - 1
           )) *
-          (w - pad * 2) +
-        pad;
+        (w - padRight);
       const y =
         h -
-        pad -
+        padBottom -
         ((v - min) /
           Math.max(1e-6, max - min)) *
-          (h - pad * 2);
+          (h - padTop - padBottom);
       return `${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
     })
     .join(" ");
+
+  const labels = [
+    {
+      val: max,
+      label: `$${getRealPrice(max).toFixed(2)}`,
+    },
+    {
+      val: min,
+      label: `$${getRealPrice(min).toFixed(2)}`,
+    },
+    {
+      val: (max + min) / 2,
+      label: `$${getRealPrice((max + min) / 2).toFixed(2)}`,
+    },
+  ];
 
   return (
     <svg
@@ -174,15 +202,45 @@ function LineChart({
         </linearGradient>
       </defs>
 
+      {/* Grid Lines */}
+      {labels.map((l, i) => {
+        const y =
+          h -
+          padBottom -
+          ((l.val - min) /
+            Math.max(1e-6, max - min)) *
+            (h - padTop - padBottom);
+        return (
+          <g key={i}>
+            <line
+              x1="0"
+              y1={y}
+              x2={w - padRight}
+              y2={y}
+              stroke="currentColor"
+              className="text-border/30"
+              strokeDasharray="4 4"
+            />
+            <text
+              x={w - padRight + 4}
+              y={y + 3}
+              className="text-[9px] font-bold fill-muted-foreground"
+            >
+              {l.label}
+            </text>
+          </g>
+        );
+      })}
+
       <path
-        d={`${d} L ${w - pad} ${h - pad} L ${pad} ${h - pad} Z`}
+        d={`${d} L ${w - padRight} ${h - padBottom} L 0 ${h - padBottom} Z`}
         fill="url(#areaFill)"
       />
       <path
         d={d}
         fill="none"
         stroke="url(#lineStroke)"
-        strokeWidth="3"
+        strokeWidth="2.5"
         strokeLinejoin="round"
         strokeLinecap="round"
       />
@@ -193,57 +251,82 @@ function LineChart({
 function CandlesChart({
   series,
   isUp,
+  currentPrice,
 }: {
   series: number[];
   isUp: boolean;
+  currentPrice: number;
 }) {
   const min = Math.min(...series);
   const max = Math.max(...series);
   const w = 320;
   const h = 200;
-  const pad = 0;
+  const padRight = 45;
+  const padTop = 10;
+  const padBottom = 10;
+
+  const getRealPrice = (
+    val: number
+  ) => {
+    const lastVal =
+      series[series.length - 1];
+    return (
+      (val / lastVal) * currentPrice
+    );
+  };
+
+  const scaleY = (val: number) =>
+    h -
+    padBottom -
+    ((val - min) /
+      Math.max(1e-6, max - min)) *
+      (h - padTop - padBottom);
+
+  const labels = [
+    {
+      val: max,
+      label: `$${getRealPrice(max).toFixed(2)}`,
+    },
+    {
+      val: min,
+      label: `$${getRealPrice(min).toFixed(2)}`,
+    },
+  ];
+
   const candles = series
     .slice(1)
     .map((v, i) => {
       const prev = series[i];
       const open = prev;
       const close = v;
+      const diff = Math.abs(
+        close - open
+      );
       const high =
         Math.max(open, close) +
-        Math.abs(close - open) * 0.6;
+        diff * 0.4;
       const low =
         Math.min(open, close) -
-        Math.abs(close - open) * 0.6;
+        diff * 0.4;
       const x =
         ((i + 1) /
           Math.max(
             1,
             series.length - 1
           )) *
-          (w - pad * 2) +
-        pad;
-      const scaleY = (val: number) =>
-        h -
-        pad -
-        ((val - min) /
-          Math.max(1e-6, max - min)) *
-          (h - pad * 2);
-      const yOpen = scaleY(open);
-      const yClose = scaleY(close);
-      const yHigh = scaleY(high);
-      const yLow = scaleY(low);
-      const up = close >= open;
-      const color = up
-        ? "#10b981"
-        : "#ec4899";
+        (w - padRight);
+
       return {
         x,
-        yOpen,
-        yClose,
-        yHigh,
-        yLow,
-        up,
-        color,
+        yOpen: scaleY(open),
+        yClose: scaleY(close),
+        yHigh: scaleY(high),
+        yLow: scaleY(low),
+        up: close >= open,
+        color:
+          close >= open
+            ? "#10b981"
+            : "#ec4899",
       };
     });
 
@@ -252,38 +335,31 @@ function CandlesChart({
       viewBox={`0 0 ${w} ${h}`}
       className="w-full h-full"
     >
-      <defs>
-        <linearGradient
-          id="candleGlow"
-          x1="0"
-          x2="1"
-          y1="0"
-          y2="0"
-        >
-          <stop
-            offset="0%"
-            stopColor={
-              isUp
-                ? "#10b981"
-                : "#ec4899"
-            }
-            stopOpacity="0.35"
-          />
-          <stop
-            offset="100%"
-            stopColor="#8b5cf6"
-            stopOpacity="0.15"
-          />
-        </linearGradient>
-      </defs>
-      <rect
-        x="0"
-        y="0"
-        width={w}
-        height={h}
-        fill="url(#candleGlow)"
-        opacity="0.15"
-      />
+      {/* Grid Lines */}
+      {labels.map((l, i) => {
+        const y = scaleY(l.val);
+        return (
+          <g key={i}>
+            <line
+              x1="0"
+              y1={y}
+              x2={w - padRight}
+              y2={y}
+              stroke="currentColor"
+              className="text-border/30"
+              strokeDasharray="4 4"
+            />
+            <text
+              x={w - padRight + 4}
+              y={y + 3}
+              className="text-[9px] font-bold fill-muted-foreground"
+            >
+              {l.label}
+            </text>
+          </g>
+        );
+      })}
+
       {candles.map((c, idx) => {
         const bodyTop = Math.min(
           c.yOpen,
@@ -294,10 +370,10 @@ function CandlesChart({
           c.yClose
         );
         const bodyH = Math.max(
-          4,
+          2,
           bodyBottom - bodyTop
         );
-        const bodyW = 6;
+        const bodyW = 5;
         return (
           <g key={idx}>
             <line
@@ -306,8 +382,8 @@ function CandlesChart({
               y1={c.yHigh}
               y2={c.yLow}
               stroke={c.color}
-              strokeWidth="2"
-              opacity="0.9"
+              strokeWidth="1.5"
+              opacity="0.8"
             />
             <rect
               x={c.x - bodyW / 2}
@@ -315,8 +391,8 @@ function CandlesChart({
               width={bodyW}
               height={bodyH}
               fill={c.color}
-              opacity={0.95}
-              rx="2"
+              opacity={0.9}
+              rx="1"
             />
           </g>
         );
@@ -375,8 +451,8 @@ export default function ExchangeTokenPage() {
   const price = token.priceUsd;
 
   return (
-    <div className="flex flex-col pb-24 min-h-screen duration-500 bg-background animate-in fade-in slide-in-from-bottom-4">
-      <header className="overflow-hidden sticky top-0 z-50 px-4 pt-8 pb-6 text-white from-gray-900 rounded-none border-none shadow-xl bg-linear-to-br via-slate-900 to-violet-950">
+    <div className="flex flex-col h-[calc(100dvh-96px)] bg-[#F8F9FA] duration-500 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
+      <header className="overflow-hidden sticky top-0 z-50 px-4 pt-4 pb-3 text-white from-gray-900 rounded-none border-none shadow-xl bg-linear-to-br via-slate-900 to-violet-950 shrink-0">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
         <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10"></div>
 
@@ -392,57 +468,77 @@ export default function ExchangeTokenPage() {
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="flex-1 pr-10 text-center">
-            <h1 className="text-2xl font-black tracking-tight leading-none text-white uppercase">
+            <h1 className="text-xl font-black tracking-tight leading-none text-white uppercase">
               {token.symbol}
             </h1>
-            <p className="text-xs italic font-medium text-white/70">
+            <p className="text-[10px] italic font-medium text-white/70">
               Mercado de Tokens
             </p>
           </div>
         </div>
       </header>
 
-      <main className="p-4 space-y-4">
-        <Card className="overflow-hidden border border-primary/10 bg-primary/5">
-          <div className="flex gap-4 justify-between items-start p-4">
-            <div className="space-y-1">
-              <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
-                Precio
+      <main className="flex overflow-hidden flex-col flex-1 p-4 space-y-3">
+        <Card className="overflow-hidden border-none shadow-sm bg-white shrink-0 rounded-[32px]">
+          <div className="flex gap-4 justify-between items-start p-5">
+            <div className="flex gap-6 items-center">
+              <div className="space-y-0.5">
+                <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                  COMPRA
+                </div>
+                <div className="text-2xl font-black tracking-tighter text-[#3B2146]">
+                  $
+                  {(
+                    token.buyPriceUsd ??
+                    price
+                  ).toFixed(2)}
+                </div>
               </div>
-              <div className="text-3xl font-black tracking-tighter text-foreground">
-                ${price.toFixed(2)}
-              </div>
-              <div className="text-[11px] font-bold text-muted-foreground">
-                {token.projectTitle}
+              <div className="w-px h-8 bg-gray-100" />
+              <div className="space-y-0.5">
+                <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                  VENTA
+                </div>
+                <div className="text-2xl font-black tracking-tighter text-[#3B2146]">
+                  $
+                  {(
+                    token.sellPriceUsd ??
+                    price
+                  ).toFixed(2)}
+                </div>
               </div>
             </div>
-            <div
-              className={cn(
-                "px-4 py-3 text-right border transition-all rounded-[24px]",
-                isUp
-                  ? "shadow-lg bg-brand-green border-brand-green shadow-brand-green/20"
-                  : "shadow-lg bg-brand-pink border-brand-pink shadow-brand-pink/20"
-              )}
-            >
-              <div className="flex gap-2 justify-end items-center">
-                {isUp ? (
-                  <TrendingUp className="w-5 h-5 text-white" />
-                ) : (
-                  <TrendingDown className="w-5 h-5 text-white" />
-                )}
-                <span className="text-lg font-black text-white">
-                  {formatPct(changePct)}
-                </span>
-              </div>
-              <div className="text-[10px] text-white/90 font-black uppercase tracking-widest mt-0.5">
+
+            <div className="flex flex-col gap-1 items-center">
+              <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-center">
                 {timeframe === "all"
-                  ? "All time"
-                  : timeframe.toUpperCase()}
+                  ? "HISTÓRICO"
+                  : timeframe === "30d"
+                    ? "30 DÍAS"
+                    : timeframe === "7d"
+                      ? "7 DÍAS"
+                      : "24 HORAS"}
+              </div>
+              <div
+                className={cn(
+                  "px-4 py-2.5 text-right transition-all rounded-[20px] flex flex-col items-center justify-center min-w-[90px] shadow-lg",
+                  isUp
+                    ? "bg-linear-to-r from-brand-lime via-brand-green to-brand-teal shadow-brand-green/20"
+                    : "bg-[#FF3366] shadow-brand-pink/20"
+                )}
+              >
+                <div className="flex gap-1.5 justify-center items-center">
+                  <span className="text-xl font-black leading-none text-white">
+                    {formatPct(
+                      changePct
+                    ).replace("+", "")}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 px-4 pb-4">
+          <div className="grid grid-cols-4 gap-2 px-4 pb-5">
             {(
               [
                 ["ALL", "all"],
@@ -456,6 +552,8 @@ export default function ExchangeTokenPage() {
                 tf
               );
               const up = v >= 0;
+              const isSelected =
+                timeframe === tf;
               return (
                 <button
                   key={tf}
@@ -464,10 +562,10 @@ export default function ExchangeTokenPage() {
                     setTimeframe(tf)
                   }
                   className={cn(
-                    "h-12 rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all",
-                    timeframe === tf
-                      ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10"
-                      : "bg-background/70 border-border hover:bg-muted/40"
+                    "h-[52px] rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center",
+                    isSelected
+                      ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10"
+                      : "bg-white border-gray-100 hover:bg-gray-50"
                   )}
                 >
                   <span className="block leading-none">
@@ -475,12 +573,10 @@ export default function ExchangeTokenPage() {
                   </span>
                   <span
                     className={cn(
-                      "block text-[9px] mt-0.5",
-                      timeframe === tf
-                        ? "text-primary-foreground/90"
-                        : up
-                          ? "text-brand-green"
-                          : "text-brand-pink"
+                      "mt-1 px-1.5 py-0.5 rounded-md text-[8px] font-black inline-block border",
+                      up
+                        ? "bg-brand-green/10 text-brand-green border-brand-green/20"
+                        : "bg-brand-pink/10 text-brand-pink border-brand-pink/20"
                     )}
                   >
                     {formatPct(v)}
@@ -491,8 +587,8 @@ export default function ExchangeTokenPage() {
           </div>
         </Card>
 
-        <Card className="overflow-hidden border backdrop-blur border-border/60 bg-card/80">
-          <div className="flex justify-between items-center p-4">
+        <Card className="flex overflow-hidden flex-col flex-1 min-h-0 border-none shadow-sm bg-white rounded-[32px]">
+          <div className="flex justify-between items-center p-3 shrink-0">
             <div className="flex gap-2 w-full">
               <button
                 type="button"
@@ -502,12 +598,12 @@ export default function ExchangeTokenPage() {
                 className={cn(
                   "flex-1 h-10 rounded-xl border text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
                   view === "linea"
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background border-border hover:bg-muted/40"
+                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                    : "bg-white border-gray-100 hover:bg-gray-50"
                 )}
               >
                 <BarChart3 className="w-4 h-4" />
-                Línea
+                LÍNEA
               </button>
               <button
                 type="button"
@@ -517,38 +613,40 @@ export default function ExchangeTokenPage() {
                 className={cn(
                   "flex-1 h-10 rounded-xl border text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
                   view === "velas"
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background border-border hover:bg-muted/40"
+                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                    : "bg-white border-gray-100 hover:bg-gray-50"
                 )}
               >
                 <CandlestickChart className="w-4 h-4" />
-                Velas
+                VELAS
               </button>
             </div>
           </div>
-          <div className="pt-2 h-[400px]">
+          <div className="flex-1 p-4 min-h-0">
             {view === "linea" ? (
               <LineChart
                 series={series}
                 isUp={isUp}
+                currentPrice={price}
               />
             ) : (
               <CandlesChart
                 series={series}
                 isUp={isUp}
+                currentPrice={price}
               />
             )}
           </div>
         </Card>
-        <div className="flex gap-3 pt-2">
+
+        <div className="flex gap-3 pt-2 pb-2 shrink-0">
           <Button
             onClick={() =>
               router.push(
                 `/exchange/${encodeURIComponent(symbol)}/sell`
               )
             }
-            variant="outline"
-            className="flex-1 h-16 text-[10px] font-black tracking-widest uppercase rounded-2xl border-border bg-card/50 hover:bg-muted/50 hover:text-foreground transition-all active:scale-95"
+            className="flex-1 h-14 text-[12px] font-black tracking-widest uppercase rounded-[20px] bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all border-none"
           >
             VENDER
           </Button>
@@ -558,7 +656,7 @@ export default function ExchangeTokenPage() {
                 `/exchange/${encodeURIComponent(symbol)}/buy`
               )
             }
-            className="flex-[1.5] h-16 rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[11px]"
+            className="flex-1 h-14 rounded-[20px] bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[12px] border-none"
           >
             COMPRAR
           </Button>

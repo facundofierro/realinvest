@@ -349,7 +349,7 @@ export default function ProjectPage({
                     className="basis-[88%]"
                   >
                     <Card
-                      className={`${option.cardClassName} shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full`}
+                      className={`${option.cardClassName} shadow-none overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full`}
                     >
                       <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
                         <option.watermarkIcon className="w-48 h-48 -rotate-12" />
@@ -372,6 +372,7 @@ export default function ProjectPage({
                             </p>
                           </div>
                           <Badge
+                            variant="ghost"
                             className={
                               option.badgeClassName
                             }
@@ -431,7 +432,7 @@ export default function ProjectPage({
               value="stages"
               className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-lg text-xs font-bold uppercase tracking-wider"
             >
-              Roadmap
+              Etapas
             </TabsTrigger>
             <TabsTrigger
               value="financials"
@@ -493,7 +494,7 @@ export default function ProjectPage({
                     </div>
 
                     <div className="grid grid-cols-3 gap-4 mb-5">
-                      <div className="p-2 rounded-xl border bg-secondary/40 border-border/50">
+                      <div className="flex flex-col items-center p-2 text-center rounded-xl border bg-secondary/40 border-border/50">
                         <span className="block text-[9px] text-muted-foreground uppercase font-black mb-1">
                           Total Uni.
                         </span>
@@ -503,7 +504,7 @@ export default function ProjectPage({
                         </span>
                       </div>
                       <div
-                        className={`p-2 rounded-xl border ${stage.status === "active" ? "bg-primary/5 border-primary/20" : "bg-secondary/40 border-border/50"}`}
+                        className={`flex flex-col items-center p-2 text-center rounded-xl border ${stage.status === "active" ? "bg-primary/5 border-primary/20" : "bg-secondary/40 border-border/50"}`}
                       >
                         <span className="block text-[9px] text-muted-foreground uppercase font-black mb-1">
                           Disponibles
@@ -514,9 +515,9 @@ export default function ProjectPage({
                           }
                         </span>
                       </div>
-                      <div className="p-2 rounded-xl border bg-secondary/40 border-border/50">
+                      <div className="flex flex-col items-center p-2 text-center rounded-xl border bg-secondary/40 border-border/50">
                         <span className="block text-[9px] text-muted-foreground uppercase font-black mb-1">
-                          Min. Entry
+                          Mín. Inversión
                         </span>
                         <span className="text-sm font-black text-foreground">
                           $
