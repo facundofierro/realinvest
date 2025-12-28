@@ -116,7 +116,7 @@ const PURCHASE_OPTIONS = [
     getHref: (id: string) =>
       `/project/${id}/units?filter=tokenized`,
     actionClassName:
-      "bg-brand-pink text-white hover:bg-brand-pink/90 border-transparent shadow-md shadow-brand-pink/20",
+      "bg-brand-pink/10 text-brand-pink border border-brand-pink/20 hover:bg-brand-pink hover:text-white hover:border-brand-pink",
     iconContainerClassName:
       "bg-brand-pink/10 border-brand-pink/20 text-brand-pink",
   },
@@ -140,7 +140,7 @@ const PURCHASE_OPTIONS = [
     getHref: (id: string) =>
       `/project/${id}/units?filter=fixed_rent`,
     actionClassName:
-      "bg-emerald-500 text-white hover:bg-emerald-600 border-transparent shadow-md shadow-emerald-500/20",
+      "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500 hover:text-white hover:border-emerald-500",
     iconContainerClassName:
       "bg-emerald-500/10 border-emerald-500/20 text-emerald-500",
   },
@@ -164,7 +164,7 @@ const PURCHASE_OPTIONS = [
     getHref: (id: string) =>
       `/project/${id}/units?filter=full_property`,
     actionClassName:
-      "bg-purple-500 text-white hover:bg-purple-600 border-transparent shadow-md shadow-purple-500/20",
+      "bg-purple-500/10 text-purple-500 border border-purple-500/20 hover:bg-purple-500 hover:text-white hover:border-purple-500",
     iconContainerClassName:
       "bg-purple-500/10 border-purple-500/20 text-purple-500",
   },
@@ -188,7 +188,7 @@ const PURCHASE_OPTIONS = [
     getHref: (id: string) =>
       `/exchange?project=${id}`,
     actionClassName:
-      "bg-orange-500 text-white hover:bg-orange-600 border-transparent shadow-md shadow-orange-500/20",
+      "bg-orange-500/10 text-orange-500 border border-orange-500/20 hover:bg-orange-500 hover:text-white hover:border-orange-500",
     iconContainerClassName:
       "bg-orange-500/10 border-orange-500/20 text-orange-500",
   },
