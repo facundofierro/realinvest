@@ -317,7 +317,7 @@ export function SimilarProjectsCarousel({
   return (
     <Carousel
       opts={{
-        align: "start",
+        align: "center",
         loop: true,
       }}
       plugins={[autoplay.current]}

@@ -106,7 +106,7 @@ const PURCHASE_OPTIONS = [
       "text-brand-pink",
     watermarkIcon: ShoppingBag,
     cardClassName:
-      "bg-linear-to-br from-brand-pink/10 via-background to-secondary/5 border-brand-pink/20",
+      "bg-transparent border-brand-pink/20",
     badgeText: "Nuevo",
     badgeClassName:
       "text-brand-pink bg-brand-pink/10 border-brand-pink/20",
@@ -128,7 +128,7 @@ const PURCHASE_OPTIONS = [
       "text-green-500",
     watermarkIcon: TrendingUp,
     cardClassName:
-      "bg-linear-to-br from-green-500/10 via-background to-secondary/5 border-primary/20",
+      "bg-transparent border-primary/20",
     badgeText: "Estable",
     badgeClassName:
       "text-green-500 bg-green-500/10 border-green-500/20",
@@ -150,7 +150,7 @@ const PURCHASE_OPTIONS = [
       "text-purple-500",
     watermarkIcon: Home,
     cardClassName:
-      "bg-linear-to-br from-purple-500/10 via-background to-secondary/5 border-purple-500/20",
+      "bg-transparent border-purple-500/20",
     badgeText: "Exclusivo",
     badgeClassName:
       "text-purple-500 bg-purple-500/10 border-purple-500/20",
@@ -172,7 +172,7 @@ const PURCHASE_OPTIONS = [
       "text-orange-500",
     watermarkIcon: Layers,
     cardClassName:
-      "bg-linear-to-br from-orange-500/10 via-background to-secondary/5 border-orange-500/20",
+      "bg-transparent border-orange-500/20",
     badgeText: "Oportunidad",
     badgeClassName:
       "text-orange-500 bg-orange-500/10 border-orange-500/20",
@@ -209,16 +209,20 @@ export default function ProjectPage({
       : "/";
   const [isCollapsed, setIsCollapsed] =
     useState(false);
+  const [showTitle, setShowTitle] =
+    useState(false);
 
   const [activeTab, setActiveTab] =
     useState("stages");
 
   useEffect(() => {
-    const threshold = 400;
+    const threshold = 260;
     const onScroll = () => {
+      const scrollY = window.scrollY;
       setIsCollapsed(
-        window.scrollY > threshold
+        scrollY > threshold
       );
+      setShowTitle(scrollY > threshold);
     };
 
     onScroll();
@@ -237,7 +241,7 @@ export default function ProjectPage({
   }, []);
 
   return (
-    <div className="relative pb-10 bg-background">
+    <div className="relative pb-2 bg-background">
       <div
         className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${isCollapsed ? "border-b backdrop-blur-md bg-background/80 border-border/40" : "bg-transparent"}`}
       >
@@ -252,7 +256,7 @@ export default function ProjectPage({
           </Link>
 
           <div
-            className={`flex-1 min-w-0 transition-all duration-300 ${isCollapsed ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}
+            className={`flex-1 min-w-0 transition-all duration-300 ${showTitle ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}
           >
             <div className="text-sm font-black tracking-tight truncate text-foreground">
               Torre Libertador 8000
@@ -301,7 +305,7 @@ export default function ProjectPage({
         </div>
       </div>
 
-      <div className="relative z-20 px-4 -mt-12 space-y-8">
+      <div className="relative z-20 px-4 -mt-12 space-y-6">
         {/* Gallery Stories & Action */}
         <div
           className={`sticky top-[62px] z-40 transition-all duration-300 -mx-4 px-4 pt-5 pb-3 ${
@@ -322,12 +326,13 @@ export default function ProjectPage({
           className={`transition-all duration-500 ease-in-out overflow-hidden ${
             activeTab === "financials"
               ? "max-h-0 opacity-0 pointer-events-none mb-0"
-              : "max-h-[500px] opacity-100 mb-8"
+              : "max-h-[500px] opacity-100 mb-4"
           }`}
         >
           <Carousel
             className="w-full"
             opts={{
+              align: "center",
               loop: true,
             }}
             plugins={[
@@ -341,6 +346,7 @@ export default function ProjectPage({
                 (option) => (
                   <CarouselItem
                     key={option.key}
+                    className="basis-[88%]"
                   >
                     <Card
                       className={`${option.cardClassName} shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full`}
@@ -444,7 +450,7 @@ export default function ProjectPage({
           {/* STAGES TAB */}
           <TabsContent
             value="stages"
-            className="mt-8 space-y-6 animate-in fade-in-50 slide-in-from-bottom-4"
+            className="mt-6 space-y-4 animate-in fade-in-50 slide-in-from-bottom-4"
           >
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -635,7 +641,7 @@ export default function ProjectPage({
           {/* PROJECT OVERVIEW TAB */}
           <TabsContent
             value="overview"
-            className="mt-8 space-y-8 animate-in fade-in-50 slide-in-from-bottom-4"
+            className="mt-6 space-y-6 animate-in fade-in-50 slide-in-from-bottom-4"
           >
             <div className="space-y-4">
               <h3 className="flex gap-2 items-center text-xl font-black tracking-tight">
