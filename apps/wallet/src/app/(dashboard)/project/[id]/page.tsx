@@ -427,22 +427,22 @@ export default function ProjectPage({
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <TabsList className="grid grid-cols-3 p-1 w-full h-14 rounded-2xl border backdrop-blur-sm bg-muted/30 border-border/50">
+          <TabsList className="grid grid-cols-3 p-1 w-full h-14 rounded-2xl border backdrop-blur-sm bg-primary/5 border-primary/10">
             <TabsTrigger
               value="stages"
-              className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-lg text-xs font-bold uppercase tracking-wider"
+              className="rounded-xl text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary text-xs font-bold uppercase tracking-wider"
             >
               Etapas
             </TabsTrigger>
             <TabsTrigger
               value="financials"
-              className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-lg text-xs font-bold uppercase tracking-wider"
+              className="rounded-xl text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary text-xs font-bold uppercase tracking-wider"
             >
               Invertir
             </TabsTrigger>
             <TabsTrigger
               value="overview"
-              className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-lg text-xs font-bold uppercase tracking-wider"
+              className="rounded-xl text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary text-xs font-bold uppercase tracking-wider"
             >
               Proyecto
             </TabsTrigger>

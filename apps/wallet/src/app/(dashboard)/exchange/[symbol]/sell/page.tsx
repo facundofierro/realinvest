@@ -1,40 +1,85 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import {
+  useMemo,
+  useState,
+} from "react";
+import {
+  useParams,
+  useRouter,
+} from "next/navigation";
 import { Button } from "@repo/ui/components/ui/button";
-import { Card, CardContent } from "@repo/ui/components/ui/card";
+import {
+  Card,
+  CardContent,
+} from "@repo/ui/components/ui/card";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@repo/ui/components/ui/tabs";
 import { cn } from "@repo/ui/lib/utils";
-import { ArrowLeft, Lock, Layers } from "lucide-react";
+import {
+  ArrowLeft,
+  Lock,
+  Layers,
+} from "lucide-react";
 import marketTokens from "@/sample-data/marketTokens.json";
 import walletPositions from "@/sample-data/walletPositions.json";
-import type { MarketToken, Position } from "@/types/wallet";
+import type {
+  MarketToken,
+  Position,
+} from "@/types/wallet";
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
+function clamp(
+  value: number,
+  min: number,
+  max: number
+): number {
+  return Math.max(
+    min,
+    Math.min(max, value)
+  );
 }
 
-function parseAmount(value: string): number {
+function parseAmount(
+  value: string
+): number {
   const n = Number(value);
   return Number.isFinite(n) ? n : 0;
 }
 
-function formatMoney(value: number): string {
-  return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function formatMoney(
+  value: number
+): string {
+  return value.toLocaleString(
+    undefined,
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  );
 }
 
 export default function SellTokenPage() {
-  const params = useParams<{ symbol: string }>();
+  const params = useParams<{
+    symbol: string;
+  }>();
   const router = useRouter();
-  const symbol = decodeURIComponent(params.symbol);
+  const symbol = decodeURIComponent(
+    params.symbol
+  );
 
   const token = useMemo(() => {
-    const list = marketTokens as MarketToken[];
+    const list =
+      marketTokens as MarketToken[];
     return (
-      list.find((t) => t.symbol === symbol) ?? {
+      list.find(
+        (t) => t.symbol === symbol
+      ) ?? {
         id: symbol,
         symbol,
         projectId: "1",
@@ -52,27 +97,76 @@ export default function SellTokenPage() {
   }, [symbol]);
 
   const ownedTokens = useMemo(() => {
-    const positions = walletPositions as Position[];
-    const relevant = positions.filter((p) => p.tokenSymbol === symbol);
-    const bought = relevant.filter((p) => p.side === "BUY").reduce((acc, p) => acc + p.filledAmount, 0);
-    const sold = relevant.filter((p) => p.side === "SELL").reduce((acc, p) => acc + p.filledAmount, 0);
+    const positions =
+      walletPositions as Position[];
+    const relevant = positions.filter(
+      (p) => p.tokenSymbol === symbol
+    );
+    const bought = relevant
+      .filter((p) => p.side === "BUY")
+      .reduce(
+        (acc, p) =>
+          acc + p.filledAmount,
+        0
+      );
+    const sold = relevant
+      .filter((p) => p.side === "SELL")
+      .reduce(
+        (acc, p) =>
+          acc + p.filledAmount,
+        0
+      );
     return Math.max(0, bought - sold);
   }, [symbol]);
 
-  const [marketAmount, setMarketAmount] = useState<string>("");
-  const [orderAmount, setOrderAmount] = useState<string>("");
-  const [orderPrice, setOrderPrice] = useState<string>(token.priceUsd ? String(token.priceUsd.toFixed(2)) : "");
+  const [
+    marketAmount,
+    setMarketAmount,
+  ] = useState<string>("");
+  const [orderAmount, setOrderAmount] =
+    useState<string>("");
+  const [orderPrice, setOrderPrice] =
+    useState<string>(
+      token.priceUsd
+        ? String(
+            token.priceUsd.toFixed(2)
+          )
+        : ""
+    );
 
   const price = token.priceUsd;
-  const maxMarketAmount = clamp(ownedTokens, 0, 1_000_000_000);
-  const marketAmountNum = clamp(parseAmount(marketAmount), 0, maxMarketAmount);
-  const marketTotal = marketAmountNum * price;
+  const maxMarketAmount = clamp(
+    ownedTokens,
+    0,
+    1_000_000_000
+  );
+  const marketAmountNum = clamp(
+    parseAmount(marketAmount),
+    0,
+    maxMarketAmount
+  );
+  const marketTotal =
+    marketAmountNum * price;
 
-  const orderPriceNumRaw = parseAmount(orderPrice);
-  const orderPriceNum = clamp(orderPriceNumRaw, 0, 1_000_000_000);
-  const maxOrderAmount = clamp(ownedTokens, 0, 1_000_000_000);
-  const orderAmountNum = clamp(parseAmount(orderAmount), 0, maxOrderAmount);
-  const orderTotal = orderAmountNum * orderPriceNum;
+  const orderPriceNumRaw =
+    parseAmount(orderPrice);
+  const orderPriceNum = clamp(
+    orderPriceNumRaw,
+    0,
+    1_000_000_000
+  );
+  const maxOrderAmount = clamp(
+    ownedTokens,
+    0,
+    1_000_000_000
+  );
+  const orderAmountNum = clamp(
+    parseAmount(orderAmount),
+    0,
+    maxOrderAmount
+  );
+  const orderTotal =
+    orderAmountNum * orderPriceNum;
 
   return (
     <div className="flex flex-col pb-28 min-h-screen bg-background">
@@ -84,14 +178,20 @@ export default function SellTokenPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.back()}
+            onClick={() =>
+              router.back()
+            }
             className="text-white rounded-full hover:bg-white/10"
           >
             <ArrowLeft className="w-6 h-6" />
           </Button>
           <div className="flex-1 pr-10 text-center">
-            <h1 className="text-2xl font-black tracking-tight leading-none text-white uppercase">Vender</h1>
-            <p className="text-xs text-white/70 font-medium italic">{token.projectTitle}</p>
+            <h1 className="text-2xl font-black tracking-tight leading-none text-white uppercase">
+              Vender
+            </h1>
+            <p className="text-xs text-white/70 font-medium italic">
+              {token.projectTitle}
+            </p>
           </div>
         </div>
       </header>
@@ -104,41 +204,77 @@ export default function SellTokenPage() {
                 <div className="font-mono text-xs font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter w-fit">
                   {token.symbol}
                 </div>
-                <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Precio mercado</div>
-                <div className="text-2xl font-black tracking-tighter text-foreground">${price.toFixed(2)}</div>
+                <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                  Precio mercado
+                </div>
+                <div className="text-2xl font-black tracking-tighter text-foreground">
+                  ${price.toFixed(2)}
+                </div>
               </div>
               <div className="text-right space-y-1">
                 <div className="flex items-center gap-2 justify-end text-muted-foreground">
                   <Layers className="w-4 h-4" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Tus tokens</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest">
+                    Tus tokens
+                  </span>
                 </div>
-                <div className="text-xl font-black tracking-tighter text-foreground">{formatMoney(ownedTokens)}</div>
+                <div className="text-xl font-black tracking-tighter text-foreground">
+                  {formatMoney(
+                    ownedTokens
+                  )}
+                </div>
                 <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/80">
-                  Máximo a vender: {formatMoney(ownedTokens)}
+                  Máximo a vender:{" "}
+                  {formatMoney(
+                    ownedTokens
+                  )}
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="mercado" className="w-full">
-          <TabsList className="grid grid-cols-2 w-full rounded-2xl bg-muted/40">
-            <TabsTrigger value="mercado" className="rounded-2xl text-[10px] font-black uppercase tracking-widest">
+        <Tabs
+          defaultValue="mercado"
+          className="w-full"
+        >
+          <TabsList className="grid grid-cols-2 w-full rounded-2xl bg-primary/5 border border-primary/10 p-1 h-12">
+            <TabsTrigger
+              value="mercado"
+              className="rounded-2xl text-[10px] font-black uppercase tracking-widest text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
+            >
               Mercado
             </TabsTrigger>
-            <TabsTrigger value="orden" className="rounded-2xl text-[10px] font-black uppercase tracking-widest">
+            <TabsTrigger
+              value="orden"
+              className="rounded-2xl text-[10px] font-black uppercase tracking-widest text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
+            >
               Orden
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="mercado" className="mt-4">
+          <TabsContent
+            value="mercado"
+            className="mt-4"
+          >
             <Card className="border border-border/60 bg-card/80 backdrop-blur">
               <CardContent className="p-4 space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Vender al precio de mercado</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    Vender al precio de
+                    mercado
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setMarketAmount(String(maxMarketAmount.toFixed(4)))}
+                    onClick={() =>
+                      setMarketAmount(
+                        String(
+                          maxMarketAmount.toFixed(
+                            4
+                          )
+                        )
+                      )
+                    }
                     className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
                   >
                     Max
@@ -146,12 +282,20 @@ export default function SellTokenPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-[11px] font-black uppercase tracking-widest">Cantidad</Label>
+                  <Label className="text-[11px] font-black uppercase tracking-widest">
+                    Cantidad
+                  </Label>
                   <div className="relative">
                     <Input
                       inputMode="decimal"
-                      value={marketAmount}
-                      onChange={(e) => setMarketAmount(e.target.value)}
+                      value={
+                        marketAmount
+                      }
+                      onChange={(e) =>
+                        setMarketAmount(
+                          e.target.value
+                        )
+                      }
                       placeholder="0.00"
                       className="pr-20 h-12 rounded-2xl font-black"
                     />
@@ -161,66 +305,114 @@ export default function SellTokenPage() {
                   </div>
                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     <span>Máximo</span>
-                    <span>{formatMoney(maxMarketAmount)} tokens</span>
+                    <span>
+                      {formatMoney(
+                        maxMarketAmount
+                      )}{" "}
+                      tokens
+                    </span>
                   </div>
                 </div>
 
                 <div className="p-4 rounded-3xl border border-border/50 bg-linear-to-br from-primary/5 via-background to-violet-500/5">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total estimado</span>
-                    <span className="text-xl font-black tracking-tighter text-foreground">{formatMoney(marketTotal)} USDT</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                      Total estimado
+                    </span>
+                    <span className="text-xl font-black tracking-tighter text-foreground">
+                      {formatMoney(
+                        marketTotal
+                      )}{" "}
+                      USDT
+                    </span>
                   </div>
                   <div className="flex justify-between items-center mt-1 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                     <span>Precio</span>
-                    <span>${price.toFixed(2)}</span>
+                    <span>
+                      $
+                      {price.toFixed(2)}
+                    </span>
                   </div>
                 </div>
 
                 <Button
                   className={cn(
                     "w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-primary/20",
-                    marketAmountNum > 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    marketAmountNum > 0
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground"
                   )}
-                  disabled={marketAmountNum <= 0}
+                  disabled={
+                    marketAmountNum <= 0
+                  }
                 >
-                  Confirmar venta (mercado)
+                  Confirmar venta
+                  (mercado)
                 </Button>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="orden" className="mt-4">
+          <TabsContent
+            value="orden"
+            className="mt-4"
+          >
             <Card className="border border-border/60 bg-card/80 backdrop-blur">
               <CardContent className="p-4 space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Colocar una orden (límite)</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                    Colocar una orden
+                    (límite)
+                  </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Lock className="w-4 h-4" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Bloquea tokens</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest">
+                      Bloquea tokens
+                    </span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-black uppercase tracking-widest">Precio</Label>
+                    <Label className="text-[11px] font-black uppercase tracking-widest">
+                      Precio
+                    </Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-3 text-muted-foreground font-black">$</span>
+                      <span className="absolute left-3 top-3 text-muted-foreground font-black">
+                        $
+                      </span>
                       <Input
                         inputMode="decimal"
-                        value={orderPrice}
-                        onChange={(e) => setOrderPrice(e.target.value)}
+                        value={
+                          orderPrice
+                        }
+                        onChange={(e) =>
+                          setOrderPrice(
+                            e.target
+                              .value
+                          )
+                        }
                         placeholder="0.00"
                         className="pl-6 h-12 rounded-2xl font-black"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[11px] font-black uppercase tracking-widest">Cantidad</Label>
+                    <Label className="text-[11px] font-black uppercase tracking-widest">
+                      Cantidad
+                    </Label>
                     <div className="relative">
                       <Input
                         inputMode="decimal"
-                        value={orderAmount}
-                        onChange={(e) => setOrderAmount(e.target.value)}
+                        value={
+                          orderAmount
+                        }
+                        onChange={(e) =>
+                          setOrderAmount(
+                            e.target
+                              .value
+                          )
+                        }
                         placeholder="0.00"
                         className="pr-20 h-12 rounded-2xl font-black"
                       />
@@ -233,26 +425,53 @@ export default function SellTokenPage() {
 
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                   <span>Máximo</span>
-                  <span>{formatMoney(maxOrderAmount)} tokens</span>
+                  <span>
+                    {formatMoney(
+                      maxOrderAmount
+                    )}{" "}
+                    tokens
+                  </span>
                 </div>
 
                 <div className="p-4 rounded-3xl border border-border/50 bg-linear-to-br from-primary/5 via-background to-violet-500/5 space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total (orden)</span>
-                    <span className="text-xl font-black tracking-tighter text-foreground">{formatMoney(orderTotal)} USDT</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                      Total (orden)
+                    </span>
+                    <span className="text-xl font-black tracking-tighter text-foreground">
+                      {formatMoney(
+                        orderTotal
+                      )}{" "}
+                      USDT
+                    </span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                    <span>Bloqueado</span>
-                    <span>{formatMoney(orderAmountNum)} tokens</span>
+                    <span>
+                      Bloqueado
+                    </span>
+                    <span>
+                      {formatMoney(
+                        orderAmountNum
+                      )}{" "}
+                      tokens
+                    </span>
                   </div>
                 </div>
 
                 <Button
                   className={cn(
                     "w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-primary/20",
-                    orderAmountNum > 0 && orderPriceNum > 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    orderAmountNum >
+                      0 &&
+                      orderPriceNum > 0
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground"
                   )}
-                  disabled={orderAmountNum <= 0 || orderPriceNum <= 0}
+                  disabled={
+                    orderAmountNum <=
+                      0 ||
+                    orderPriceNum <= 0
+                  }
                 >
                   Colocar orden de venta
                 </Button>
@@ -264,4 +483,3 @@ export default function SellTokenPage() {
     </div>
   );
 }
-

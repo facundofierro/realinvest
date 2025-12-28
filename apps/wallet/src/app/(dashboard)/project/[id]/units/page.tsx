@@ -207,7 +207,7 @@ export default function ProjectUnitsPage() {
                   `/project/${params.id}/units?filter=full_property`
                 )
               }
-              className={`h-12 px-1 rounded-xl border text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "full_property" ? "bg-primary/10 border-primary/20 text-primary shadow-sm" : "bg-secondary/50 border-border/50 text-muted-foreground hover:bg-secondary/80"}`}
+              className={`h-12 px-1 rounded-xl border-2 text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "full_property" ? "bg-primary/80 text-primary-foreground shadow-lg border-primary" : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"}`}
             >
               Propiedad Completa
             </button>
@@ -217,7 +217,7 @@ export default function ProjectUnitsPage() {
                   `/project/${params.id}/units?filter=tokenized`
                 )
               }
-              className={`h-12 px-1 rounded-xl border text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "tokenized" ? "bg-primary/10 border-primary/20 text-primary shadow-sm" : "bg-secondary/50 border-border/50 text-muted-foreground hover:bg-secondary/80"}`}
+              className={`h-12 px-1 rounded-xl border-2 text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "tokenized" ? "bg-primary/80 text-primary-foreground shadow-lg border-primary" : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"}`}
             >
               Tokens Lanzamiento
             </button>
@@ -227,7 +227,7 @@ export default function ProjectUnitsPage() {
                   `/project/${params.id}/units?filter=fixed_rent`
                 )
               }
-              className={`h-12 px-1 rounded-xl border text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "fixed_rent" ? "bg-primary/10 border-primary/20 text-primary shadow-sm" : "bg-secondary/50 border-border/50 text-muted-foreground hover:bg-secondary/80"}`}
+              className={`h-12 px-1 rounded-xl border-2 text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "fixed_rent" ? "bg-primary/80 text-primary-foreground shadow-lg border-primary" : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"}`}
             >
               Renta Fija
             </button>
@@ -504,16 +504,16 @@ export default function ProjectUnitsPage() {
                     defaultValue="plano"
                     className="flex flex-col w-full h-full"
                   >
-                    <TabsList className="grid grid-cols-2 p-1 mb-4 w-full rounded-xl bg-muted/50">
+                    <TabsList className="grid grid-cols-2 p-1 mb-4 w-full rounded-xl border bg-primary/5 border-primary/10">
                       <TabsTrigger
                         value="plano"
-                        className="rounded-lg text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        className="rounded-lg text-[10px] font-black uppercase tracking-widest bg-transparent text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
                       >
                         Plano
                       </TabsTrigger>
                       <TabsTrigger
                         value="caracteristicas"
-                        className="rounded-lg text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                        className="rounded-lg text-[10px] font-black uppercase tracking-widest bg-transparent text-primary/60 data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
                       >
                         Características
                       </TabsTrigger>
@@ -588,8 +588,7 @@ export default function ProjectUnitsPage() {
                 className={`flex gap-3 shrink-0 ${
                   isDetailsOpen
                     ? "justify-center pt-4 border-t border-border/50"
-                    : ""
-                }`}
+                    : ""}`}
               >
                 {!isDetailsOpen && (
                   <Button

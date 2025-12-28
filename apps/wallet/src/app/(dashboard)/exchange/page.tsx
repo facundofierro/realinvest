@@ -545,23 +545,23 @@ export default function ExchangePage() {
             <TabsList className="flex items-center gap-1.5 w-full h-auto bg-transparent p-0 border-none">
               <TabsTrigger
                 value="market"
-                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/30 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
               >
                 Mercado
               </TabsTrigger>
               <TabsTrigger
                 value="favorites"
-                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/30 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
               >
                 Favoritos
               </TabsTrigger>
               <TabsTrigger
                 value="positions"
-                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-secondary/30 border border-border/50 text-[9px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
+                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
               >
                 Mis Posiciones
               </TabsTrigger>
-              <button className="flex justify-center items-center w-11 h-11 rounded-2xl border shrink-0 bg-secondary/30 text-muted-foreground border-border/30">
+              <button className="flex justify-center items-center w-11 h-11 rounded-2xl border shrink-0 bg-primary/10 text-primary border-primary/20">
                 <Filter className="w-4 h-4" />
               </button>
             </TabsList>
@@ -582,11 +582,11 @@ export default function ExchangePage() {
                   }
                   size="sm"
                   className={cn(
-                    "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border border-white/5",
+                    "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border-2",
                     sortBy ===
                       "marketCap"
-                      ? "shadow-md bg-primary text-primary-foreground"
-                      : "bg-white/5"
+                      ? "shadow-md bg-primary/80 text-primary-foreground border-primary"
+                      : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
                   )}
                   onClick={() =>
                     setSortBy(
@@ -607,10 +607,10 @@ export default function ExchangePage() {
                   }
                   size="sm"
                   className={cn(
-                    "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border border-white/5",
+                    "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border-2",
                     sortBy === "change"
-                      ? "shadow-md bg-primary text-primary-foreground"
-                      : "bg-white/5"
+                      ? "shadow-md bg-primary/80 text-primary-foreground border-primary"
+                      : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
                   )}
                   onClick={() =>
                     setSortBy("change")
@@ -622,7 +622,7 @@ export default function ExchangePage() {
                   </span>
                 </Button>
 
-                <div className="flex gap-1 items-center p-1 h-11 rounded-2xl border bg-muted/20 border-border/30">
+                <div className="flex gap-1 items-center p-1 h-11 rounded-2xl border bg-primary/5 border-primary/10">
                   {(
                     [
                       "24H",
@@ -641,11 +641,11 @@ export default function ExchangePage() {
                       }
                       size="sm"
                       className={cn(
-                        "rounded-xl px-2 h-full text-[9px] font-black tracking-tighter transition-all border-none",
+                        "rounded-xl px-2 h-full text-[9px] font-black tracking-tighter transition-all border-2",
                         timeframe ===
                           tf.toLowerCase()
-                          ? "shadow-sm bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-white/5"
+                          ? "shadow-sm bg-primary/80 text-primary-foreground border-primary"
+                          : "bg-transparent text-primary/60 border-transparent hover:bg-primary/10"
                       )}
                       onClick={() =>
                         setTimeframe(
