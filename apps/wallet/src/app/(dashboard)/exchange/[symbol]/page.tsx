@@ -564,7 +564,7 @@ export default function ExchangeTokenPage() {
                   className={cn(
                     "h-[52px] rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center",
                     isSelected
-                      ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10"
+                      ? "bg-primary/80 text-white border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10"
                       : "bg-white border-gray-100 hover:bg-gray-50"
                   )}
                 >
@@ -575,8 +575,18 @@ export default function ExchangeTokenPage() {
                     className={cn(
                       "mt-1 px-1.5 py-0.5 rounded-md text-[8px] font-black inline-block border",
                       up
-                        ? "bg-brand-green/10 text-brand-green border-brand-green/20"
-                        : "bg-brand-pink/10 text-brand-pink border-brand-pink/20"
+                        ? cn(
+                            "text-brand-green",
+                            isSelected
+                              ? "bg-green-100 border-green-200"
+                              : "bg-brand-green/10 border-brand-green/20"
+                          )
+                        : cn(
+                            "text-brand-pink",
+                            isSelected
+                              ? "bg-pink-100 border-pink-200"
+                              : "bg-brand-pink/10 border-brand-pink/20"
+                          )
                     )}
                   >
                     {formatPct(v)}
@@ -598,7 +608,7 @@ export default function ExchangeTokenPage() {
                 className={cn(
                   "flex-1 h-10 rounded-xl border text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
                   view === "linea"
-                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                    ? "bg-primary/80 text-white border-primary shadow-lg shadow-primary/20"
                     : "bg-white border-gray-100 hover:bg-gray-50"
                 )}
               >
@@ -613,7 +623,7 @@ export default function ExchangeTokenPage() {
                 className={cn(
                   "flex-1 h-10 rounded-xl border text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
                   view === "velas"
-                    ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                    ? "bg-primary/80 text-white border-primary shadow-lg shadow-primary/20"
                     : "bg-white border-gray-100 hover:bg-gray-50"
                 )}
               >

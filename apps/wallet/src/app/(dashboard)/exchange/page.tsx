@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Suspense,
   useEffect,
   useMemo,
   useState,
@@ -100,7 +101,7 @@ function isActivePosition(
   );
 }
 
-export default function ExchangePage() {
+function ExchangePageInner() {
   const router = useRouter();
   const searchParams =
     useSearchParams();
@@ -1439,5 +1440,13 @@ export default function ExchangePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ExchangePage() {
+  return (
+    <Suspense fallback={null}>
+      <ExchangePageInner />
+    </Suspense>
   );
 }
