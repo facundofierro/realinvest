@@ -29,6 +29,14 @@ import {
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
 import ALL_UNITS from "@/sample-data/projectUnits.json";
 
 interface Unit {
@@ -39,6 +47,7 @@ interface Unit {
   statusRaw?: string;
   price: string;
   tokenName?: string;
+  tokenSymbol?: string;
   totalTokens?: number;
   tokensSold?: number;
   isTokenized: boolean;
@@ -65,6 +74,17 @@ export default function ProjectUnitsPage() {
     isDetailsOpen,
     setIsDetailsOpen,
   ] = useState(false);
+  const [
+    isContactDialogOpen,
+    setIsContactDialogOpen,
+  ] = useState(false);
+  const [contactForm, setContactForm] =
+    useState({
+      name: "",
+      phone: "",
+      email: "",
+      preference: "whatsapp", // whatsapp, call, telegram
+    });
 
   const filteredUnits = useMemo(() => {
     // Cast imported JSON to Unit[]
@@ -262,12 +282,25 @@ export default function ProjectUnitsPage() {
               <div
                 key={unit.id}
                 id={`unit-${unit.id}`}
-                onClick={() =>
-                  !isUpcoming &&
+                onClick={() => {
+                  if (isUpcoming)
+                    return;
                   setSelectedUnitId(
                     unit.id
-                  )
-                }
+                  );
+                  // Auto scroll to center
+                  setTimeout(() => {
+                    const el =
+                      document.getElementById(
+                        `unit-${unit.id}`
+                      );
+                    el?.scrollIntoView({
+                      behavior:
+                        "smooth",
+                      block: "center",
+                    });
+                  }, 100);
+                }}
                 className={`flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border ${
                   selectedUnitId ===
                   unit.id
@@ -588,7 +621,8 @@ export default function ProjectUnitsPage() {
                 className={`flex gap-3 shrink-0 ${
                   isDetailsOpen
                     ? "justify-center pt-4 border-t border-border/50"
-                    : ""}`}
+                    : ""
+                }`}
               >
                 {!isDetailsOpen && (
                   <Button
@@ -610,6 +644,26 @@ export default function ProjectUnitsPage() {
                       ? "w-full max-w-sm"
                       : "flex-[1.5]"
                   } h-14 rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/25 hover:bg-primary/90 font-black uppercase tracking-widest text-xs`}
+                  onClick={() => {
+                    if (
+                      selectedUnit.isTokenized
+                    ) {
+                      const symbol =
+                        selectedUnit.tokenSymbol ??
+                        selectedUnit.tokenName;
+                      if (symbol) {
+                        router.push(
+                          `/exchange/${encodeURIComponent(
+                            symbol
+                          )}`
+                        );
+                      }
+                    } else {
+                      setIsContactDialogOpen(
+                        true
+                      );
+                    }
+                  }}
                 >
                   Invertir Ahora
                 </Button>
@@ -618,6 +672,137 @@ export default function ProjectUnitsPage() {
           </div>
         </div>
       )}
+
+      <Dialog
+        open={isContactDialogOpen}
+        onOpenChange={
+          setIsContactDialogOpen
+        }
+      >
+        <DialogContent className="max-w-md w-[95%] rounded-[32px] p-6 border-none shadow-2xl bg-card">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black tracking-tight uppercase text-center">
+              Contactar Agente
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">
+                Nombre Completo
+              </Label>
+              <Input
+                id="name"
+                value={contactForm.name}
+                onChange={(e) =>
+                  setContactForm({
+                    ...contactForm,
+                    name: e.target
+                      .value,
+                  })
+                }
+                placeholder="Ingresá tu nombre"
+                className="rounded-xl bg-muted/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">
+                Teléfono
+              </Label>
+              <Input
+                id="phone"
+                value={
+                  contactForm.phone
+                }
+                onChange={(e) =>
+                  setContactForm({
+                    ...contactForm,
+                    phone:
+                      e.target.value,
+                  })
+                }
+                placeholder="+54 9 11..."
+                className="rounded-xl bg-muted/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={
+                  contactForm.email
+                }
+                onChange={(e) =>
+                  setContactForm({
+                    ...contactForm,
+                    email:
+                      e.target.value,
+                  })
+                }
+                placeholder="tu@email.com"
+                className="rounded-xl bg-muted/50 border-border/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>
+                Preferencia de contacto
+              </Label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  {
+                    id: "whatsapp",
+                    label: "WhatsApp",
+                  },
+                  {
+                    id: "call",
+                    label: "Llamada",
+                  },
+                  {
+                    id: "telegram",
+                    label: "Telegram",
+                  },
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() =>
+                      setContactForm({
+                        ...contactForm,
+                        preference:
+                          opt.id,
+                      })
+                    }
+                    className={`h-10 text-xs font-bold uppercase rounded-xl border transition-all ${
+                      contactForm.preference ===
+                      opt.id
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background border-border hover:bg-muted"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <Button
+            className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-xs"
+            onClick={() => {
+              // Submit logic here
+              console.log(
+                "Contact form submitted:",
+                contactForm
+              );
+              setIsContactDialogOpen(
+                false
+              );
+            }}
+          >
+            Enviar Solicitud
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

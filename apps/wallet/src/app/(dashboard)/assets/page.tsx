@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -9,6 +11,7 @@ import {
   TrendingUp,
   ArrowUpRight,
   ArrowDownLeft,
+  X,
 } from "lucide-react";
 import { Badge } from "@repo/ui/components/ui/badge";
 import Link from "next/link";
@@ -60,6 +63,14 @@ export default function AssetsPage() {
       borderColor: "border-orange-500",
     },
   ];
+
+  const router = useRouter();
+  const [
+    selectedToken,
+    setSelectedToken,
+  ] = useState<
+    (typeof myTokens)[0] | null
+  >(null);
 
   return (
     <div className="pb-24 duration-500 animate-in fade-in slide-in-from-bottom-4">
@@ -174,7 +185,18 @@ export default function AssetsPage() {
             {myTokens.map((asset) => (
               <Card
                 key={asset.id}
-                className="overflow-hidden border border-border/40 shadow-sm hover:shadow-md transition-all group rounded-[28px] bg-card"
+                onClick={() =>
+                  setSelectedToken(
+                    asset
+                  )
+                }
+                className={cn(
+                  "overflow-hidden border border-border/40 shadow-sm hover:shadow-md transition-all group rounded-[28px] bg-card cursor-pointer",
+                  selectedToken?.id ===
+                    asset.id
+                    ? "ring-2 ring-primary"
+                    : ""
+                )}
               >
                 <CardContent className="p-5">
                   <div className="grid grid-cols-[1fr_120px] items-center gap-x-4">
@@ -233,6 +255,106 @@ export default function AssetsPage() {
           </div>
         </div>
       </div>
+
+      {selectedToken && (
+        <div className="fixed inset-x-0 bottom-0 z-[60] p-4 animate-in slide-in-from-bottom-full duration-300">
+          <div className="bg-card/95 backdrop-blur-3xl border border-primary/30 shadow-[0_-10px_50px_-15px_rgba(0,0,0,0.4)] rounded-[32px] p-6 overflow-hidden relative">
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() =>
+                setSelectedToken(null)
+              }
+              className="absolute top-6 right-6 z-50 w-9 h-9 bg-white rounded-full border-none shadow-lg hover:bg-white/90 text-slate-500"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+
+            <div className="flex flex-col gap-6">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <div className="flex gap-2 items-center">
+                    <span className="font-mono text-xs font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
+                      {
+                        selectedToken.unitId
+                      }
+                    </span>
+                    <h3 className="text-2xl font-black tracking-tight">
+                      {
+                        selectedToken.tokenName
+                      }
+                    </h3>
+                  </div>
+                  <div className="text-sm font-bold tracking-widest uppercase text-muted-foreground">
+                    {
+                      selectedToken.projectName
+                    }
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
+                    Valor Total
+                  </div>
+                  <div className="text-2xl font-black text-foreground">
+                    ${" "}
+                    {
+                      selectedToken.value
+                    }
+                  </div>
+                  <div className="text-[10px] font-black text-brand-green uppercase mt-0.5">
+                    {
+                      selectedToken.change
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    router.push(
+                      `/exchange?tab=positions`
+                    );
+                  }}
+                  className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted"
+                >
+                  POSICIONES
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const symbol =
+                      encodeURIComponent(
+                        selectedToken.tokenName
+                      );
+                    router.push(
+                      `/exchange/${symbol}/sell`
+                    );
+                  }}
+                  className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted"
+                >
+                  VENDER
+                </Button>
+                <Button
+                  className="flex-[1.5] h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
+                  onClick={() => {
+                    const symbol =
+                      encodeURIComponent(
+                        selectedToken.tokenName
+                      );
+                    router.push(
+                      `/exchange/${symbol}/buy`
+                    );
+                  }}
+                >
+                  COMPRAR
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

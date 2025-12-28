@@ -1360,7 +1360,7 @@ export default function ExchangePage() {
                     </span>
                   </div>
                 </div>
-                <div className="text-right mt-10">
+                <div className="mt-10 text-right">
                   <div className="text-2xl font-black text-foreground">
                     $
                     {selectedToken.priceUsd.toFixed(
