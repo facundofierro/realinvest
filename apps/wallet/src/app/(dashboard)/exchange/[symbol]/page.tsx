@@ -12,6 +12,20 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Card } from "@repo/ui/components/ui/card";
 import { cn } from "@repo/ui/lib/utils";
 import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@repo/ui/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import {
   ArrowLeft,
   BarChart3,
   CandlestickChart,
@@ -544,6 +558,16 @@ export default function ExchangeTokenPage() {
     useState<Timeframe>("all");
   const [view, setView] =
     useState<ChartView>("linea");
+  const [
+    isTradeDialogOpen,
+    setIsTradeDialogOpen,
+  ] = useState(false);
+  const [tradeType, setTradeType] =
+    useState<"BUY" | "SELL">("BUY");
+  const [orderType, setOrderType] =
+    useState<"MARKET" | "LIMIT">(
+      "MARKET"
+    );
 
   const changePct = getChangePct(
     token,
@@ -799,11 +823,12 @@ export default function ExchangeTokenPage() {
         <div className="flex gap-3 pt-4 pb-6 shrink-0">
           <Button
             variant="outline"
-            onClick={() =>
-              router.push(
-                `/exchange/${encodeURIComponent(symbol)}/sell`
-              )
-            }
+            onClick={() => {
+              setTradeType("SELL");
+              setIsTradeDialogOpen(
+                true
+              );
+            }}
             className="flex-1 h-20 flex-col gap-0.5 text-[12px] font-black tracking-widest uppercase rounded-[24px] border-brand-pink bg-gray-100 text-[#3B2146] shadow-sm hover:bg-gray-200 hover:text-[#3B2146] active:scale-95 transition-all"
           >
             <span>VENDER</span>
@@ -817,11 +842,12 @@ export default function ExchangeTokenPage() {
           </Button>
           <Button
             variant="outline"
-            onClick={() =>
-              router.push(
-                `/exchange/${encodeURIComponent(symbol)}/buy`
-              )
-            }
+            onClick={() => {
+              setTradeType("BUY");
+              setIsTradeDialogOpen(
+                true
+              );
+            }}
             className="flex-1 h-20 flex-col gap-0.5 text-[12px] font-black tracking-widest uppercase rounded-[24px] border-brand-green bg-gray-100 text-[#3B2146] shadow-sm hover:bg-gray-200 hover:text-[#3B2146] active:scale-95 transition-all"
           >
             <span>COMPRAR</span>
@@ -834,6 +860,116 @@ export default function ExchangeTokenPage() {
             </span>
           </Button>
         </div>
+
+        <Dialog
+          open={isTradeDialogOpen}
+          onOpenChange={
+            setIsTradeDialogOpen
+          }
+        >
+          <DialogContent className="max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
+            <div className="p-6 space-y-6">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-black tracking-tight uppercase">
+                  {tradeType === "BUY"
+                    ? "Comprar"
+                    : "Vender"}{" "}
+                  {token?.symbol}
+                </DialogTitle>
+              </DialogHeader>
+
+              <Tabs
+                value={orderType}
+                onValueChange={(v) =>
+                  setOrderType(
+                    v as
+                      | "MARKET"
+                      | "LIMIT"
+                  )
+                }
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="MARKET">
+                    Mercado
+                  </TabsTrigger>
+                  <TabsTrigger value="LIMIT">
+                    Orden
+                  </TabsTrigger>
+                </TabsList>
+
+                <div className="py-4 space-y-4">
+                  {orderType ===
+                  "MARKET" ? (
+                    <p className="text-sm text-muted-foreground">
+                      Operar al precio
+                      actual del
+                      mercado. La orden
+                      se ejecutará
+                      inmediatamente al
+                      mejor precio
+                      disponible.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Establece un
+                      precio específico
+                      para comprar o
+                      vender. La orden
+                      se ejecutará solo
+                      cuando el mercado
+                      alcance tu precio.
+                    </p>
+                  )}
+
+                  <div className="space-y-4">
+                    {orderType ===
+                      "LIMIT" && (
+                      <div className="space-y-2">
+                        <Label>
+                          Precio
+                          Objetivo (
+                          {
+                            token?.symbol
+                          }
+                          )
+                        </Label>
+                        <Input
+                          type="number"
+                          placeholder="0.00"
+                          className="h-12 rounded-xl"
+                        />
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <Label>
+                        Cantidad
+                      </Label>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        className="h-12 rounded-xl"
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    className="w-full h-12 mt-6 rounded-xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/25"
+                    size="lg"
+                    onClick={() =>
+                      setIsTradeDialogOpen(
+                        false
+                      )
+                    }
+                  >
+                    {tradeType === "BUY"
+                      ? "Confirmar Compra"
+                      : "Confirmar Venta"}
+                  </Button>
+                </div>
+              </Tabs>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

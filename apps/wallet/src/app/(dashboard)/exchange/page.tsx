@@ -43,6 +43,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
 import type {
   MarketToken,
   Position,
@@ -148,6 +150,16 @@ function ExchangePageInner() {
     isClosingOrder,
     setIsClosingOrder,
   ] = useState(false);
+  const [
+    isTradeDialogOpen,
+    setIsTradeDialogOpen,
+  ] = useState(false);
+  const [tradeType, setTradeType] =
+    useState<"BUY" | "SELL">("BUY");
+  const [orderType, setOrderType] =
+    useState<"MARKET" | "LIMIT">(
+      "MARKET"
+    );
   const [loadError, setLoadError] =
     useState<string | null>(null);
 
@@ -1328,6 +1340,116 @@ function ExchangePageInner() {
             >
               Cerrar
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isTradeDialogOpen}
+        onOpenChange={
+          setIsTradeDialogOpen
+        }
+      >
+        <DialogContent className="max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
+          <div className="p-6 space-y-6">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black tracking-tight uppercase">
+                {tradeType === "BUY"
+                  ? "Comprar"
+                  : "Vender"}{" "}
+                {selectedToken?.symbol}
+              </DialogTitle>
+            </DialogHeader>
+
+            <Tabs
+              value={orderType}
+              onValueChange={(v) =>
+                setOrderType(
+                  v as
+                    | "MARKET"
+                    | "LIMIT"
+                )
+              }
+            >
+              <TabsList className="grid grid-cols-2 w-full">
+                <TabsTrigger value="MARKET">
+                  Mercado
+                </TabsTrigger>
+                <TabsTrigger value="LIMIT">
+                  Orden
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="py-4 space-y-4">
+                {orderType ===
+                "MARKET" ? (
+                  <p className="text-sm text-muted-foreground">
+                    Operar al precio
+                    actual del mercado.
+                    La orden se
+                    ejecutará
+                    inmediatamente al
+                    mejor precio
+                    disponible.
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Establece un precio
+                    específico para
+                    comprar o vender. La
+                    orden se ejecutará
+                    solo cuando el
+                    mercado alcance tu
+                    precio.
+                  </p>
+                )}
+
+                <div className="space-y-4">
+                  {orderType ===
+                    "LIMIT" && (
+                    <div className="space-y-2">
+                      <Label>
+                        Precio Objetivo
+                        (
+                        {
+                          selectedToken?.symbol
+                        }
+                        )
+                      </Label>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        className="h-12 rounded-xl"
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label>
+                      Cantidad
+                    </Label>
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      className="h-12 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  className="mt-6 w-full h-12 text-xs font-black tracking-widest uppercase rounded-xl shadow-xl bg-primary text-primary-foreground shadow-primary/25"
+                  size="lg"
+                  onClick={() =>
+                    setIsTradeDialogOpen(
+                      false
+                    )
+                  }
+                >
+                  {tradeType === "BUY"
+                    ? "Confirmar Compra"
+                    : "Confirmar Venta"}
+                </Button>
+              </div>
+            </Tabs>
           </div>
         </DialogContent>
       </Dialog>
