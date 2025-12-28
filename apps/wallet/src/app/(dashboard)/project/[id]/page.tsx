@@ -1,6 +1,10 @@
 "use client";
 
-import { use } from "react";
+import {
+  use,
+  useEffect,
+  useState,
+} from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Badge } from "@repo/ui/components/ui/badge";
 import {
@@ -29,13 +33,10 @@ import {
   Home,
   Maximize2,
   TrendingUp,
-  BarChart3,
-  PieChart,
   DollarSign,
   Wallet,
   Building2,
   Heart,
-  Calculator,
   Hammer,
 } from "lucide-react";
 import Link from "next/link";
@@ -94,6 +95,97 @@ const STAGES = [
   },
 ];
 
+const PURCHASE_OPTIONS = [
+  {
+    key: "token_launch",
+    title: "Lanzamiento",
+    subtitle:
+      "Comprar tokens de propiedad en lanzamiento",
+    headerIcon: Wallet,
+    headerIconClassName:
+      "text-brand-pink",
+    watermarkIcon: ShoppingBag,
+    cardClassName:
+      "bg-linear-to-br from-brand-pink/10 via-background to-secondary/5 border-brand-pink/20",
+    badgeText: "Nuevo",
+    badgeClassName:
+      "text-brand-pink bg-brand-pink/10 border-brand-pink/20",
+    valueLabel: "Precio Inicial",
+    value: "$100.00",
+    actionText: "Reservar",
+    getHref: (id: string) =>
+      `/project/${id}/units?filter=tokenized`,
+    actionClassName:
+      "bg-brand-pink/10 text-brand-pink hover:bg-brand-pink hover:text-white border border-brand-pink/20",
+  },
+  {
+    key: "fixed_rent",
+    title: "Renta Fija",
+    subtitle:
+      "Comprar tokens con renta fija garantizada",
+    headerIcon: DollarSign,
+    headerIconClassName:
+      "text-green-500",
+    watermarkIcon: TrendingUp,
+    cardClassName:
+      "bg-linear-to-br from-green-500/10 via-background to-secondary/5 border-primary/20",
+    badgeText: "Estable",
+    badgeClassName:
+      "text-green-500 bg-green-500/10 border-green-500/20",
+    valueLabel: "Retorno Anual",
+    value: "12%",
+    actionText: "Depositar",
+    getHref: (id: string) =>
+      `/project/${id}/units?filter=fixed_rent`,
+    actionClassName:
+      "bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white border border-green-500/20",
+  },
+  {
+    key: "full_property",
+    title: "Propiedad Completa",
+    subtitle:
+      "Comprar propiedad entera en lanzamiento",
+    headerIcon: Building2,
+    headerIconClassName:
+      "text-purple-500",
+    watermarkIcon: Home,
+    cardClassName:
+      "bg-linear-to-br from-purple-500/10 via-background to-secondary/5 border-purple-500/20",
+    badgeText: "Exclusivo",
+    badgeClassName:
+      "text-purple-500 bg-purple-500/10 border-purple-500/20",
+    valueLabel: "Desde",
+    value: "$120,000",
+    actionText: "Ver Planes",
+    getHref: (id: string) =>
+      `/project/${id}/units?filter=full_property`,
+    actionClassName:
+      "bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white border border-purple-500/20",
+  },
+  {
+    key: "construction_tokens",
+    title: "En Construcción",
+    subtitle:
+      "Comprar tokens de propiedad en construcción",
+    headerIcon: Hammer,
+    headerIconClassName:
+      "text-orange-500",
+    watermarkIcon: Layers,
+    cardClassName:
+      "bg-linear-to-br from-orange-500/10 via-background to-secondary/5 border-orange-500/20",
+    badgeText: "Oportunidad",
+    badgeClassName:
+      "text-orange-500 bg-orange-500/10 border-orange-500/20",
+    valueLabel: "Plusvalía Est.",
+    value: "15%",
+    actionText: "Ver Tokens",
+    getHref: (id: string) =>
+      `/exchange?project=${id}`,
+    actionClassName:
+      "bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white border border-orange-500/20",
+  },
+] as const;
+
 export default function ProjectPage({
   params,
   searchParams,
@@ -115,10 +207,71 @@ export default function ProjectPage({
     returnToRaw.startsWith("/")
       ? returnToRaw
       : "/";
+  const [isCollapsed, setIsCollapsed] =
+    useState(false);
+
+  const [activeTab, setActiveTab] =
+    useState("stages");
+
+  useEffect(() => {
+    const threshold = 400;
+    const onScroll = () => {
+      setIsCollapsed(
+        window.scrollY > threshold
+      );
+    };
+
+    onScroll();
+    window.addEventListener(
+      "scroll",
+      onScroll,
+      {
+        passive: true,
+      }
+    );
+    return () =>
+      window.removeEventListener(
+        "scroll",
+        onScroll
+      );
+  }, []);
 
   return (
-    <div className="relative pb-32 min-h-screen bg-background">
-      {/* Header Image */}
+    <div className="relative pb-10 bg-background">
+      <div
+        className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${isCollapsed ? "border-b backdrop-blur-md bg-background/80 border-border/40" : "bg-transparent"}`}
+      >
+        <div
+          className={`flex gap-3 items-center px-4 transition-all duration-300 ${isCollapsed ? "py-3" : "pt-4 pb-2"}`}
+        >
+          <Link
+            href={backHref}
+            className={`p-2 rounded-full border transition-colors ${isCollapsed ? "bg-muted/20 hover:bg-muted/40 border-border/50 text-foreground" : "text-white bg-background/30 hover:bg-background/50 border-white/10"}`}
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+
+          <div
+            className={`flex-1 min-w-0 transition-all duration-300 ${isCollapsed ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}
+          >
+            <div className="text-sm font-black tracking-tight truncate text-foreground">
+              Torre Libertador 8000
+            </div>
+            <div className="flex gap-1 items-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground truncate">
+              <MapPin className="w-3.5 h-3.5 text-primary" />{" "}
+              Av. del Libertador 8000,
+              Nuñez
+            </div>
+          </div>
+
+          <button
+            className={`p-2 rounded-full border transition-colors group ${isCollapsed ? "bg-muted/20 hover:bg-muted/40 border-border/50 text-foreground" : "text-white bg-background/30 hover:bg-background/50 border-white/10"}`}
+          >
+            <Heart className="w-5 h-5 transition-all group-active:fill-red-500 group-active:text-red-500" />
+          </button>
+        </div>
+      </div>
+
       <div className="h-[420px] relative w-full overflow-hidden">
         <Image
           src="/projects/header-tower.png"
@@ -128,18 +281,6 @@ export default function ProjectPage({
           priority
         />
         <div className="absolute inset-0 to-transparent bg-linear-to-t from-background via-background/80" />
-
-        <Link
-          href={backHref}
-          className="absolute top-4 left-4 z-10 p-2 text-white rounded-full border backdrop-blur-md transition-colors bg-background/30 hover:bg-background/50 border-white/10"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </Link>
-
-        <button className="absolute top-4 right-4 z-10 p-2 text-white rounded-full border backdrop-blur-md transition-colors bg-background/30 hover:bg-background/50 border-white/10 group">
-          <Heart className="w-6 h-6 transition-all group-active:fill-red-500 group-active:text-red-500" />
-        </button>
-
         <div className="absolute right-4 left-4 bottom-16 z-10">
           <div className="space-y-1">
             <Badge
@@ -162,8 +303,14 @@ export default function ProjectPage({
 
       <div className="relative z-20 px-4 -mt-12 space-y-8">
         {/* Gallery Stories & Action */}
-        <div className="flex gap-4 items-start">
-          <div className="overflow-x-auto flex-1 px-4 pb-2 pl-8 -mx-4 scrollbar-hide">
+        <div
+          className={`sticky top-[62px] z-40 transition-all duration-300 -mx-4 px-4 pt-5 pb-3 ${
+            isCollapsed
+              ? "border-b backdrop-blur-md bg-background/80 border-border/40"
+              : "bg-transparent"
+          }`}
+        >
+          <div className="overflow-x-auto flex-1 scrollbar-hide">
             <ProjectStories
               stories={STORIES}
             />
@@ -171,217 +318,106 @@ export default function ProjectPage({
         </div>
 
         {/* Purchase Options Carousel */}
-        <Carousel
-          className="w-full"
-          opts={{
-            loop: true,
-          }}
-          plugins={[
-            Autoplay({
-              delay: 4000,
-            }),
-          ]}
+        <div
+          className={`transition-all duration-500 ease-in-out overflow-hidden ${
+            activeTab === "financials"
+              ? "max-h-0 opacity-0 pointer-events-none mb-0"
+              : "max-h-[500px] opacity-100 mb-8"
+          }`}
         >
-          <CarouselContent>
-            {/* 1. Comprar tokens de propiedad en lanzamiento */}
-            <CarouselItem>
-              <Card className="bg-linear-to-br from-primary/10 via-background to-secondary/5 border-primary/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
-                <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-                  <ShoppingBag className="w-48 h-48 -rotate-12" />
-                </div>
-                <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="space-y-1">
-                      <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
-                        <Wallet className="w-5 h-5 text-primary" />
-                        Tokens en
-                        Lanzamiento
-                      </h3>
-                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
-                        Comprar tokens
-                        de propiedad en
-                        lanzamiento
-                      </p>
-                    </div>
-                    <Badge className="text-blue-500 bg-blue-500/10 border-blue-500/20">
-                      Nuevo
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-end">
-                    <div className="space-y-1">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                        Precio Inicial
-                      </span>
-                      <div className="text-2xl font-black text-foreground">
-                        $100.00
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      className="h-8 text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/20 shadow-none"
-                      asChild
+          <Carousel
+            className="w-full"
+            opts={{
+              loop: true,
+            }}
+            plugins={[
+              Autoplay({
+                delay: 4000,
+              }),
+            ]}
+          >
+            <CarouselContent>
+              {PURCHASE_OPTIONS.map(
+                (option) => (
+                  <CarouselItem
+                    key={option.key}
+                  >
+                    <Card
+                      className={`${option.cardClassName} shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full`}
                     >
-                      <Link
-                        href={`/project/${id}/units?filter=tokenized`}
-                      >
-                        Reservar
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-
-            {/* 2. Comprar tokens con renta fija */}
-            <CarouselItem>
-              <Card className="bg-linear-to-br from-green-500/10 via-background to-secondary/5 border-primary/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
-                <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-                  <TrendingUp className="w-48 h-48 -rotate-12" />
-                </div>
-                <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="space-y-1">
-                      <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
-                        <DollarSign className="w-5 h-5 text-green-500" />
-                        Renta Fija
-                      </h3>
-                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
-                        Comprar tokens
-                        con renta fija
-                        garantizada
-                      </p>
-                    </div>
-                    <Badge className="text-green-500 bg-green-500/10 border-green-500/20">
-                      Estable
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-end">
-                    <div className="space-y-1">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                        Retorno Anual
-                      </span>
-                      <div className="text-2xl font-black text-foreground">
-                        12%
+                      <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
+                        <option.watermarkIcon className="w-48 h-48 -rotate-12" />
                       </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      className="h-8 text-[10px] font-black uppercase tracking-widest bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white border border-green-500/20 shadow-none"
-                      asChild
-                    >
-                      <Link
-                        href={`/project/${id}/units?filter=fixed_rent`}
-                      >
-                        Depositar
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-
-            {/* 3. Comprar propiedad en lanzamiento */}
-            <CarouselItem>
-              <Card className="bg-linear-to-br from-purple-500/10 via-background to-secondary/5 border-purple-500/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
-                <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-                  <Home className="w-48 h-48 -rotate-12" />
-                </div>
-                <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="space-y-1">
-                      <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
-                        <Building2 className="w-5 h-5 text-purple-500" />
-                        Propiedad
-                        Completa
-                      </h3>
-                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
-                        Comprar
-                        propiedad entera
-                        en lanzamiento
-                      </p>
-                    </div>
-                    <Badge className="text-purple-500 bg-purple-500/10 border-purple-500/20">
-                      Exclusivo
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-end">
-                    <div className="space-y-1">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                        Desde
-                      </span>
-                      <div className="text-2xl font-black text-foreground">
-                        $120,000
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      className="h-8 text-[10px] font-black uppercase tracking-widest bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white border border-purple-500/20 shadow-none"
-                      asChild
-                    >
-                      <Link
-                        href={`/project/${id}/units?filter=full_property`}
-                      >
-                        Ver Planes
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-
-            {/* 4. Comprar tokens de propiedad en construccion */}
-            <CarouselItem>
-              <Card className="bg-linear-to-br from-orange-500/10 via-background to-secondary/5 border-orange-500/20 shadow-xl overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full">
-                <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-                  <Layers className="w-48 h-48 -rotate-12" />
-                </div>
-                <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="space-y-1">
-                      <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
-                        <Hammer className="w-5 h-5 text-orange-500" />
-                        En Construcción
-                      </h3>
-                      <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
-                        Comprar tokens
-                        de propiedad en
-                        construcción
-                      </p>
-                    </div>
-                    <Badge className="text-orange-500 bg-orange-500/10 border-orange-500/20">
-                      Oportunidad
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-end">
-                    <div className="space-y-1">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
-                        Plusvalía Est.
-                      </span>
-                      <div className="text-2xl font-black text-foreground">
-                        15%
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      className="h-8 text-[10px] font-black uppercase tracking-widest bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white border border-orange-500/20 shadow-none"
-                      asChild
-                    >
-                      <Link
-                        href={`/exchange?project=${id}`}
-                      >
-                        Ver Tokens
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-          </CarouselContent>
-        </Carousel>
+                      <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="space-y-1">
+                            <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
+                              <option.headerIcon
+                                className={`w-5 h-5 ${option.headerIconClassName}`}
+                              />
+                              {
+                                option.title
+                              }
+                            </h3>
+                            <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+                              {
+                                option.subtitle
+                              }
+                            </p>
+                          </div>
+                          <Badge
+                            className={
+                              option.badgeClassName
+                            }
+                          >
+                            {
+                              option.badgeText
+                            }
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between items-end">
+                          <div className="space-y-1">
+                            <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-tighter">
+                              {
+                                option.valueLabel
+                              }
+                            </span>
+                            <div className="text-2xl font-black text-foreground">
+                              {
+                                option.value
+                              }
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            className={`h-8 text-[10px] font-black uppercase tracking-widest shadow-none ${option.actionClassName}`}
+                            asChild
+                          >
+                            <Link
+                              href={option.getHref(
+                                id
+                              )}
+                            >
+                              {
+                                option.actionText
+                              }
+                            </Link>
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </CarouselItem>
+                )
+              )}
+            </CarouselContent>
+          </Carousel>
+        </div>
 
         {/* MAIN CONTENT TABS */}
         <Tabs
           defaultValue="stages"
+          value={activeTab}
+          onValueChange={setActiveTab}
           className="w-full"
         >
           <TabsList className="grid grid-cols-3 p-1 w-full h-14 rounded-2xl border backdrop-blur-sm bg-muted/30 border-border/50">
@@ -395,7 +431,7 @@ export default function ProjectPage({
               value="financials"
               className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-lg text-xs font-bold uppercase tracking-wider"
             >
-              Finanzas
+              Invertir
             </TabsTrigger>
             <TabsTrigger
               value="overview"
@@ -539,137 +575,60 @@ export default function ProjectPage({
             value="financials"
             className="mt-8 space-y-6 animate-in fade-in-50 slide-in-from-bottom-4"
           >
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="shadow-sm bg-primary/5 border-primary/20">
-                <CardContent className="p-4 space-y-1">
-                  <TrendingUp className="mb-2 w-5 h-5 text-primary" />
-                  <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">
-                    TIR Proyectada
-                  </span>
-                  <div className="text-2xl font-black text-brand-green">
-                    12.4%
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="shadow-sm bg-secondary/20 border-border/50">
-                <CardContent className="p-4 space-y-1">
-                  <DollarSign className="mb-2 w-5 h-5 text-brand-green" />
-                  <span className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">
-                    VAN (NPV)
-                  </span>
-                  <div className="text-2xl font-black text-foreground">
-                    $2.8M
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="flex gap-2 items-center text-lg font-black">
-                <BarChart3 className="w-5 h-5 text-primary" />{" "}
-                Flujo de Fondos
-                Proyectado
-              </h4>
-              <Card className="p-4 border-2 border-dashed bg-muted/10 border-border/50">
-                <div className="space-y-6">
-                  {[
-                    {
-                      label:
-                        "Construcción",
-                      progress: 100,
-                      val: "$1.4M",
-                      color:
-                        "bg-primary",
-                    },
-                    {
-                      label:
-                        "Marketing/Ventas",
-                      progress: 45,
-                      val: "$0.6M",
-                      color:
-                        "bg-orange-500",
-                    },
-                    {
-                      label:
-                        "Reservas/Legal",
-                      progress: 80,
-                      val: "$0.2M",
-                      color:
-                        "bg-brand-green",
-                    },
-                  ].map((item, i) => (
-                    <div
-                      key={i}
-                      className="space-y-2"
-                    >
-                      <div className="flex justify-between text-[11px] font-black uppercase tracking-wider">
-                        <span>
-                          {item.label}
-                        </span>
-                        <span className="text-muted-foreground">
-                          {item.val}
-                        </span>
-                      </div>
-                      <div className="overflow-hidden w-full h-2 rounded-full bg-secondary">
-                        <div
-                          className={`${item.color} h-full rounded-full transition-all`}
-                          style={{
-                            width: `${item.progress}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </div>
-
-            <div className="pt-2 space-y-4">
-              <h4 className="flex gap-2 items-center text-lg font-black">
-                <PieChart className="w-5 h-5 text-primary" />{" "}
-                Programa de Dividendos
-              </h4>
-              <div className="space-y-3">
-                {[
-                  {
-                    date: "Dic 2024",
-                    event:
-                      "Inicio de Rentas",
-                    type: "Distribución",
-                  },
-                  {
-                    date: "Jun 2025",
-                    event:
-                      "Finalización Obra",
-                    type: "Appreciation",
-                  },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex justify-between items-center p-4 rounded-2xl border bg-muted/20 border-border/50"
+            <div className="space-y-3">
+              {PURCHASE_OPTIONS.map(
+                (option) => (
+                  <Card
+                    key={option.key}
+                    className={`${option.cardClassName} shadow-sm overflow-hidden`}
                   >
-                    <div className="flex gap-4 items-center">
-                      <div className="p-2 rounded-xl border bg-background border-border/50 text-primary">
-                        <Calculator className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-black">
-                          {item.event}
+                    <CardContent className="p-4">
+                      <div className="flex gap-4 justify-between items-center">
+                        <div className="space-y-1 min-w-0">
+                          <div className="text-sm font-black tracking-tight text-foreground">
+                            {
+                              option.title
+                            }
+                          </div>
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground line-clamp-1">
+                            {option.subtitle.replace(
+                              /Comprar\s+/i,
+                              ""
+                            )}
+                          </div>
+                          <div className="flex gap-2 items-baseline">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                              {
+                                option.valueLabel
+                              }
+                            </span>
+                            <span className="text-lg font-black text-foreground">
+                              {
+                                option.value
+                              }
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                          {item.date}
-                        </div>
+                        <Button
+                          size="sm"
+                          className={`h-9 text-[10px] font-black uppercase tracking-widest shadow-none ${option.actionClassName}`}
+                          asChild
+                        >
+                          <Link
+                            href={option.getHref(
+                              id
+                            )}
+                          >
+                            {
+                              option.actionText
+                            }
+                          </Link>
+                        </Button>
                       </div>
-                    </div>
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] font-black uppercase"
-                    >
-                      {item.type}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
+                    </CardContent>
+                  </Card>
+                )
+              )}
             </div>
           </TabsContent>
 
