@@ -107,7 +107,8 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-2 gap-4 pt-2">
             <Button
-              className="w-full bg-white/10 hover:bg-white/20 hover:scale-[1.02] transition-all duration-300 border-0 backdrop-blur-sm h-12 rounded-2xl"
+              variant="ghost"
+              className="w-full bg-white/5 hover:bg-white/10 hover:scale-[1.02] transition-all duration-300 border border-white/10 backdrop-blur-md h-12 rounded-2xl text-white font-bold shadow-none"
               asChild
             >
               <Link href="/deposit">
@@ -116,7 +117,8 @@ export default function DashboardPage() {
               </Link>
             </Button>
             <Button
-              className="w-full bg-white/10 hover:bg-white/20 hover:scale-[1.02] transition-all duration-300 border-0 backdrop-blur-sm h-12 rounded-2xl"
+              variant="ghost"
+              className="w-full bg-white/5 hover:bg-white/10 hover:scale-[1.02] transition-all duration-300 border border-white/10 backdrop-blur-md h-12 rounded-2xl text-white font-bold shadow-none"
               asChild
             >
               <Link href="/withdraw">

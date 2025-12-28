@@ -15,6 +15,12 @@ import {
   ArrowDownLeft,
   X,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@repo/ui/components/ui/dialog";
 import { Badge } from "@repo/ui/components/ui/badge";
 import Link from "next/link";
 import { cn } from "@repo/ui/lib/utils";
@@ -103,7 +109,8 @@ export default function AssetsPage() {
 
             <div className="grid grid-cols-2 gap-4 pt-2">
               <Button
-                className="w-full h-11 text-xs rounded-2xl border-0 backdrop-blur-sm bg-white/10 hover:bg-white/20"
+                variant="ghost"
+                className="w-full h-11 text-xs rounded-2xl border border-white/10 backdrop-blur-md bg-white/5 hover:bg-white/10 text-white font-bold shadow-none"
                 asChild
               >
                 <Link href="/deposit">
@@ -112,7 +119,8 @@ export default function AssetsPage() {
                 </Link>
               </Button>
               <Button
-                className="w-full h-11 text-xs rounded-2xl border-0 backdrop-blur-sm bg-white/10 hover:bg-white/20"
+                variant="ghost"
+                className="w-full h-11 text-xs rounded-2xl border border-white/10 backdrop-blur-md bg-white/5 hover:bg-white/10 text-white font-bold shadow-none"
                 asChild
               >
                 <Link href="/withdraw">
@@ -278,22 +286,32 @@ export default function AssetsPage() {
                   <div className="flex gap-2 items-center">
                     <span className="font-mono text-xs font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
                       {
-                        selectedToken.unitId
-                      }
-                    </span>
-                    <h3 className="text-2xl font-black tracking-tight">
-                      {
                         selectedToken.tokenName
                       }
-                    </h3>
+                    </span>
                   </div>
-                  <div className="text-sm font-bold tracking-widest uppercase text-muted-foreground">
+                  <h3 className="text-xl font-black text-foreground">
                     {
                       selectedToken.projectName
                     }
+                  </h3>
+                  <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                    <span className="flex gap-1.5 items-center">
+                      <Building2 className="w-3.5 h-3.5" />{" "}
+                      {
+                        selectedToken.location
+                      }
+                    </span>
+                    <span className="flex gap-1.5 items-center">
+                      <div className="w-3.5 h-3.5 rounded-full bg-muted/50" />
+                      {
+                        selectedToken.tokens
+                      }{" "}
+                      TOKENS
+                    </span>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="mt-10 text-right">
                   <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
                     Valor Total
                   </div>
@@ -311,7 +329,7 @@ export default function AssetsPage() {
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-2">
                 <Button
                   variant="outline"
                   onClick={() => {

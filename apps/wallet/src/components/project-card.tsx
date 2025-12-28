@@ -4,7 +4,11 @@ import {
   Card,
   CardContent,
 } from "@repo/ui/components/ui/card";
-import { Building2 } from "lucide-react";
+import {
+  Building2,
+  Hammer,
+  Key,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -33,11 +37,6 @@ export function ProjectCard({
   fixedRent,
   isPreSale,
 }: ProjectCardProps) {
-  const isPreSaleStatus =
-    isPreSale ||
-    status === "PRE-VENTA" ||
-    status === "PRE_SALE";
-
   return (
     <Link href={`/project/${id}`}>
       <Card className="overflow-hidden h-full border-none shadow-lg group rounded-3xl">
@@ -49,10 +48,19 @@ export function ProjectCard({
             className="object-cover"
           />
           <div className="absolute inset-0 to-transparent bg-linear-to-t from-black/60" />
-          <div
-            className={`absolute top-2 right-2 ${isPreSaleStatus ? "bg-accent/90 shadow-accent/20" : "bg-black/40 border-white/10"} text-white text-[10px] uppercase font-bold px-3 py-1 rounded-full backdrop-blur-md border shadow-sm`}
-          >
-            {status.replace(/_/g, " ")}
+          <div className="absolute top-2 left-2">
+            {status ===
+              "EN CONSTRUCCION" ||
+            status ===
+              "EN_CONSTRUCCION" ? (
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-500/20 backdrop-blur-md border border-orange-500/30 text-orange-500 shadow-sm">
+                <Hammer className="w-4 h-4" />
+              </div>
+            ) : (
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 backdrop-blur-md border border-primary/30 text-primary shadow-sm">
+                <Key className="w-4 h-4" />
+              </div>
+            )}
           </div>
         </div>
         <CardContent className="p-4">

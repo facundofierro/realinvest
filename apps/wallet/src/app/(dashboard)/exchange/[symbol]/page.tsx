@@ -565,7 +565,7 @@ export default function ExchangeTokenPage() {
                     "h-[52px] rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center",
                     isSelected
                       ? "bg-primary/80 text-white border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10"
-                      : "bg-white border-gray-100 hover:bg-gray-50"
+                      : "bg-primary/5 border-primary/10 text-primary hover:bg-primary/10"
                   )}
                 >
                   <span className="block leading-none">
@@ -609,7 +609,7 @@ export default function ExchangeTokenPage() {
                   "flex-1 h-10 rounded-xl border text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
                   view === "linea"
                     ? "bg-primary/80 text-white border-primary shadow-lg shadow-primary/20"
-                    : "bg-white border-gray-100 hover:bg-gray-50"
+                    : "bg-primary/5 border-primary/10 text-primary hover:bg-primary/10"
                 )}
               >
                 <BarChart3 className="w-4 h-4" />
@@ -624,7 +624,7 @@ export default function ExchangeTokenPage() {
                   "flex-1 h-10 rounded-xl border text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
                   view === "velas"
                     ? "bg-primary/80 text-white border-primary shadow-lg shadow-primary/20"
-                    : "bg-white border-gray-100 hover:bg-gray-50"
+                    : "bg-primary/5 border-primary/10 text-primary hover:bg-primary/10"
                 )}
               >
                 <CandlestickChart className="w-4 h-4" />

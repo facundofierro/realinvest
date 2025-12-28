@@ -100,7 +100,7 @@ const PURCHASE_OPTIONS = [
     key: "token_launch",
     title: "Lanzamiento",
     subtitle:
-      "Comprar tokens de propiedad en lanzamiento",
+      "Tokens de propiedad en lanzamiento",
     headerIcon: Wallet,
     headerIconClassName:
       "text-brand-pink",
@@ -117,12 +117,14 @@ const PURCHASE_OPTIONS = [
       `/project/${id}/units?filter=tokenized`,
     actionClassName:
       "bg-brand-pink/10 text-brand-pink hover:bg-brand-pink hover:text-white border border-brand-pink/20",
+    iconContainerClassName:
+      "bg-brand-pink/10 border-brand-pink text-brand-pink",
   },
   {
     key: "fixed_rent",
     title: "Renta Fija",
     subtitle:
-      "Comprar tokens con renta fija garantizada",
+      "Tokens con renta fija garantizada",
     headerIcon: DollarSign,
     headerIconClassName:
       "text-green-500",
@@ -139,12 +141,14 @@ const PURCHASE_OPTIONS = [
       `/project/${id}/units?filter=fixed_rent`,
     actionClassName:
       "bg-green-500/10 text-green-600 hover:bg-green-500 hover:text-white border border-green-500/20",
+    iconContainerClassName:
+      "bg-green-500/10 border-green-500 text-green-500",
   },
   {
     key: "full_property",
     title: "Propiedad Completa",
     subtitle:
-      "Comprar propiedad entera en lanzamiento",
+      "Propiedad completa en lanzamiento",
     headerIcon: Building2,
     headerIconClassName:
       "text-purple-500",
@@ -161,12 +165,14 @@ const PURCHASE_OPTIONS = [
       `/project/${id}/units?filter=full_property`,
     actionClassName:
       "bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white border border-purple-500/20",
+    iconContainerClassName:
+      "bg-purple-500/10 border-purple-500 text-purple-500",
   },
   {
     key: "construction_tokens",
     title: "En Construcción",
     subtitle:
-      "Comprar tokens de propiedad en construcción",
+      "Tokens de propiedad en construcción",
     headerIcon: Hammer,
     headerIconClassName:
       "text-orange-500",
@@ -183,6 +189,8 @@ const PURCHASE_OPTIONS = [
       `/exchange?project=${id}`,
     actionClassName:
       "bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white border border-orange-500/20",
+    iconContainerClassName:
+      "bg-orange-500/10 border-orange-500 text-orange-500",
   },
 ] as const;
 
@@ -314,7 +322,7 @@ export default function ProjectPage({
               : "bg-transparent"
           }`}
         >
-          <div className="overflow-x-auto flex-1 scrollbar-hide">
+          <div className="overflow-x-auto flex-1 py-2 scrollbar-hide">
             <ProjectStories
               stories={STORIES}
             />
@@ -358,9 +366,11 @@ export default function ProjectPage({
                         <div className="flex justify-between items-start mb-4">
                           <div className="space-y-1">
                             <h3 className="flex gap-2 items-center text-lg font-black text-foreground">
-                              <option.headerIcon
-                                className={`w-5 h-5 ${option.headerIconClassName}`}
-                              />
+                              <div
+                                className={`flex items-center justify-center w-8 h-8 rounded-full border backdrop-blur-md shadow-sm ${option.iconContainerClassName}`}
+                              >
+                                <option.headerIcon className="w-4 h-4" />
+                              </div>
                               {
                                 option.title
                               }
@@ -371,16 +381,6 @@ export default function ProjectPage({
                               }
                             </p>
                           </div>
-                          <Badge
-                            variant="ghost"
-                            className={
-                              option.badgeClassName
-                            }
-                          >
-                            {
-                              option.badgeText
-                            }
-                          </Badge>
                         </div>
                         <div className="flex justify-between items-end">
                           <div className="space-y-1">
@@ -396,8 +396,9 @@ export default function ProjectPage({
                             </div>
                           </div>
                           <Button
-                            size="sm"
-                            className={`h-8 text-[10px] font-black uppercase tracking-widest shadow-none ${option.actionClassName}`}
+                            size="default"
+                            variant="ghost"
+                            className={`h-12 text-xs font-black uppercase tracking-widest shadow-none ${option.actionClassName}`}
                             asChild
                           >
                             <Link
@@ -592,10 +593,17 @@ export default function ProjectPage({
                     <CardContent className="p-4">
                       <div className="flex gap-4 justify-between items-center">
                         <div className="space-y-1 min-w-0">
-                          <div className="text-sm font-black tracking-tight text-foreground">
-                            {
-                              option.title
-                            }
+                          <div className="flex gap-2 items-center">
+                            <div
+                              className={`flex items-center justify-center w-8 h-8 rounded-full border backdrop-blur-md shadow-sm ${option.iconContainerClassName}`}
+                            >
+                              <option.headerIcon className="w-4 h-4" />
+                            </div>
+                            <div className="text-sm font-black tracking-tight text-foreground">
+                              {
+                                option.title
+                              }
+                            </div>
                           </div>
                           <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground line-clamp-1">
                             {option.subtitle.replace(
@@ -618,6 +626,7 @@ export default function ProjectPage({
                         </div>
                         <Button
                           size="sm"
+                          variant="ghost"
                           className={`h-9 text-[10px] font-black uppercase tracking-widest shadow-none ${option.actionClassName}`}
                           asChild
                         >
