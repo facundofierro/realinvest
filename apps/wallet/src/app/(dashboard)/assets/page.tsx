@@ -340,7 +340,7 @@ export default function AssetsPage() {
                       `/exchange?tab=positions`
                     );
                   }}
-                  className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted"
+                  className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted hover:text-foreground"
                 >
                   POSICIONES
                 </Button>
@@ -355,7 +355,7 @@ export default function AssetsPage() {
                       `/exchange/${symbol}/sell`
                     );
                   }}
-                  className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted"
+                  className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted hover:text-foreground"
                 >
                   VENDER
                 </Button>

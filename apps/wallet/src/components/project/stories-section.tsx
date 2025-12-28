@@ -6,6 +6,7 @@ import {
   useCallback,
   useRef,
 } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   ChevronLeft,
@@ -157,134 +158,140 @@ export function ProjectStories({
         ))}
       </div>
 
-      {activeIndex !== null && (
-        <div className="fixed inset-0 z-[9999] bg-black animate-in fade-in zoom-in-95 duration-300 select-none flex flex-col items-center justify-center">
-          {/* Progress Bars */}
-          <div className="absolute top-4 left-4 right-4 z-[10002] flex gap-1.5 h-1">
-            {stories.map((_, i) => (
-              <div
-                key={i}
-                className="h-full flex-1 bg-white/20 rounded-full overflow-hidden"
-              >
+      {activeIndex !== null &&
+        createPortal(
+          <div className="fixed inset-0 z-[9999] bg-black animate-in fade-in zoom-in-95 duration-300 select-none flex flex-col items-center justify-center">
+            {/* Progress Bars */}
+            <div className="absolute top-4 left-4 right-4 z-[10002] flex gap-1.5 h-1">
+              {stories.map((_, i) => (
                 <div
-                  className={cn(
-                    "h-full bg-white transition-all ease-linear",
-                    i === activeIndex
-                      ? "duration-100"
-                      : "duration-0"
-                  )}
-                  style={{
-                    width:
+                  key={i}
+                  className="h-full flex-1 bg-white/20 rounded-full overflow-hidden"
+                >
+                  <div
+                    className={cn(
+                      "h-full bg-white transition-all ease-linear",
                       i === activeIndex
-                        ? `${progress}%`
-                        : i <
-                            activeIndex
-                          ? "100%"
-                          : "0%",
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Header Gradient */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-linear-to-b from-black/60 to-transparent z-[10001]" />
-
-          {/* Header */}
-          <div className="absolute top-8 left-4 right-4 z-[10002] flex justify-between items-center text-white p-2">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden relative shadow-lg">
-                <Image
-                  src={
-                    stories[activeIndex]
-                      .image
-                  }
-                  alt=""
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-sm leading-tight">
-                  {
-                    stories[activeIndex]
-                      .title
-                  }
-                </span>
-                <span className="text-[10px] opacity-80 font-medium uppercase tracking-wider">
-                  Torre Libertador 8000
-                </span>
-              </div>
+                        ? "duration-100"
+                        : "duration-0"
+                    )}
+                    style={{
+                      width:
+                        i ===
+                        activeIndex
+                          ? `${progress}%`
+                          : i <
+                              activeIndex
+                            ? "100%"
+                            : "0%",
+                    }}
+                  />
+                </div>
+              ))}
             </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setActiveIndex(null);
-              }}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors backdrop-blur-md focus:outline-none focus-visible:ring-0"
-              aria-label="Cerrar historias"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
 
-          {/* Navigation Areas (Invisible overlay) */}
-          <div className="absolute inset-0 z-[10000] flex">
-            <div
-              className="w-1/2 h-full cursor-pointer"
-              onClick={prevStory}
-            />
-            <div
-              className="w-1/2 h-full cursor-pointer"
-              onClick={nextStory}
-            />
-          </div>
+            {/* Header Gradient */}
+            <div className="absolute top-0 left-0 right-0 h-32 bg-linear-to-b from-black/60 to-transparent z-[10001]" />
 
-          {/* Content */}
-          <div className="relative w-full h-full flex items-center justify-center">
-            <Image
-              src={
-                stories[activeIndex]
-                  .image
-              }
-              alt={
-                stories[activeIndex]
-                  .title
-              }
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+            {/* Header */}
+            <div className="absolute top-8 left-4 right-4 z-[10002] flex justify-between items-center text-white p-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden relative shadow-lg">
+                  <Image
+                    src={
+                      stories[
+                        activeIndex
+                      ].image
+                    }
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-bold text-sm leading-tight">
+                    {
+                      stories[
+                        activeIndex
+                      ].title
+                    }
+                  </span>
+                  <span className="text-[10px] opacity-80 font-medium uppercase tracking-wider">
+                    Torre Libertador
+                    8000
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveIndex(null);
+                }}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors backdrop-blur-md focus:outline-none focus-visible:ring-0"
+                aria-label="Cerrar historias"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
 
-          {/* Desktop Navigation Arrows */}
-          <div className="absolute inset-y-0 left-8 hidden md:flex items-center z-[10002]">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                prevStory();
-              }}
-              disabled={
-                activeIndex === 0
-              }
-              className="p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white disabled:opacity-0 transition-all hover:scale-110 active:scale-90 focus:outline-none focus-visible:ring-0"
-            >
-              <ChevronLeft className="w-8 h-8" />
-            </button>
-          </div>
-          <div className="absolute inset-y-0 right-8 hidden md:flex items-center z-[10002]">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                nextStory();
-              }}
-              className="p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all hover:scale-110 active:scale-90 focus:outline-none focus-visible:ring-0"
-            >
-              <ChevronRight className="w-8 h-8" />
-            </button>
-          </div>
-        </div>
-      )}
+            {/* Navigation Areas (Invisible overlay) */}
+            <div className="absolute inset-0 z-[10000] flex">
+              <div
+                className="w-1/2 h-full cursor-pointer"
+                onClick={prevStory}
+              />
+              <div
+                className="w-1/2 h-full cursor-pointer"
+                onClick={nextStory}
+              />
+            </div>
+
+            {/* Content */}
+            <div className="relative w-full h-full flex items-center justify-center">
+              <Image
+                src={
+                  stories[activeIndex]
+                    .image
+                }
+                alt={
+                  stories[activeIndex]
+                    .title
+                }
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+
+            {/* Desktop Navigation Arrows */}
+            <div className="absolute inset-y-0 left-8 hidden md:flex items-center z-[10002]">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevStory();
+                }}
+                disabled={
+                  activeIndex === 0
+                }
+                className="p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white disabled:opacity-0 transition-all hover:scale-110 active:scale-90 focus:outline-none focus-visible:ring-0"
+              >
+                <ChevronLeft className="w-8 h-8" />
+              </button>
+            </div>
+            <div className="absolute inset-y-0 right-8 hidden md:flex items-center z-[10002]">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextStory();
+                }}
+                className="p-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all hover:scale-110 active:scale-90 focus:outline-none focus-visible:ring-0"
+              >
+                <ChevronRight className="w-8 h-8" />
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
     </>
   );
 }

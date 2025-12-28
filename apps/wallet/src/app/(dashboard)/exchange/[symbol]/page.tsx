@@ -13,12 +13,14 @@ import { Card } from "@repo/ui/components/ui/card";
 import { cn } from "@repo/ui/lib/utils";
 import {
   ArrowLeft,
-  TrendingDown,
-  TrendingUp,
   BarChart3,
   CandlestickChart,
+  List,
 } from "lucide-react";
 import marketTokens from "@/sample-data/marketTokens.json";
+import walletBalances from "@/sample-data/walletBalances.json";
+import walletHoldings from "@/sample-data/walletHoldings.json";
+import walletPositions from "@/sample-data/walletPositions.json";
 import type { MarketToken } from "@/types/wallet";
 
 type Timeframe =
@@ -26,13 +28,118 @@ type Timeframe =
   | "30d"
   | "7d"
   | "24h";
-type ChartView = "linea" | "velas";
+type ChartView =
+  | "linea"
+  | "velas"
+  | "ordenes";
+
+function OrderBook({
+  currentPrice,
+}: {
+  currentPrice: number;
+}) {
+  // Generate deterministic dummy orders based on current price
+  const { asks, bids } = useMemo(() => {
+    const asks = Array.from({
+      length: 6,
+    })
+      .map((_, i) => ({
+        price:
+          currentPrice *
+          (1 + (i + 1) * 0.005),
+        amount:
+          Math.floor(
+            (Math.sin(i * 123.45) *
+              0.5 +
+              0.5) *
+              500
+          ) + 50,
+        width:
+          (Math.sin(i * 67.89) * 0.5 +
+            0.5) *
+          100,
+      }))
+      .reverse();
+
+    const bids = Array.from({
+      length: 6,
+    }).map((_, i) => ({
+      price:
+        currentPrice *
+        (1 - (i + 1) * 0.005),
+      amount:
+        Math.floor(
+          (Math.cos(i * 123.45) * 0.5 +
+            0.5) *
+            500
+        ) + 50,
+      width:
+        (Math.cos(i * 67.89) * 0.5 +
+          0.5) *
+        100,
+    }));
+    return { asks, bids };
+  }, [currentPrice]);
+
+  return (
+    <div className="flex gap-4 h-full duration-300 animate-in fade-in zoom-in-95">
+      <div className="flex-1 space-y-2">
+        <div className="text-[10px] font-black text-white/50 uppercase tracking-widest text-right">
+          Precio (USDT)
+        </div>
+        {asks.map((ask, i) => (
+          <div
+            key={i}
+            className="flex relative justify-between items-center h-6 text-xs group"
+          >
+            <div
+              className="absolute top-0 right-0 bottom-0 rounded-l-sm transition-all bg-red-500/10 group-hover:bg-red-500/20"
+              style={{
+                width: `${ask.width}%`,
+              }}
+            />
+            <span className="relative z-10 font-mono font-medium text-white/70">
+              {ask.amount}
+            </span>
+            <span className="relative z-10 font-mono font-bold text-red-400">
+              {ask.price.toFixed(2)}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="w-px bg-white/10" />
+      <div className="flex-1 space-y-2">
+        <div className="text-[10px] font-black text-white/50 uppercase tracking-widest">
+          Precio (USDT)
+        </div>
+        {bids.map((bid, i) => (
+          <div
+            key={i}
+            className="flex relative justify-between items-center h-6 text-xs group"
+          >
+            <div
+              className="absolute top-0 bottom-0 left-0 rounded-r-sm transition-all bg-emerald-500/10 group-hover:bg-emerald-500/20"
+              style={{
+                width: `${bid.width}%`,
+              }}
+            />
+            <span className="relative z-10 font-mono font-bold text-emerald-400">
+              {bid.price.toFixed(2)}
+            </span>
+            <span className="relative z-10 font-mono font-medium text-white/70">
+              {bid.amount}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function formatPct(
   value: number
 ): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(1)}%`;
+  return `${Math.abs(value).toFixed(1)}%`;
 }
 
 function getChangePct(
@@ -450,9 +557,46 @@ export default function ExchangeTokenPage() {
   );
   const price = token.priceUsd;
 
+  // Get user data
+  const userBalance = useMemo(() => {
+    return (
+      walletBalances.find(
+        (b) => b.currencyCode === "USDT"
+      )?.available ?? 0
+    );
+  }, []);
+
+  const userHolding = useMemo(() => {
+    const holding = walletHoldings.find(
+      (h) => h.tokenSymbol === symbol
+    );
+    return holding
+      ? holding.tokens * price
+      : 0;
+  }, [symbol, price]);
+
+  const openOrders = useMemo(() => {
+    const positions =
+      walletPositions.filter(
+        (p) =>
+          p.tokenSymbol === symbol &&
+          (p.status === "OPEN" ||
+            p.status ===
+              "PARTIALLY_FILLED")
+      );
+    return positions.reduce(
+      (acc, p) =>
+        acc +
+        (p.totalAmount -
+          p.filledAmount) *
+          p.orderPriceUsd,
+      0
+    );
+  }, [symbol]);
+
   return (
-    <div className="flex flex-col h-[calc(100dvh-96px)] bg-[#F8F9FA] duration-500 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
-      <header className="overflow-hidden sticky top-0 z-50 px-4 pt-4 pb-3 text-white from-gray-900 rounded-none border-none shadow-xl bg-linear-to-br via-slate-900 to-violet-950 shrink-0">
+    <div className="flex flex-col h-[100dvh] -mb-24 pb-24 bg-linear-to-b from-gray-900 via-slate-900 to-black duration-500 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
+      <header className="overflow-hidden sticky top-0 z-50 px-4 pt-4 pb-3 text-white bg-transparent from-gray-900 rounded-none border-none shadow-xl shrink-0">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
         <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10"></div>
 
@@ -481,58 +625,52 @@ export default function ExchangeTokenPage() {
       <main className="flex overflow-hidden flex-col flex-1 p-4 space-y-3">
         <Card className="overflow-hidden border-none shadow-sm bg-white shrink-0 rounded-[32px]">
           <div className="flex gap-4 justify-between items-start p-5">
-            <div className="flex gap-6 items-center">
-              <div className="space-y-0.5">
+            <div className="flex gap-6 justify-around items-center w-full">
+              <div className="space-y-0.5 text-center">
                 <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
-                  COMPRA
+                  TENENCIA
                 </div>
-                <div className="text-2xl font-black tracking-tighter text-[#3B2146]">
+                <div className="text-xl font-black tracking-tighter text-[#3B2146]">
                   $
-                  {(
-                    token.buyPriceUsd ??
-                    price
-                  ).toFixed(2)}
+                  {userHolding.toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                 </div>
               </div>
               <div className="w-px h-8 bg-gray-100" />
-              <div className="space-y-0.5">
+              <div className="space-y-0.5 text-center">
                 <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
-                  VENTA
+                  LIQUIDEZ
                 </div>
-                <div className="text-2xl font-black tracking-tighter text-[#3B2146]">
+                <div className="text-xl font-black tracking-tighter text-[#3B2146]">
                   $
-                  {(
-                    token.sellPriceUsd ??
-                    price
-                  ).toFixed(2)}
+                  {userBalance.toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                 </div>
               </div>
-            </div>
-
-            <div className="flex flex-col gap-1 items-center">
-              <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-center">
-                {timeframe === "all"
-                  ? "HISTÓRICO"
-                  : timeframe === "30d"
-                    ? "30 DÍAS"
-                    : timeframe === "7d"
-                      ? "7 DÍAS"
-                      : "24 HORAS"}
-              </div>
-              <div
-                className={cn(
-                  "px-4 py-2.5 text-right transition-all rounded-[20px] flex flex-col items-center justify-center min-w-[90px] shadow-lg",
-                  isUp
-                    ? "bg-linear-to-r from-brand-lime via-brand-green to-brand-teal shadow-brand-green/20"
-                    : "bg-[#FF3366] shadow-brand-pink/20"
-                )}
-              >
-                <div className="flex gap-1.5 justify-center items-center">
-                  <span className="text-xl font-black leading-none text-white">
-                    {formatPct(
-                      changePct
-                    ).replace("+", "")}
-                  </span>
+              <div className="w-px h-8 bg-gray-100" />
+              <div className="space-y-0.5 text-center">
+                <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                  ORDENES
+                </div>
+                <div className="text-xl font-black tracking-tighter text-[#3B2146]">
+                  $
+                  {openOrders.toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                 </div>
               </div>
             </div>
@@ -564,7 +702,7 @@ export default function ExchangeTokenPage() {
                   className={cn(
                     "h-[52px] rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center",
                     isSelected
-                      ? "bg-primary/80 text-white border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10"
+                      ? "bg-primary/20 text-primary border-primary/20 shadow-lg shadow-primary/5 scale-[1.05] z-10"
                       : "bg-primary/5 border-primary/10 text-primary hover:bg-primary/10"
                   )}
                 >
@@ -573,20 +711,10 @@ export default function ExchangeTokenPage() {
                   </span>
                   <span
                     className={cn(
-                      "mt-1 px-1.5 py-0.5 rounded-md text-[8px] font-black inline-block border",
+                      "mt-1 px-2 py-1 rounded-[10px] text-[10px] font-black inline-block shadow-sm text-white border-none min-w-[50px]",
                       up
-                        ? cn(
-                            "text-brand-green",
-                            isSelected
-                              ? "bg-green-100 border-green-200"
-                              : "bg-brand-green/10 border-brand-green/20"
-                          )
-                        : cn(
-                            "text-brand-pink",
-                            isSelected
-                              ? "bg-pink-100 border-pink-200"
-                              : "bg-brand-pink/10 border-brand-pink/20"
-                          )
+                        ? "bg-linear-to-r from-brand-lime via-brand-green to-brand-teal shadow-brand-green/20"
+                        : "bg-[#FF3366] shadow-brand-pink/20"
                     )}
                   >
                     {formatPct(v)}
@@ -597,19 +725,19 @@ export default function ExchangeTokenPage() {
           </div>
         </Card>
 
-        <Card className="flex overflow-hidden flex-col flex-1 min-h-0 border-none shadow-sm bg-white rounded-[32px]">
-          <div className="flex justify-between items-center p-3 shrink-0">
-            <div className="flex gap-2 w-full">
+        <div className="flex flex-col flex-1 min-h-0 -mx-4 w-[calc(100%+2rem)] bg-linear-to-b from-gray-900 via-slate-900 to-black text-white shadow-inner">
+          <div className="flex justify-between items-center p-4 shrink-0">
+            <div className="flex gap-2 p-1 w-full rounded-2xl border backdrop-blur-md bg-white/5 border-white/10">
               <button
                 type="button"
                 onClick={() =>
                   setView("linea")
                 }
                 className={cn(
-                  "flex-1 h-10 rounded-xl border text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
+                  "flex-1 h-9 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
                   view === "linea"
-                    ? "bg-primary/80 text-white border-primary shadow-lg shadow-primary/20"
-                    : "bg-primary/5 border-primary/10 text-primary hover:bg-primary/10"
+                    ? "bg-white/10 text-white shadow-lg shadow-black/20 border border-white/10"
+                    : "text-white/40 hover:text-white hover:bg-white/5"
                 )}
               >
                 <BarChart3 className="w-4 h-4" />
@@ -621,14 +749,29 @@ export default function ExchangeTokenPage() {
                   setView("velas")
                 }
                 className={cn(
-                  "flex-1 h-10 rounded-xl border text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
+                  "flex-1 h-9 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
                   view === "velas"
-                    ? "bg-primary/80 text-white border-primary shadow-lg shadow-primary/20"
-                    : "bg-primary/5 border-primary/10 text-primary hover:bg-primary/10"
+                    ? "bg-white/10 text-white shadow-lg shadow-black/20 border border-white/10"
+                    : "text-white/40 hover:text-white hover:bg-white/5"
                 )}
               >
                 <CandlestickChart className="w-4 h-4" />
                 VELAS
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setView("ordenes")
+                }
+                className={cn(
+                  "flex-1 h-9 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
+                  view === "ordenes"
+                    ? "bg-white/10 text-white shadow-lg shadow-black/20 border border-white/10"
+                    : "text-white/40 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <List className="w-4 h-4" />
+                ORDENES
               </button>
             </div>
           </div>
@@ -639,36 +782,56 @@ export default function ExchangeTokenPage() {
                 isUp={isUp}
                 currentPrice={price}
               />
-            ) : (
+            ) : view === "velas" ? (
               <CandlesChart
                 series={series}
                 isUp={isUp}
                 currentPrice={price}
               />
+            ) : (
+              <OrderBook
+                currentPrice={price}
+              />
             )}
           </div>
-        </Card>
+        </div>
 
-        <div className="flex gap-3 pt-2 pb-2 shrink-0">
+        <div className="flex gap-3 pt-4 pb-6 shrink-0">
           <Button
+            variant="outline"
             onClick={() =>
               router.push(
                 `/exchange/${encodeURIComponent(symbol)}/sell`
               )
             }
-            className="flex-1 h-14 text-[12px] font-black tracking-widest uppercase rounded-[20px] bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all border-none"
+            className="flex-1 h-20 flex-col gap-0.5 text-[12px] font-black tracking-widest uppercase rounded-[24px] border-brand-pink bg-gray-100 text-[#3B2146] shadow-sm hover:bg-gray-200 hover:text-[#3B2146] active:scale-95 transition-all"
           >
-            VENDER
+            <span>VENDER</span>
+            <span className="text-3xl font-bold tracking-normal normal-case opacity-100">
+              $
+              {(
+                token.sellPriceUsd ??
+                price
+              ).toFixed(2)}
+            </span>
           </Button>
           <Button
+            variant="outline"
             onClick={() =>
               router.push(
                 `/exchange/${encodeURIComponent(symbol)}/buy`
               )
             }
-            className="flex-1 h-14 rounded-[20px] bg-primary text-white shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[12px] border-none"
+            className="flex-1 h-20 flex-col gap-0.5 text-[12px] font-black tracking-widest uppercase rounded-[24px] border-brand-green bg-gray-100 text-[#3B2146] shadow-sm hover:bg-gray-200 hover:text-[#3B2146] active:scale-95 transition-all"
           >
-            COMPRAR
+            <span>COMPRAR</span>
+            <span className="text-3xl font-bold tracking-normal normal-case opacity-100">
+              $
+              {(
+                token.buyPriceUsd ??
+                price
+              ).toFixed(2)}
+            </span>
           </Button>
         </div>
       </main>

@@ -1129,7 +1129,7 @@ function ExchangePageInner() {
                       true
                     )
                   }
-                  className="flex-1 h-14 text-xs font-black tracking-widest uppercase rounded-2xl border-border/50 hover:bg-muted"
+                  className="flex-1 h-14 text-xs font-black tracking-widest uppercase rounded-2xl border-border/50 hover:bg-muted hover:text-foreground"
                 >
                   Ver Detalles
                 </Button>
@@ -1144,7 +1144,7 @@ function ExchangePageInner() {
                       `/exchange/${symbol}`
                     );
                   }}
-                  className="flex-1 h-14 text-xs font-black tracking-widest uppercase rounded-2xl border-border/50 hover:bg-muted"
+                  className="flex-1 h-14 text-xs font-black tracking-widest uppercase rounded-2xl border-border/50 hover:bg-muted hover:text-foreground"
                 >
                   Ver Token
                 </Button>

@@ -621,8 +621,7 @@ export default function ProjectUnitsPage() {
                 className={`flex gap-3 shrink-0 ${
                   isDetailsOpen
                     ? "justify-center pt-4 border-t border-border/50"
-                    : ""
-                }`}
+                    : ""}`}
               >
                 {!isDetailsOpen && (
                   <Button
@@ -632,7 +631,7 @@ export default function ProjectUnitsPage() {
                         true
                       )
                     }
-                    className="flex-1 h-14 text-xs font-black tracking-widest uppercase rounded-2xl border-border/50 hover:bg-muted"
+                    className="flex-1 h-14 text-xs font-black tracking-widest uppercase rounded-2xl border-border/50 hover:bg-muted hover:text-foreground"
                   >
                     <Info className="mr-2 w-4 h-4" />{" "}
                     Ver Detalles
@@ -681,11 +680,11 @@ export default function ProjectUnitsPage() {
       >
         <DialogContent className="max-w-md w-[95%] rounded-[32px] p-6 border-none shadow-2xl bg-card">
           <DialogHeader>
-            <DialogTitle className="text-xl font-black tracking-tight uppercase text-center">
+            <DialogTitle className="text-xl font-black tracking-tight text-center uppercase">
               Contactar Agente
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
+          <div className="py-4 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">
                 Nombre Completo
@@ -787,7 +786,7 @@ export default function ProjectUnitsPage() {
             </div>
           </div>
           <Button
-            className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-xs"
+            className="w-full h-12 text-xs font-black tracking-widest uppercase rounded-xl"
             onClick={() => {
               // Submit logic here
               console.log(
