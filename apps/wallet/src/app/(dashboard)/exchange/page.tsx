@@ -71,6 +71,18 @@ function formatUsd(
   );
 }
 
+function formatUsdNoCents(
+  value: number
+): string {
+  return value.toLocaleString(
+    undefined,
+    {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }
+  );
+}
+
 function getChangePct(
   token: MarketToken,
   timeframe: Timeframe
@@ -777,44 +789,43 @@ function ExchangePageInner() {
 
           <TabsContent
             value="positions"
-            className="flex-1 overflow-y-auto p-4 pb-32 space-y-4 data-[state=active]:block"
+            className="flex flex-col flex-1 overflow-hidden data-[state=active]:flex"
           >
-            {loadError && (
-              <div className="p-4 rounded-[28px] border border-dashed text-muted-foreground bg-muted/5 border-muted/20 text-sm">
-                {loadError}
-              </div>
-            )}
-
-            <Card className="bg-linear-to-br from-primary/20 via-primary/5 to-transparent border-primary/10 overflow-hidden relative shadow-lg rounded-[28px] mb-4">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                  <LayoutGrid className="h-3.5 w-3.5" />
-                  Posiciones Activas
-                </CardTitle>
-                <div className="text-3xl font-black tracking-tighter text-foreground">
-                  $
-                  {formatUsd(
-                    summary.totalValueUsd
-                  )}
+            <div className="p-4 pb-0 shrink-0">
+              {loadError && (
+                <div className="mb-4 p-4 rounded-[28px] border border-dashed text-muted-foreground bg-muted/5 border-muted/20 text-sm">
+                  {loadError}
                 </div>
-              </CardHeader>
-              <CardContent>
+              )}
+
+              <div className="flex justify-between items-center mb-2">
+                <div>
+                  <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-1">
+                    <LayoutGrid className="h-3.5 w-3.5" />
+                    Posiciones Activas
+                  </div>
+                  <div className="text-3xl font-black tracking-tighter text-foreground">
+                    $
+                    {formatUsdNoCents(
+                      summary.totalValueUsd
+                    )}
+                  </div>
+                </div>
                 <div
                   className={cn(
-                    "text-[10px] font-black flex items-center w-fit px-2.5 py-1 rounded-full border",
+                    "text-xs font-black flex items-center px-3 py-1.5 rounded-full border self-end mb-1",
                     summary.totalGainUsd >=
                       0
                       ? "text-brand-green bg-brand-green/10 border-brand-green/20"
                       : "text-brand-pink bg-brand-pink/10 border-brand-pink/20"
                   )}
                 >
-                  <TrendingUp className="mr-1 w-3 h-3" />
                   {summary.totalGainUsd >=
                   0
-                    ? "+"
+                    ? ""
                     : "-"}
                   $
-                  {formatUsd(
+                  {formatUsdNoCents(
                     Math.abs(
                       summary.totalGainUsd
                     )
@@ -825,215 +836,162 @@ function ExchangePageInner() {
                   ).toFixed(1)}
                   %)
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <div className="grid gap-4">
-              {activePositions.length >
-              0 ? (
-                [...activePositions]
-                  .sort((a, b) => {
-                    const openedA =
-                      a.openedMarketPriceUsd ??
-                      a.orderPriceUsd;
-                    const openedB =
-                      b.openedMarketPriceUsd ??
-                      b.orderPriceUsd;
-                    const gainA =
-                      (a.side === "SELL"
-                        ? -1
-                        : 1) *
-                      (a.marketPriceUsd -
-                        openedA) *
-                      a.filledAmount;
-                    const gainB =
-                      (b.side === "SELL"
-                        ? -1
-                        : 1) *
-                      (b.marketPriceUsd -
-                        openedB) *
-                      b.filledAmount;
-                    return (
-                      Math.abs(gainB) -
-                      Math.abs(gainA)
-                    );
-                  })
-                  .map((pos) => {
-                    const token =
-                      tokenBySymbol.get(
-                        pos.tokenSymbol
+            <div className="overflow-y-auto flex-1 p-4 pt-4 pb-32 space-y-4">
+              <div className="grid gap-4">
+                {activePositions.length >
+                0 ? (
+                  [...activePositions]
+                    .sort((a, b) => {
+                      const openedA =
+                        a.openedMarketPriceUsd ??
+                        a.orderPriceUsd;
+                      const openedB =
+                        b.openedMarketPriceUsd ??
+                        b.orderPriceUsd;
+                      const gainA =
+                        (a.side ===
+                        "SELL"
+                          ? -1
+                          : 1) *
+                        (a.marketPriceUsd -
+                          openedA) *
+                        a.filledAmount;
+                      const gainB =
+                        (b.side ===
+                        "SELL"
+                          ? -1
+                          : 1) *
+                        (b.marketPriceUsd -
+                          openedB) *
+                        b.filledAmount;
+                      return (
+                        Math.abs(
+                          gainB
+                        ) -
+                        Math.abs(gainA)
                       );
-                    const unitLabel =
-                      getUnitLabelFromSymbol(
-                        pos.tokenSymbol
-                      );
-                    const openedPrice =
-                      pos.openedMarketPriceUsd ??
-                      pos.orderPriceUsd;
-                    const raw =
-                      pos.marketPriceUsd -
-                      openedPrice;
-                    const gainUsd =
-                      (pos.side ===
-                      "SELL"
-                        ? -raw
-                        : raw) *
-                      pos.filledAmount;
-                    const marketValueUsd =
-                      pos.filledAmount *
-                      pos.marketPriceUsd;
-                    const progress =
-                      pos.totalAmount >
-                      0
-                        ? (pos.filledAmount /
-                            pos.totalAmount) *
-                          100
-                        : 0;
-                    const isSelected =
-                      selectedPositionId ===
-                      pos.id;
+                    })
+                    .map((pos) => {
+                      const token =
+                        tokenBySymbol.get(
+                          pos.tokenSymbol
+                        );
+                      const unitLabel =
+                        getUnitLabelFromSymbol(
+                          pos.tokenSymbol
+                        );
+                      const openedPrice =
+                        pos.openedMarketPriceUsd ??
+                        pos.orderPriceUsd;
+                      const raw =
+                        pos.marketPriceUsd -
+                        openedPrice;
+                      const gainUsd =
+                        (pos.side ===
+                        "SELL"
+                          ? -raw
+                          : raw) *
+                        pos.filledAmount;
+                      const expectedGainUsd =
+                        (pos.side ===
+                        "SELL"
+                          ? -raw
+                          : raw) *
+                        pos.totalAmount;
+                      const marketValueUsd =
+                        pos.filledAmount *
+                        pos.marketPriceUsd;
+                      const progress =
+                        pos.totalAmount >
+                        0
+                          ? (pos.filledAmount /
+                              pos.totalAmount) *
+                            100
+                          : 0;
+                      const isSelected =
+                        selectedPositionId ===
+                        pos.id;
 
-                    return (
-                      <div
-                        key={pos.id}
-                        onClick={() => {
-                          setSelectedPositionId(
-                            pos.id
-                          );
-                          setSelectedTokenId(
-                            null
-                          );
-                        }}
-                        className={cn(
-                          "flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border",
-                          isSelected
-                            ? "bg-white border-primary shadow-xl scale-[1.02] z-10 relative"
-                            : "bg-card border-border/40 hover:border-primary/30 shadow-sm"
-                        )}
-                      >
-                        <div className="flex justify-between items-center mb-1">
-                          <div className="flex gap-4 items-center min-w-0">
-                            <div
-                              className={cn(
-                                "w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg transition-colors shrink-0",
-                                isSelected
-                                  ? "bg-primary text-white shadow-lg shadow-primary/30"
-                                  : "bg-muted/30 text-[#3B2146] border border-border/50"
-                              )}
-                            >
-                              {
-                                unitLabel
-                              }
-                            </div>
-                            <div className="min-w-0">
-                              <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight truncate">
+                      return (
+                        <div
+                          key={pos.id}
+                          onClick={() => {
+                            setSelectedPositionId(
+                              pos.id
+                            );
+                            setSelectedTokenId(
+                              null
+                            );
+                          }}
+                          className={cn(
+                            "flex flex-col p-4 rounded-[28px] transition-all cursor-pointer border",
+                            isSelected
+                              ? "bg-white border-primary shadow-xl scale-[1.02] z-10 relative"
+                              : "bg-card border-border/40 hover:border-primary/30 shadow-sm"
+                          )}
+                        >
+                          <div className="flex justify-between items-center mb-1">
+                            <div className="flex gap-4 items-center min-w-0">
+                              <div
+                                className={cn(
+                                  "w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg transition-colors shrink-0",
+                                  isSelected
+                                    ? "bg-primary text-white shadow-lg shadow-primary/30"
+                                    : "bg-muted/30 text-[#3B2146] border border-border/50"
+                                )}
+                              >
                                 {
-                                  pos.tokenSymbol
+                                  unitLabel
                                 }
                               </div>
-                              <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5 truncate">
-                                {token?.projectTitle ??
-                                  "Proyecto"}
-                              </div>
-                              <div className="flex gap-2 items-center mt-1">
-                                <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                              <div className="min-w-0">
+                                <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight truncate">
                                   {
-                                    pos.filledAmount
-                                  }{" "}
-                                  /{" "}
-                                  {
-                                    pos.totalAmount
-                                  }{" "}
-                                  TOKENS
-                                </span>
-                                <Badge className="text-[8px] h-4 px-1 bg-primary/10 text-primary border-none rounded-full font-black">
-                                  {Math.round(
-                                    progress
-                                  )}
-                                  %
-                                </Badge>
+                                    pos.tokenSymbol
+                                  }
+                                </div>
+                                <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5 truncate">
+                                  {token?.projectTitle ??
+                                    "Proyecto"}
+                                </div>
+                                <div className="flex gap-2 items-center mt-1">
+                                  <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                                    {
+                                      pos.filledAmount
+                                    }{" "}
+                                    /{" "}
+                                    {
+                                      pos.totalAmount
+                                    }{" "}
+                                    TOKENS
+                                  </span>
+                                  <Badge className="text-[8px] h-4 px-1 bg-primary/10 text-primary border-none rounded-full font-black">
+                                    {Math.round(
+                                      progress
+                                    )}
+                                    %
+                                  </Badge>
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          <div className="text-right shrink-0">
-                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
-                              Valor
-                              Actual
-                            </div>
-                            <div className="text-[17px] font-black text-[#3B2146] leading-tight">
-                              $
-                              {formatUsd(
-                                marketValueUsd
-                              )}
-                            </div>
-                            <div
-                              className={cn(
-                                "text-[10px] font-black uppercase mt-1",
-                                gainUsd >=
-                                  0
-                                  ? "text-brand-green"
-                                  : "text-brand-pink"
-                              )}
-                            >
-                              {gainUsd >=
-                              0
-                                ? "+"
-                                : "-"}
-                              $
-                              {formatUsd(
-                                Math.abs(
-                                  gainUsd
-                                )
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 mt-4">
-                          <div className="p-3 rounded-2xl border backdrop-blur-sm bg-background/40 border-border/50">
-                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">
-                              Tu Orden
-                            </div>
-                            <div className="text-sm font-black">
-                              $
-                              {pos.orderPriceUsd.toFixed(
-                                2
-                              )}
-                            </div>
-                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mt-1 opacity-60">
-                              Apertura $
-                              {openedPrice.toFixed(
-                                2
-                              )}
-                            </div>
-                          </div>
-                          <div className="p-3 rounded-2xl border backdrop-blur-sm bg-background/40 border-border/50">
-                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">
-                              Mercado
-                            </div>
-                            <div className="text-sm font-black">
-                              $
-                              {pos.marketPriceUsd.toFixed(
-                                2
-                              )}
-                            </div>
-                            <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mt-1 opacity-60">
-                              Lado{" "}
-                              {pos.side}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-4 space-y-3">
-                          <div className="flex justify-between items-end">
-                            <div className="flex flex-col">
-                              <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
-                                Ganancia
-                              </span>
-                              <span
+                            <div className="text-right shrink-0">
+                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
+                                Valor
+                                Actual
+                              </div>
+                              <div className="text-[17px] font-black text-[#3B2146] leading-tight">
+                                $
+                                {formatUsdNoCents(
+                                  marketValueUsd
+                                )}
+                              </div>
+                              <div
                                 className={cn(
-                                  "text-xs font-black",
+                                  "text-[10px] font-black uppercase mt-1",
                                   gainUsd >=
                                     0
                                     ? "text-brand-green"
@@ -1045,38 +1003,123 @@ function ExchangePageInner() {
                                   ? "+"
                                   : "-"}
                                 $
-                                {formatUsd(
+                                {formatUsdNoCents(
                                   Math.abs(
                                     gainUsd
                                   )
                                 )}
-                              </span>
-                            </div>
-                            <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
-                              Progresión
+                              </div>
                             </div>
                           </div>
-                          <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full transition-all duration-1000 bg-primary"
-                              style={{
-                                width: `${progress}%`,
-                              }}
-                            />
+
+                          <div className="grid grid-cols-2 gap-3 mt-4">
+                            <div className="p-3 rounded-2xl border backdrop-blur-sm bg-background/40 border-border/50">
+                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">
+                                Tu Orden
+                              </div>
+                              <div className="text-sm font-black">
+                                $
+                                {pos.orderPriceUsd.toFixed(
+                                  2
+                                )}
+                              </div>
+                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mt-1 opacity-60">
+                                Apertura
+                                $
+                                {openedPrice.toFixed(
+                                  2
+                                )}
+                              </div>
+                            </div>
+                            <div className="p-3 rounded-2xl border backdrop-blur-sm bg-background/40 border-border/50">
+                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mb-1 opacity-60">
+                                Mercado
+                              </div>
+                              <div className="text-sm font-black">
+                                $
+                                {pos.marketPriceUsd.toFixed(
+                                  2
+                                )}
+                              </div>
+                              <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-tighter mt-1 opacity-60">
+                                Lado{" "}
+                                {pos.side ===
+                                "BUY"
+                                  ? "Compra"
+                                  : "Venta"}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="mt-4 space-y-3">
+                            <div className="flex justify-between items-end">
+                              <div className="flex flex-col">
+                                <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
+                                  Ganancia
+                                  Actual
+                                </span>
+                                <span
+                                  className={cn(
+                                    "text-xs font-black",
+                                    gainUsd >=
+                                      0
+                                      ? "text-brand-green"
+                                      : "text-brand-pink"
+                                  )}
+                                >
+                                  {gainUsd >=
+                                  0
+                                    ? "+"
+                                    : "-"}
+                                  $
+                                  {formatUsdNoCents(
+                                    Math.abs(
+                                      gainUsd
+                                    )
+                                  )}
+                                </span>
+                              </div>
+                              <div className="flex flex-col items-end">
+                                <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
+                                  Ganancia
+                                  Esperada
+                                </span>
+                                <span className="text-xs font-black text-foreground">
+                                  {expectedGainUsd >=
+                                  0
+                                    ? "+"
+                                    : "-"}
+                                  $
+                                  {formatUsdNoCents(
+                                    Math.abs(
+                                      expectedGainUsd
+                                    )
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full transition-all duration-1000 bg-brand-green"
+                                style={{
+                                  width: `${progress}%`,
+                                }}
+                              />
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })
-              ) : (
-                <div className="py-20 text-center rounded-3xl border border-dashed text-muted-foreground bg-muted/5 border-muted/20">
-                  <Layers className="mx-auto mb-3 w-10 h-10 opacity-20" />
-                  <p className="text-sm font-medium">
-                    No tenés posiciones
-                    activas
-                  </p>
-                </div>
-              )}
+                      );
+                    })
+                ) : (
+                  <div className="py-20 text-center rounded-3xl border border-dashed text-muted-foreground bg-muted/5 border-muted/20">
+                    <Layers className="mx-auto mb-3 w-10 h-10 opacity-20" />
+                    <p className="text-sm font-medium">
+                      No tenés
+                      posiciones activas
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </TabsContent>
         </Tabs>
@@ -1134,9 +1177,10 @@ function ExchangePageInner() {
                   <div className="flex items-center gap-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     <span>
                       Lado{" "}
-                      {
-                        selectedPosition.side
-                      }
+                      {selectedPosition.side ===
+                      "BUY"
+                        ? "Compra"
+                        : "Venta"}
                     </span>
                     <span>
                       {
