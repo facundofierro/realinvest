@@ -565,8 +565,8 @@ function ExchangePageInner() {
   };
 
   return (
-    <div className="flex flex-col pb-48 min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white px-4 py-5 rounded-b-[40px] shadow-xl border-none overflow-hidden">
+    <div className="flex flex-col h-[100dvh] -mb-24 bg-background overflow-hidden">
+      <header className="sticky top-0 z-50 bg-linear-to-br from-gray-900 via-slate-900 to-violet-950 text-white px-4 py-5 rounded-b-[40px] shadow-xl border-none overflow-hidden shrink-0">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
         <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10"></div>
 
@@ -592,161 +592,166 @@ function ExchangePageInner() {
         </div>
       </header>
 
-      <div className="flex flex-col flex-1">
+      <div className="flex overflow-hidden flex-col flex-1">
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="w-full"
+          className="flex overflow-hidden flex-col flex-1 w-full"
         >
-          <div className="px-4 py-4 border-b border-border/50 bg-muted/10">
-            <TabsList className="flex items-center gap-1.5 w-full h-auto bg-transparent p-0 border-none">
+          <div className="z-10 px-4 pt-2 pb-2 border-b backdrop-blur border-border/50 bg-background/95">
+            <TabsList className="flex gap-4 justify-between items-center p-0 w-full h-auto bg-transparent border-none">
               <TabsTrigger
                 value="market"
-                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
+                className="flex-1 min-w-0 h-10 px-0 rounded-none bg-transparent border-b-2 border-transparent text-[11px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:border-primary hover:text-foreground transition-colors"
               >
                 Mercado
               </TabsTrigger>
               <TabsTrigger
                 value="favorites"
-                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
+                className="flex-1 min-w-0 h-10 px-0 rounded-none bg-transparent border-b-2 border-transparent text-[11px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:border-primary hover:text-foreground transition-colors"
               >
                 Favoritos
               </TabsTrigger>
               <TabsTrigger
                 value="positions"
-                className="flex-1 min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary"
+                className="flex-1 min-w-0 h-10 px-0 rounded-none bg-transparent border-b-2 border-transparent text-[11px] font-black uppercase tracking-wider text-muted-foreground data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none data-[state=active]:border-primary hover:text-foreground transition-colors"
               >
                 Mis Posiciones
               </TabsTrigger>
-              <button className="flex justify-center items-center w-11 h-11 rounded-2xl border shrink-0 bg-primary/10 text-primary border-primary/20">
-                <Filter className="w-4 h-4" />
-              </button>
             </TabsList>
           </div>
 
           <TabsContent
             value="market"
-            className="p-4 space-y-4"
+            className="flex flex-col flex-1 overflow-hidden data-[state=active]:flex"
           >
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-1.5 w-full">
-                <Button
-                  variant={
-                    sortBy ===
-                    "marketCap"
-                      ? "secondary"
-                      : "ghost"
-                  }
-                  size="sm"
-                  className={cn(
-                    "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border-2",
-                    sortBy ===
+            <div className="z-10 p-4 pb-2 space-y-4 shrink-0 bg-background">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-1.5 w-full">
+                  <Button
+                    variant={
+                      sortBy ===
                       "marketCap"
-                      ? "shadow-md bg-primary/80 text-primary-foreground border-primary"
-                      : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                  )}
-                  onClick={() =>
-                    setSortBy(
-                      "marketCap"
-                    )
-                  }
-                >
-                  <CircleDollarSign className="h-3.5 w-3.5" />
-                  <span className="truncate">
-                    Marketcap
-                  </span>
-                </Button>
-                <Button
-                  variant={
-                    sortBy === "change"
-                      ? "secondary"
-                      : "ghost"
-                  }
-                  size="sm"
-                  className={cn(
-                    "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border-2",
-                    sortBy === "change"
-                      ? "shadow-md bg-primary/80 text-primary-foreground border-primary"
-                      : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                  )}
-                  onClick={() =>
-                    setSortBy("change")
-                  }
-                >
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  <span className="truncate">
-                    % Var.
-                  </span>
-                </Button>
+                        ? "secondary"
+                        : "ghost"
+                    }
+                    size="sm"
+                    className={cn(
+                      "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border-2",
+                      sortBy ===
+                        "marketCap"
+                        ? "shadow-md bg-primary/80 text-primary-foreground border-primary"
+                        : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                    )}
+                    onClick={() =>
+                      setSortBy(
+                        "marketCap"
+                      )
+                    }
+                  >
+                    <CircleDollarSign className="h-3.5 w-3.5" />
+                    <span className="truncate">
+                      Marketcap
+                    </span>
+                  </Button>
+                  <Button
+                    variant={
+                      sortBy ===
+                      "change"
+                        ? "secondary"
+                        : "ghost"
+                    }
+                    size="sm"
+                    className={cn(
+                      "rounded-2xl gap-1 flex-1 h-11 transition-all text-[10px] uppercase font-black tracking-wider border-2",
+                      sortBy ===
+                        "change"
+                        ? "shadow-md bg-primary/80 text-primary-foreground border-primary"
+                        : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
+                    )}
+                    onClick={() =>
+                      setSortBy(
+                        "change"
+                      )
+                    }
+                  >
+                    <TrendingUp className="h-3.5 w-3.5" />
+                    <span className="truncate">
+                      % Var.
+                    </span>
+                  </Button>
 
-                <div className="flex gap-1 items-center p-1 h-11 rounded-2xl border bg-primary/5 border-primary/10">
-                  {(
-                    [
-                      "24H",
-                      "7D",
-                      "30D",
-                      "ALL",
-                    ] as const
-                  ).map((tf) => (
-                    <Button
-                      key={tf}
-                      variant={
-                        timeframe ===
-                        tf.toLowerCase()
-                          ? "secondary"
-                          : "ghost"
-                      }
-                      size="sm"
-                      className={cn(
-                        "rounded-xl px-2 h-full text-[9px] font-black tracking-tighter transition-all border-2",
-                        timeframe ===
+                  <div className="flex gap-1 items-center p-1 h-11 rounded-2xl border bg-primary/5 border-primary/10">
+                    {(
+                      [
+                        "24H",
+                        "7D",
+                        "30D",
+                        "ALL",
+                      ] as const
+                    ).map((tf) => (
+                      <Button
+                        key={tf}
+                        variant={
+                          timeframe ===
                           tf.toLowerCase()
-                          ? "shadow-sm bg-primary/80 text-primary-foreground border-primary"
-                          : "bg-transparent text-primary/60 border-transparent hover:bg-primary/10"
-                      )}
-                      onClick={() =>
-                        setTimeframe(
-                          tf.toLowerCase() as
-                            | "24h"
-                            | "7d"
-                            | "30d"
-                            | "all"
-                        )
-                      }
-                    >
-                      {tf}
-                    </Button>
-                  ))}
+                            ? "secondary"
+                            : "ghost"
+                        }
+                        size="sm"
+                        className={cn(
+                          "rounded-xl px-2 h-full text-[9px] font-black tracking-tighter transition-all border-2",
+                          timeframe ===
+                            tf.toLowerCase()
+                            ? "shadow-sm bg-primary/80 text-primary-foreground border-primary"
+                            : "bg-transparent text-primary/60 border-transparent hover:bg-primary/10"
+                        )}
+                        onClick={() =>
+                          setTimeframe(
+                            tf.toLowerCase() as
+                              | "24h"
+                              | "7d"
+                              | "30d"
+                              | "all"
+                          )
+                        }
+                      >
+                        {tf}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="grid gap-4">
-              {filteredTokens.length >
-              0 ? (
-                filteredTokens.map(
-                  (token) => (
-                    <TokenRow
-                      key={token.id}
-                      token={token}
-                    />
+            <div className="overflow-y-auto flex-1 p-4 pb-32">
+              <div className="grid gap-4">
+                {filteredTokens.length >
+                0 ? (
+                  filteredTokens.map(
+                    (token) => (
+                      <TokenRow
+                        key={token.id}
+                        token={token}
+                      />
+                    )
                   )
-                )
-              ) : (
-                <div className="py-20 text-center rounded-3xl border border-dashed text-muted-foreground bg-muted/5 border-muted/20">
-                  <Search className="mx-auto mb-3 w-10 h-10 opacity-20" />
-                  <p className="text-sm font-medium">
-                    No se encontraron
-                    tokens
-                  </p>
-                </div>
-              )}
+                ) : (
+                  <div className="py-20 text-center rounded-3xl border border-dashed text-muted-foreground bg-muted/5 border-muted/20">
+                    <Search className="mx-auto mb-3 w-10 h-10 opacity-20" />
+                    <p className="text-sm font-medium">
+                      No se encontraron
+                      tokens
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </TabsContent>
 
           <TabsContent
             value="favorites"
-            className="p-4 space-y-4"
+            className="flex-1 overflow-y-auto p-4 pb-32 space-y-4 data-[state=active]:block"
           >
             <div className="grid gap-4">
               {favorites.length > 0 ? (
@@ -772,7 +777,7 @@ function ExchangePageInner() {
 
           <TabsContent
             value="positions"
-            className="p-4 space-y-4"
+            className="flex-1 overflow-y-auto p-4 pb-32 space-y-4 data-[state=active]:block"
           >
             {loadError && (
               <div className="p-4 rounded-[28px] border border-dashed text-muted-foreground bg-muted/5 border-muted/20 text-sm">

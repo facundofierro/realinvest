@@ -195,6 +195,18 @@ function formatPct(
   return `${Math.abs(value).toFixed(1)}%`;
 }
 
+function formatUsd(
+  value: number
+): string {
+  return value.toLocaleString(
+    undefined,
+    {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }
+  );
+}
+
 function formatCompactNumber(
   value: number
 ): string {
@@ -563,6 +575,20 @@ export default function ExchangeTokenPage() {
     useState<"MARKET" | "LIMIT">(
       "MARKET"
     );
+  const [amount, setAmount] =
+    useState("");
+  const [
+    limitPriceInput,
+    setLimitPriceInput,
+  ] = useState("");
+
+  // Reset inputs when opening dialog
+  useEffect(() => {
+    if (isTradeDialogOpen) {
+      setAmount("");
+      setLimitPriceInput("");
+    }
+  }, [isTradeDialogOpen]);
 
   const [token, setToken] =
     useState<MarketToken | null>(null);
@@ -824,6 +850,169 @@ export default function ExchangeTokenPage() {
       : null;
   }, [bids]);
 
+  const marketSimulation =
+    useMemo(() => {
+      if (
+        orderType !== "MARKET" ||
+        !amount ||
+        isNaN(Number(amount)) ||
+        Number(amount) <= 0
+      )
+        return null;
+      const targetQty = Number(amount);
+      let remaining = targetQty;
+      let totalUsd = 0;
+      const details: {
+        price: number;
+        amount: number;
+        total: number;
+      }[] = [];
+
+      const orders =
+        tradeType === "BUY"
+          ? asks
+          : bids;
+      const sortedOrders = [
+        ...orders,
+      ].sort((a, b) =>
+        tradeType === "BUY"
+          ? a.price - b.price
+          : b.price - a.price
+      );
+
+      for (const order of sortedOrders) {
+        if (remaining <= 0) break;
+        const take = Math.min(
+          remaining,
+          order.amount
+        );
+        const cost = take * order.price;
+        totalUsd += cost;
+        remaining -= take;
+        details.push({
+          price: order.price,
+          amount: take,
+          total: cost,
+        });
+      }
+
+      return {
+        totalUsd,
+        avgPrice:
+          targetQty > remaining
+            ? totalUsd /
+              (targetQty - remaining)
+            : 0,
+        filledQty:
+          targetQty - remaining,
+        remainingQty: remaining,
+        details,
+      };
+    }, [
+      amount,
+      tradeType,
+      asks,
+      bids,
+      orderType,
+    ]);
+
+  const limitSimulation =
+    useMemo(() => {
+      if (
+        orderType !== "LIMIT" ||
+        !amount ||
+        !limitPriceInput
+      )
+        return null;
+      const qty = Number(amount);
+      const price = Number(
+        limitPriceInput
+      );
+      if (isNaN(qty) || isNaN(price))
+        return null;
+
+      const currentPrice =
+        effectiveToken.priceUsd;
+      const diff = price - currentPrice;
+      // Expected gain relative to current market price
+      const gain =
+        (tradeType === "SELL"
+          ? diff
+          : -diff) * qty;
+
+      return {
+        gain,
+        total: qty * price,
+      };
+    }, [
+      amount,
+      limitPriceInput,
+      orderType,
+      effectiveToken.priceUsd,
+      tradeType,
+    ]);
+
+  const isPriceWorse: boolean =
+    orderType === "LIMIT" &&
+    !!limitPriceInput &&
+    !isNaN(Number(limitPriceInput)) &&
+    ((tradeType === "BUY" &&
+      Number(limitPriceInput) >
+        effectiveToken.priceUsd) ||
+      (tradeType === "SELL" &&
+        Number(limitPriceInput) <
+          effectiveToken.priceUsd));
+
+  const handleMax = () => {
+    if (tradeType === "SELL") {
+      const holding = holdings.find(
+        (h) => h.tokenSymbol === symbol
+      );
+      setAmount(
+        holding
+          ? holding.tokens.toString()
+          : "0"
+      );
+    } else {
+      if (
+        orderType === "LIMIT" &&
+        limitPriceInput
+      ) {
+        const price = Number(
+          limitPriceInput
+        );
+        if (price > 0) {
+          setAmount(
+            (
+              userBalance / price
+            ).toFixed(6)
+          );
+        }
+      } else {
+        let money = userBalance;
+        let qty = 0;
+        const sortedAsks = [
+          ...asks,
+        ].sort(
+          (a, b) => a.price - b.price
+        );
+        for (const ask of sortedAsks) {
+          const cost =
+            ask.price * ask.amount;
+          if (money >= cost) {
+            money -= cost;
+            qty += ask.amount;
+          } else {
+            qty += money / ask.price;
+            money = 0;
+            break;
+          }
+        }
+        setAmount(qty.toFixed(6));
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col h-[100dvh] -mb-24 pb-24 bg-linear-to-b from-gray-900 via-slate-900 to-black duration-500 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
       <header className="overflow-hidden sticky top-0 z-50 px-4 pt-4 pb-3 text-white bg-transparent from-gray-900 rounded-none border-none shadow-xl shrink-0">
@@ -1080,17 +1269,36 @@ export default function ExchangeTokenPage() {
             setIsTradeDialogOpen
           }
         >
-          <DialogContent className="max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
-            <div className="p-6 space-y-6">
+          <DialogContent
+            className={cn(
+              "max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden shadow-2xl border-2",
+              tradeType === "SELL"
+                ? "border-brand-pink"
+                : "border-brand-green"
+            )}
+          >
+            <div className="p-6 space-y-6 backdrop-blur-xl bg-card/95">
               <DialogHeader>
-                <DialogTitle className="text-xl font-black tracking-tight uppercase">
-                  {tradeType === "BUY"
-                    ? "Comprar"
-                    : "Vender"}{" "}
-                  {
-                    effectiveToken.symbol
-                  }
-                </DialogTitle>
+                <div className="flex flex-col gap-1 items-center text-center">
+                  <span
+                    className={cn(
+                      "text-sm font-black tracking-widest uppercase",
+                      tradeType ===
+                        "SELL"
+                        ? "text-brand-pink"
+                        : "text-brand-green"
+                    )}
+                  >
+                    {tradeType === "BUY"
+                      ? "Comprar"
+                      : "Vender"}
+                  </span>
+                  <DialogTitle className="text-3xl font-black tracking-tighter uppercase">
+                    {
+                      effectiveToken.symbol
+                    }
+                  </DialogTitle>
+                </div>
               </DialogHeader>
 
               <Tabs
@@ -1102,78 +1310,299 @@ export default function ExchangeTokenPage() {
                       | "LIMIT"
                   )
                 }
+                className="w-full"
               >
-                <TabsList className="grid grid-cols-2 w-full">
-                  <TabsTrigger value="MARKET">
+                <TabsList className="grid grid-cols-2 p-1 w-full rounded-full bg-muted/20">
+                  <TabsTrigger
+                    value="MARKET"
+                    className="rounded-full text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
                     Mercado
                   </TabsTrigger>
-                  <TabsTrigger value="LIMIT">
+                  <TabsTrigger
+                    value="LIMIT"
+                    className="rounded-full text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  >
                     Orden
                   </TabsTrigger>
                 </TabsList>
 
-                <div className="py-4 space-y-4">
-                  {orderType ===
-                  "MARKET" ? (
-                    <p className="text-sm text-muted-foreground">
-                      Operar al precio
-                      actual del
-                      mercado. La orden
-                      se ejecutará
-                      inmediatamente al
-                      mejor precio
-                      disponible.
-                    </p>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      Establece un
-                      precio específico
-                      para comprar o
-                      vender. La orden
-                      se ejecutará solo
-                      cuando el mercado
-                      alcance tu precio.
-                    </p>
-                  )}
-
+                <div className="py-6 space-y-6">
                   <div className="space-y-4">
-                    {orderType ===
-                      "LIMIT" && (
-                      <div className="space-y-2">
-                        <Label>
-                          Precio
-                          Objetivo (
-                          {
-                            token?.symbol
-                          }
-                          )
-                        </Label>
+                    <div className="flex justify-between items-center">
+                      <Label>
+                        Detalles de la
+                        operación
+                      </Label>
+                      <button
+                        onClick={
+                          handleMax
+                        }
+                        className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
+                      >
+                        Max:{" "}
+                        {tradeType ===
+                        "SELL"
+                          ? (holdings.find(
+                              (h) =>
+                                h.tokenSymbol ===
+                                symbol
+                            )?.tokens ??
+                            0)
+                          : `$${formatUsd(
+                              userBalance
+                            )}`}
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                          Cantidad
+                        </span>
                         <Input
+                          value={amount}
+                          onChange={(
+                            e
+                          ) =>
+                            setAmount(
+                              e.target
+                                .value
+                            )
+                          }
                           type="number"
                           placeholder="0.00"
-                          className="h-12 rounded-xl"
+                          className="h-12 font-bold rounded-xl"
                         />
                       </div>
-                    )}
-                    <div className="space-y-2">
-                      <Label>
-                        Cantidad
-                      </Label>
-                      <Input
-                        type="number"
-                        placeholder="0.00"
-                        className="h-12 rounded-xl"
-                      />
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                          {orderType ===
+                          "MARKET"
+                            ? "Precio Aprox."
+                            : "Precio Límite"}
+                        </span>
+                        {orderType ===
+                        "MARKET" ? (
+                          <div className="flex items-center px-3 h-12 font-bold truncate rounded-xl border bg-muted/20 border-border/50 text-muted-foreground">
+                            {marketSimulation &&
+                            marketSimulation.avgPrice >
+                              0
+                              ? `$${marketSimulation.avgPrice.toFixed(
+                                  2
+                                )}`
+                              : "Mercado"}
+                          </div>
+                        ) : (
+                          <Input
+                            value={
+                              limitPriceInput
+                            }
+                            onChange={(
+                              e
+                            ) =>
+                              setLimitPriceInput(
+                                e.target
+                                  .value
+                              )
+                            }
+                            type="number"
+                            placeholder="0.00"
+                            className="h-12 font-bold rounded-xl"
+                          />
+                        )}
+                      </div>
                     </div>
+
+                    {/* Total Row */}
+                    <div className="flex justify-between items-center p-4 rounded-2xl border bg-muted/10 border-border/50">
+                      <span className="text-xs font-bold uppercase text-muted-foreground">
+                        Total Estimado
+                      </span>
+                      <span className="text-xl font-black">
+                        $
+                        {formatUsd(
+                          orderType ===
+                            "MARKET"
+                            ? (marketSimulation?.totalUsd ??
+                                0)
+                            : (limitSimulation?.total ??
+                                0)
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Market Details */}
+                    {orderType ===
+                      "MARKET" &&
+                      marketSimulation &&
+                      marketSimulation
+                        .details
+                        .length > 0 && (
+                        <div className="p-3 space-y-2 rounded-xl border bg-muted/10 border-border/50">
+                          <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">
+                            Detalles de
+                            Ejecución
+                          </div>
+                          {marketSimulation.details
+                            .slice(0, 3)
+                            .map(
+                              (
+                                d,
+                                i
+                              ) => (
+                                <div
+                                  key={
+                                    i
+                                  }
+                                  className="flex justify-between text-[10px]"
+                                >
+                                  <span>
+                                    {d.amount.toFixed(
+                                      4
+                                    )}{" "}
+                                    @ $
+                                    {d.price.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                  <span className="font-mono">
+                                    $
+                                    {d.total.toFixed(
+                                      2
+                                    )}
+                                  </span>
+                                </div>
+                              )
+                            )}
+                          {marketSimulation
+                            .details
+                            .length >
+                            3 && (
+                            <div className="text-[9px] text-center text-muted-foreground italic">
+                              +{" "}
+                              {marketSimulation
+                                .details
+                                .length -
+                                3}{" "}
+                              órdenes
+                              más
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                    {/* Limit Details */}
+                    {orderType ===
+                      "LIMIT" &&
+                      limitSimulation && (
+                        <div className="p-3 space-y-2 rounded-xl border bg-muted/10 border-border/50">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-muted-foreground">
+                              Ganancia
+                              Est.:
+                            </span>
+                            <span
+                              className={cn(
+                                "font-bold",
+                                limitSimulation.gain >=
+                                  0
+                                  ? "text-brand-green"
+                                  : "text-brand-pink"
+                              )}
+                            >
+                              {limitSimulation.gain >=
+                              0
+                                ? "+"
+                                : ""}
+                              $
+                              {formatUsd(
+                                limitSimulation.gain
+                              )}
+                            </span>
+                          </div>
+                          {tradeType ===
+                            "BUY" &&
+                            Number(
+                              limitPriceInput
+                            ) >
+                              effectiveToken.priceUsd && (
+                              <div className="text-[10px] text-brand-pink font-bold mt-1">
+                                ⚠️
+                                Precio
+                                mayor al
+                                mercado
+                                ($
+                                {effectiveToken.priceUsd.toFixed(
+                                  2
+                                )}
+                                )
+                              </div>
+                            )}
+                          {tradeType ===
+                            "SELL" &&
+                            Number(
+                              limitPriceInput
+                            ) <
+                              effectiveToken.priceUsd && (
+                              <div className="text-[10px] text-brand-pink font-bold mt-1">
+                                ⚠️
+                                Precio
+                                menor al
+                                mercado
+                                ($
+                                {effectiveToken.priceUsd.toFixed(
+                                  2
+                                )}
+                                )
+                              </div>
+                            )}
+                        </div>
+                      )}
                   </div>
 
                   <Button
-                    className="mt-6 w-full h-12 text-xs font-black tracking-widest uppercase rounded-xl shadow-xl bg-primary text-primary-foreground shadow-primary/25"
+                    className={cn(
+                      "mt-6 w-full h-14 text-xs font-black tracking-widest uppercase rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-95",
+                      tradeType ===
+                        "SELL"
+                        ? "bg-brand-pink text-white shadow-brand-pink/25 hover:bg-brand-pink/90"
+                        : "bg-brand-green text-white shadow-brand-green/25 hover:bg-brand-green/90"
+                    )}
                     size="lg"
                     onClick={() =>
                       setIsTradeDialogOpen(
                         false
                       )
+                    }
+                    disabled={
+                      !amount ||
+                      Number(amount) <=
+                        0 ||
+                      (tradeType ===
+                        "BUY" &&
+                        orderType ===
+                          "MARKET" &&
+                        (marketSimulation?.totalUsd ??
+                          0) >
+                          userBalance) ||
+                      (tradeType ===
+                        "BUY" &&
+                        orderType ===
+                          "LIMIT" &&
+                        (limitSimulation?.total ??
+                          0) >
+                          userBalance) ||
+                      (tradeType ===
+                        "SELL" &&
+                        Number(amount) >
+                          (holdings.find(
+                            (h) =>
+                              h.tokenSymbol ===
+                              symbol
+                          )?.tokens ??
+                            0)) ||
+                      isPriceWorse
                     }
                   >
                     {tradeType === "BUY"
