@@ -22,11 +22,13 @@ This document outlines the strategy for porting the Real Invest Wallet Next.js w
 ```
 real-invest/
 ├── apps/
-│   └── wallet/          # Next.js web application (existing)
+│   ├── wallet/          # Next.js web application (primary)
+│   └── landing/         # Next.js landing page
 ├── native/             # Native platform implementations
 │   └── wallet/          # Wallet application native implementations
 │       ├── tauri/       # Desktop apps (Windows, macOS, Linux)
-│       └── capacitor/   # Mobile apps (iOS, Android)
+│       ├── capacitor/   # Mobile apps (iOS, Android)
+│       └── webview/     # Static Next.js build for native platforms
 └── packages/
     └── ui/             # Shared UI components (existing)
 ```
@@ -43,9 +45,9 @@ real-invest/
 {
   "build": {
     "beforeDevCommand": "cd ../../apps/wallet && npm run dev",
-    "beforeBuildCommand": "cd ../../apps/wallet && npm run build",
+    "beforeBuildCommand": "cd ../../../apps/wallet && npm run build",
     "devPath": "http://localhost:3000",
-    "distDir": "../../apps/wallet/.next"
+    "distDir": "../../../apps/wallet/.next"
   },
   "package": {
     "productName": "Real Invest Wallet",
@@ -98,66 +100,7 @@ real-invest/
 
 1. **Native Menu Integration**:
 
-```rust
-// src-tauri/src/main.rs
-#[tauri::command]
-fn get_native_menu() -> Menu {
-    Menu::new()
-        .add_submenu(Submenu::new("File", Menu::new()
-            .add_item(MenuItem::CloseWindow)
-        ))
-        .add_submenu(Submenu::new("Edit", Menu::new()
-            .add_item(MenuItem::Copy)
-            .add_item(MenuItem::Paste)
-            .add_item(MenuItem::SelectAll)
-        ))
-}
-```
-
 2. **File System Access** (for export functionality):
-
-```typescript
-// Platform-specific file handling
-export const exportPortfolioData =
-  async (data: any) => {
-    if (window.__TAURI__) {
-      const { save } =
-        await import("@tauri-apps/api/dialog");
-      const { writeTextFile } =
-        await import("@tauri-apps/api/fs");
-
-      const filePath = await save({
-        filters: [
-          {
-            name: "JSON",
-            extensions: ["json"],
-          },
-        ],
-      });
-
-      if (filePath) {
-        await writeTextFile(
-          filePath,
-          JSON.stringify(data, null, 2)
-        );
-      }
-    } else {
-      // Web implementation
-      const blob = new Blob(
-        [JSON.stringify(data, null, 2)],
-        { type: "application/json" }
-      );
-      const url =
-        URL.createObjectURL(blob);
-      const a =
-        document.createElement("a");
-      a.href = url;
-      a.download =
-        "portfolio-export.json";
-      a.click();
-    }
-  };
-```
 
 ## **Capacitor Implementation (Mobile)**
 
@@ -173,7 +116,7 @@ import { CapacitorConfig } from "@capacitor/cli";
 const config: CapacitorConfig = {
   appId: "com.realinvest.wallet",
   appName: "Real Invest Wallet",
-  webDir: "../../apps/wallet/.next",
+  webDir: "../../../apps/wallet/.next",
   bundledWebRuntime: false,
   ios: {
     scheme: "RealInvestWallet",
@@ -206,59 +149,7 @@ export default config;
 
 1. **Touch & Gesture Support**:
 
-```typescript
-// Enhanced touch handling for mobile
-export const useMobileGestures = () => {
-  const isMobile =
-    typeof window !== "undefined" &&
-    "ontouchstart" in window;
-
-  const handleSwipe = (
-    direction: "left" | "right",
-    callback: () => void
-  ) => {
-    if (!isMobile) return;
-
-    // Implement swipe gesture handling
-  };
-
-  return { isMobile, handleSwipe };
-};
-```
-
 2. **Native Device Features**:
-
-```typescript
-// Biometric authentication integration
-import { BiometricAuth } from "@capacitor-community/biometric-auth";
-
-export const useBiometricAuth =
-  async () => {
-    try {
-      const available =
-        await BiometricAuth.isAvailable();
-
-      if (available.has) {
-        const result =
-          await BiometricAuth.verify({
-            reason:
-              "Authenticate to access your portfolio",
-            title:
-              "Real Invest Authentication",
-          });
-
-        return result.verified;
-      }
-    } catch (error) {
-      console.warn(
-        "Biometric auth not available:",
-        error
-      );
-    }
-
-    return false;
-  };
-```
 
 ## **Build & Deployment Process**
 
@@ -389,6 +280,35 @@ jobs:
 
 ## **Shared Code Strategy**
 
+### **Component Sharing Approach**
+
+**Direct Export from Wallet App**:
+
+```json
+// apps/wallet/package.json
+{
+  "name": "@repo/wallet",
+  "exports": {
+    "./components/*": "./src/components/*",
+    "./lib/*": "./src/lib/*",
+    "./types/*": "./src/types/*"
+  }
+}
+```
+
+**Usage in Native Webview**:
+
+```tsx
+// native/wallet/webview/app/deposit/page.tsx
+import { DepositPage } from "@repo/wallet/components/deposit-page";
+import { useAuth } from "@repo/wallet/lib/auth";
+import { WalletBalance } from "@repo/wallet/types/wallet";
+
+export default function Deposit() {
+  return <DepositPage />;
+}
+```
+
 ### **Platform Detection**
 
 ```typescript
@@ -495,14 +415,14 @@ jobs:
 
 ### **Phase 1: Desktop (Tauri) - 2-3 weeks**
 
-- [ ] Setup Tauri project structure
+- [x] Setup Tauri project structure
 - [ ] Configure build pipeline
 - [ ] Implement desktop-specific enhancements
 - [ ] Testing and validation
 
 ### **Phase 2: Mobile (Capacitor) - 3-4 weeks**
 
-- [ ] Setup Capacitor project structure
+- [x] Setup Capacitor project structure
 - [ ] Configure mobile build pipeline
 - [ ] Implement mobile-specific UI/UX
 - [ ] App store preparation
