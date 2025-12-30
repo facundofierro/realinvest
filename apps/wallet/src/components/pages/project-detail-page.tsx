@@ -1,7 +1,6 @@
 "use client";
 
-import {
-  use,
+import React, {
   useEffect,
   useState,
 } from "react";
@@ -42,6 +41,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { ProjectStories } from "@/components/project/stories-section";
+import type { ProjectPurchaseOption } from "@/lib/api/project-purchase-options";
 
 export interface PurchaseOption {
   key: string;
@@ -78,21 +78,144 @@ interface Story {
   color: string;
 }
 
+const iconMap = {
+  Wallet,
+  DollarSign,
+  Building2,
+  Hammer,
+  ShoppingBag,
+  TrendingUp,
+  Home,
+  Layers,
+} as const;
+
+function mapPurchaseOptions(
+  options: ProjectPurchaseOption[]
+): PurchaseOption[] {
+  return options.map((option) => ({
+    ...option,
+    headerIcon:
+      iconMap[
+        option.headerIcon as keyof typeof iconMap
+      ] || Wallet,
+    watermarkIcon:
+      iconMap[
+        option.watermarkIcon as keyof typeof iconMap
+      ] || Wallet,
+    getHref: (id: string) =>
+      option.getHref.replace(
+        "{id}",
+        id
+      ),
+  }));
+}
+
 interface ProjectDetailPageProps {
   id: string;
   backHref: string;
-  stories: Story[];
-  purchaseOptions: PurchaseOption[];
-  stages: Stage[];
+  stories?: Story[];
+  purchaseOptions?: ProjectPurchaseOption[];
+  stages?: Stage[];
+}
+
+async function fetchProjectStories(): Promise<
+  Story[]
+> {
+  const response = await fetch(
+    "/api/projects/stories"
+  );
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch stories"
+    );
+  }
+  const json = (await response
+    .json()
+    .catch(() => null)) as {
+    stories?: Story[];
+  } | null;
+  return Array.isArray(json?.stories)
+    ? json.stories
+    : [];
+}
+
+async function fetchProjectStages(): Promise<
+  Stage[]
+> {
+  const response = await fetch(
+    "/api/projects/stages"
+  );
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch stages"
+    );
+  }
+  const json = (await response
+    .json()
+    .catch(() => null)) as {
+    stages?: Stage[];
+  } | null;
+  return Array.isArray(json?.stages)
+    ? json.stages
+    : [];
+}
+
+async function fetchProjectPurchaseOptions(): Promise<
+  ProjectPurchaseOption[]
+> {
+  const response = await fetch(
+    "/api/projects/purchase-options"
+  );
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch purchase options"
+    );
+  }
+  const json = (await response
+    .json()
+    .catch(() => null)) as {
+    purchaseOptions?: ProjectPurchaseOption[];
+  } | null;
+  return Array.isArray(
+    json?.purchaseOptions
+  )
+    ? json.purchaseOptions
+    : [];
 }
 
 export default function ProjectDetailPage({
   id,
   backHref,
-  stories,
-  purchaseOptions,
-  stages,
+  stories: initialStories,
+  purchaseOptions:
+    initialPurchaseOptions,
+  stages: initialStages,
 }: ProjectDetailPageProps) {
+  const [stories, setStories] =
+    useState<Story[]>(
+      initialStories ?? []
+    );
+  const [stages, setStages] = useState<
+    Stage[]
+  >(initialStages ?? []);
+  const [
+    purchaseOptions,
+    setPurchaseOptions,
+  ] = useState<ProjectPurchaseOption[]>(
+    initialPurchaseOptions ?? []
+  );
+  const [loading, setLoading] =
+    useState(
+      initialStories == null ||
+        initialStages == null ||
+        initialPurchaseOptions == null
+    );
+  const [error, setError] = useState<
+    string | null
+  >(null);
+
+  const mappedPurchaseOptions =
+    mapPurchaseOptions(purchaseOptions);
   const [isCollapsed, setIsCollapsed] =
     useState(false);
   const [showTitle, setShowTitle] =
@@ -103,6 +226,68 @@ export default function ProjectDetailPage({
     isStoryActive,
     setIsStoryActive,
   ] = useState(false);
+
+  useEffect(() => {
+    if (
+      initialStories &&
+      initialStages &&
+      initialPurchaseOptions
+    ) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function load() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [
+          storiesData,
+          stagesData,
+          purchaseOptionsData,
+        ] = await Promise.all([
+          initialStories ??
+            fetchProjectStories(),
+          initialStages ??
+            fetchProjectStages(),
+          initialPurchaseOptions ??
+            fetchProjectPurchaseOptions(),
+        ]);
+
+        if (cancelled) return;
+
+        setStories(storiesData);
+        setStages(stagesData);
+        setPurchaseOptions(
+          purchaseOptionsData
+        );
+      } catch (e) {
+        if (cancelled) return;
+        setError(
+          e instanceof Error
+            ? e.message
+            : "Failed to load project content"
+        );
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    initialStories,
+    initialStages,
+    initialPurchaseOptions,
+  ]);
 
   useEffect(() => {
     const handleStoryActive = (
@@ -146,6 +331,26 @@ export default function ProjectDetailPage({
         onScroll
       );
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-background">
+        <div className="text-muted-foreground">
+          Loading project...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-background">
+        <div className="text-destructive">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative pb-2 bg-background">
@@ -270,7 +475,7 @@ export default function ProjectDetailPage({
             ]}
           >
             <CarouselContent>
-              {purchaseOptions.map(
+              {mappedPurchaseOptions.map(
                 (option) => (
                   <CarouselItem
                     key={option.key}
@@ -280,7 +485,13 @@ export default function ProjectDetailPage({
                       className={`${option.cardClassName} shadow-sm rounded-[24px] overflow-hidden relative cursor-pointer group active:scale-[0.98] transition-all h-full`}
                     >
                       <div className="absolute -top-10 -right-10 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity">
-                        <option.watermarkIcon className="w-48 h-48 -rotate-12" />
+                        {React.createElement(
+                          option.watermarkIcon,
+                          {
+                            className:
+                              "w-48 h-48 -rotate-12",
+                          }
+                        )}
                       </div>
                       <CardContent className="flex relative z-10 flex-col justify-between p-5 h-full">
                         <div className="flex justify-between items-start mb-4">
@@ -289,7 +500,13 @@ export default function ProjectDetailPage({
                               <div
                                 className={`flex items-center justify-center w-8 h-8 rounded-full border backdrop-blur-md shadow-sm ${option.iconContainerClassName}`}
                               >
-                                <option.headerIcon className="w-4 h-4" />
+                                {React.createElement(
+                                  option.headerIcon,
+                                  {
+                                    className:
+                                      "w-4 h-4",
+                                  }
+                                )}
                               </div>
                               {
                                 option.title
@@ -514,7 +731,7 @@ export default function ProjectDetailPage({
             className="mt-8 space-y-6 animate-in fade-in-50 slide-in-from-bottom-4"
           >
             <div className="space-y-3">
-              {purchaseOptions.map(
+              {mappedPurchaseOptions.map(
                 (option) => (
                   <Card
                     key={option.key}
@@ -527,7 +744,13 @@ export default function ProjectDetailPage({
                             <div
                               className={`flex items-center justify-center w-8 h-8 rounded-full border backdrop-blur-md shadow-sm ${option.iconContainerClassName}`}
                             >
-                              <option.headerIcon className="w-4 h-4" />
+                              {React.createElement(
+                                option.headerIcon,
+                                {
+                                  className:
+                                    "w-4 h-4",
+                                }
+                              )}
                             </div>
                             <div className="text-sm font-black tracking-tight text-foreground">
                               {

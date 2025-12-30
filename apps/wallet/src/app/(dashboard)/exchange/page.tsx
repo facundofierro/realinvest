@@ -1,22 +1,5 @@
-import ExchangePage from "@/components/pages/exchange-page";
-import {
-  getMarketTokens,
-  getProjects,
-  getWalletBalances,
-} from "@/lib/api";
+import ExchangePageClient from "@/components/pages/exchange-page-client";
 
-export default async function Page() {
-  const [tokens, projects, balances] = await Promise.all([
-    getMarketTokens(),
-    getProjects(),
-    getWalletBalances(),
-  ]);
-
-  return (
-    <ExchangePage
-      tokens={tokens}
-      projects={projects}
-      balances={balances}
-    />
-  );
+export default function Page() {
+  return <ExchangePageClient />;
 }

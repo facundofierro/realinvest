@@ -64,15 +64,42 @@ function formatMoney(
 
 export interface ExchangeSellPageProps {
   token: MarketToken;
-  ownedTokens: number;
+  positions: Position[];
+}
+
+function calculateOwnedTokens(
+  positions: Position[],
+  symbol: string
+): number {
+  const relevant = positions.filter(
+    (p) => p.tokenSymbol === symbol
+  );
+  const bought = relevant
+    .filter((p) => p.side === "BUY")
+    .reduce(
+      (acc, p) => acc + p.filledAmount,
+      0
+    );
+  const sold = relevant
+    .filter((p) => p.side === "SELL")
+    .reduce(
+      (acc, p) => acc + p.filledAmount,
+      0
+    );
+  return Math.max(0, bought - sold);
 }
 
 export default function ExchangeSellPage({
   token,
-  ownedTokens,
+  positions,
 }: ExchangeSellPageProps) {
   const router = useRouter();
   const symbol = token.symbol;
+  const ownedTokens =
+    calculateOwnedTokens(
+      positions,
+      symbol
+    );
 
   const [
     marketAmount,

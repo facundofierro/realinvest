@@ -37,10 +37,24 @@ export interface ProjectUnit {
   unitCode: string;
   title: string;
   areaM2?: number;
+  area?: string;
   bedrooms?: number;
   bathrooms?: number;
   floorPlanImage?: string;
   tokenSymbol: string;
+  tokenName?: string;
+  isTokenized: boolean;
+  investmentType?: string;
+  status: string;
+  statusRaw?: string;
+  price: string;
+  queueOrder?: number;
+  orientation?: string;
+  totalTokens?: number;
+  tokensSold?: number;
+  negotiatedAmount?: string;
+  type: string;
+  floor: string;
 }
 
 export interface MarketToken {
