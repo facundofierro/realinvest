@@ -1,0 +1,35 @@
+[
+  {
+    "id": "barrio-el-ceibo",
+    "title": "Barrio Privado \"El Ceibo\"",
+    "location": "Pilar, Buenos Aires",
+    "image": "/projects/barrio-el-ceibo.png",
+    "status": "PRE-VENTA",
+    "roi": 18,
+    "progress": 0,
+    "priceRange": "$100K",
+    "fixedRent": 18
+  },
+  {
+    "id": "residencial-las-heras",
+    "title": "Residencial Las Heras",
+    "location": "Recoleta, BSAS",
+    "image": "/projects/torre-libertador.png",
+    "status": "EN CONSTRUCCION",
+    "roi": 18,
+    "progress": 85,
+    "priceRange": "$150K",
+    "fixedRent": 14
+  },
+  {
+    "id": "oficinas-madero",
+    "title": "Oficinas Madero",
+    "location": "Puerto Madero, CABA",
+    "image": "/projects/barrio-el-ceibo.png",
+    "status": "COMPLETADO",
+    "roi": 10,
+    "progress": 100,
+    "priceRange": "$250K+",
+    "fixedRent": 8.5
+  }
+]

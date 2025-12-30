@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Etapa 1: Lanzamiento",
+    "date": "Marzo 2024",
+    "status": "active",
+    "units": 20,
+    "available": 5,
+    "minPrice": 100
+  },
+  {
+    "id": 2,
+    "name": "Etapa 2: Pozo",
+    "date": "Septiembre 2024",
+    "status": "upcoming",
+    "units": 35,
+    "available": 35,
+    "minPrice": 110
+  }
+]
