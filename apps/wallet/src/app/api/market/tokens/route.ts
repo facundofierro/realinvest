@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { readSampleJson } from "@/lib/sample-data";
-import type { MarketToken } from "@/types/wallet";
+import { getMarketTokens } from "@/lib/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const tokens = await readSampleJson<MarketToken[]>("marketTokens.json");
+  const tokens = await getMarketTokens();
   return NextResponse.json({ tokens });
 }
 

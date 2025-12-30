@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { readSampleJson } from "@/lib/sample-data";
-import type { Holding } from "@/types/wallet";
+import { getWalletHoldings } from "@/lib/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const holdings = await readSampleJson<Holding[]>("walletHoldings.json");
+  const holdings = await getWalletHoldings();
   return NextResponse.json({ holdings });
 }
 

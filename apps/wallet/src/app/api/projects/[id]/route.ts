@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { readSampleJson } from "@/lib/sample-data";
-import type { Project } from "@/types/wallet";
+import { getProjectById } from "@/lib/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,13 +9,20 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const projects = await readSampleJson<Project[]>("projects.json");
-  const project = projects.find((p) => p.id === id);
+  
+  try {
+    const project = await getProjectById(id);
+    
+    if (!project) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
 
-  if (!project) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ project });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ project });
 }
 

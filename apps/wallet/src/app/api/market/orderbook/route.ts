@@ -1,57 +1,12 @@
 import { NextResponse } from "next/server";
-import { readSampleJson } from "@/lib/sample-data";
-import type {
-  MarketToken,
-  MarketOrderBook,
-  OrderBookLevel,
-} from "@/types/wallet";
+import { getMarketOrderBook } from "@/lib/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function makeDepth(
-  currentPrice: number
-): {
-  asks: OrderBookLevel[];
-  bids: OrderBookLevel[];
-} {
-  const asks = Array.from({ length: 6 })
-    .map((_, i) => ({
-      price:
-        currentPrice *
-        (1 + (i + 1) * 0.005),
-      amount:
-        Math.floor(
-          (Math.sin(i * 123.45) * 0.5 +
-            0.5) *
-            500
-        ) + 50,
-    }))
-    .reverse();
-
-  const bids = Array.from({
-    length: 6,
-  }).map((_, i) => ({
-    price:
-      currentPrice *
-      (1 - (i + 1) * 0.005),
-    amount:
-      Math.floor(
-        (Math.cos(i * 123.45) * 0.5 +
-          0.5) *
-          500
-      ) + 50,
-  }));
-
-  return { asks, bids };
-}
-
-export async function GET(
-  request: Request
-) {
+export async function GET(request: Request) {
   const url = new URL(request.url);
-  const symbol =
-    url.searchParams.get("symbol");
+  const symbol = url.searchParams.get("symbol");
 
   if (!symbol) {
     return NextResponse.json(
@@ -60,45 +15,19 @@ export async function GET(
     );
   }
 
-  const tokens = await readSampleJson<
-    MarketToken[]
-  >("marketTokens.json");
-  const token =
-    tokens.find(
-      (t) => t.symbol === symbol
-    ) ?? null;
-
-  if (!token) {
+  try {
+    const orderBook = await getMarketOrderBook(symbol);
+    return NextResponse.json(orderBook);
+  } catch (error) {
+    if (error instanceof Error && error.message === "Token not found") {
+      return NextResponse.json(
+        { error: "Token not found" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(
-      { error: "Token not found" },
-      { status: 404 }
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
-
-  const orderBooks =
-    await readSampleJson<
-      Record<string, MarketOrderBook>
-    >("marketOrderBooks.json");
-  const fromFixture =
-    orderBooks[symbol] ?? null;
-
-  if (fromFixture) {
-    return NextResponse.json(
-      fromFixture
-    );
-  }
-
-  const currentPrice =
-    typeof token.priceUsd === "number"
-      ? token.priceUsd
-      : 0;
-
-  const { asks, bids } = makeDepth(
-    currentPrice
-  );
-
-  return NextResponse.json({
-    asks,
-    bids,
-  });
 }

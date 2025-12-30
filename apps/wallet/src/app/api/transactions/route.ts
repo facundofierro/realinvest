@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { readSampleJson } from "@/lib/sample-data";
-import type { Transaction } from "@/types/wallet";
+import { getTransactions } from "@/lib/api";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const transactions = await readSampleJson<Transaction[]>("transactions.json");
+  const transactions = await getTransactions();
   return NextResponse.json({ transactions });
 }
 
