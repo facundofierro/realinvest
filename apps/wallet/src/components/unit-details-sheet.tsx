@@ -85,7 +85,7 @@ export function UnitDetailsSheet({
             <div className="flex justify-between items-start shrink-0">
               <div className="space-y-1 min-w-0 pr-4">
                 <div className="flex gap-2 items-center">
-                  <span className="font-mono text-xs font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter truncate">
+                  <span className="font-mono text-xs font-black bg-[#3B2146]/10 text-[#3B2146] px-2 py-0.5 rounded uppercase tracking-tighter truncate">
                     {symbol}
                   </span>
                 </div>

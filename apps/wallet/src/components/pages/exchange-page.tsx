@@ -1024,7 +1024,7 @@ function ExchangePageInner({
         price={
           selectedToken?.priceUsd ?? 0
         }
-        stockText={`STOCK: ${selectedToken?.tokensAvailable ?? 0} TOKENS`}
+        stockText={`${(selectedToken?.tokensAvailable ?? 0).toLocaleString()} TOKENS AVAILABLE`}
         features={
           selectedToken ? (
             <>

@@ -539,7 +539,7 @@ export default function ProjectUnitsPage({
                             Tokens en
                             venta
                           </span>
-                          <div className="w-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white py-1.5 px-3 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center gap-1">
+                          <div className="w-full h-7 bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white px-3 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center gap-1">
                             <span className="text-[14px] font-black leading-none">
                               {
                                 unit.negotiatedAmount
@@ -633,7 +633,7 @@ export default function ProjectUnitsPage({
                                     <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground text-center">
                                       TOKENS
                                     </div>
-                                    <div className="h-9 px-3 rounded-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white flex items-center gap-1.5 shadow-md shadow-brand-green/20">
+                                    <div className="h-7 px-3 rounded-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white flex items-center gap-1.5 shadow-md shadow-brand-green/20">
                                       <span className="text-[14px] font-black leading-none">
                                         {formatCompactUsd(
                                           remainingValueUsd
@@ -666,49 +666,38 @@ export default function ProjectUnitsPage({
         }}
         isExpanded={isDetailsOpen}
         symbol={
-          selectedUnit?.unitCode ?? ""
+          selectedUnit?.tokenSymbol ??
+          selectedUnit?.unitCode ??
+          ""
         }
         title={
           selectedUnit
-            ? `${selectedUnit.type} • Piso ${selectedUnit.floor}`
+            ? "Torre Libertador 8000"
             : ""
         }
         price={selectedUnit?.price ?? 0}
         stockText={
-          selectedUnit?.isTokenized &&
-          selectedUnit.totalTokens
-            ? `${selectedUnit.tokensSold || 0}/${selectedUnit.totalTokens} TOKENS`
-            : undefined
+          selectedUnit
+            ? `${selectedUnit.totalTokens ? (selectedUnit.totalTokens - (selectedUnit.tokensSold || 0)).toLocaleString() : "0"} TOKENS AVAILABLE`
+            : ""
         }
         features={
           selectedUnit ? (
             <>
-              <span className="flex gap-1 items-center text-xs text-foreground/80">
-                <Building2 className="w-3.5 h-3.5" />{" "}
-                Depto{" "}
-                {selectedUnit.unitCode}{" "}
-                • Piso{" "}
-                {selectedUnit.floor}
+              <span className="flex gap-1 items-center text-foreground/80">
+                <Building2 className="w-3.5 h-3.5" /> Depto {selectedUnit.unitCode} • Piso {selectedUnit.floor}
               </span>
               <span className="flex gap-1 items-center opacity-70">
-                <Layers className="w-3 h-3" />{" "}
-                {selectedUnit.type}
+                <Layers className="w-3 h-3" /> {selectedUnit.type}
               </span>
-              {selectedUnit.area ||
-              selectedUnit.areaM2 ? (
+              {selectedUnit.area || selectedUnit.areaM2 ? (
                 <span className="flex gap-1 items-center opacity-70">
-                  <Maximize2 className="w-3 h-3" />{" "}
-                  {selectedUnit.area ??
-                    `${selectedUnit.areaM2} M2`}
+                  <Maximize2 className="w-3 h-3" /> {selectedUnit.area ?? `${selectedUnit.areaM2} M²`}
                 </span>
               ) : null}
               {selectedUnit.orientation ? (
                 <span className="flex gap-1 items-center opacity-70">
-                  <MapPin className="w-3 h-3" />{" "}
-                  Vista{" "}
-                  {
-                    selectedUnit.orientation
-                  }
+                  <MapPin className="w-3 h-3" /> Vista {selectedUnit.orientation}
                 </span>
               ) : null}
             </>
@@ -716,10 +705,10 @@ export default function ProjectUnitsPage({
         }
         actions={
           selectedUnit ? (
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full">
               <Button
                 variant="outline"
-                className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
+                className="flex-1 h-12 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
                 onClick={() => {
                   setIsDetailsOpen(
                     true
@@ -733,7 +722,7 @@ export default function ProjectUnitsPage({
               </Button>
               <Button
                 variant="outline"
-                className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
+                className="flex-1 h-12 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
                 onClick={() => {
                   setIsDetailsOpen(
                     true
@@ -744,7 +733,7 @@ export default function ProjectUnitsPage({
                 UNIDAD
               </Button>
               <Button
-                className="flex-[1.5] h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
+                className="flex-[1.5] h-12 rounded-xl bg-[#8B5CF6] text-white shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
                 onClick={() => {
                   if (
                     selectedUnit.isTokenized &&
@@ -826,7 +815,7 @@ export default function ProjectUnitsPage({
               className="overflow-y-auto flex-1 mt-0"
             >
               <div className="space-y-4">
-                <Card className="border-border/40 shadow-sm">
+                <Card className="shadow-sm border-border/40">
                   <CardContent className="p-4 space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-xs font-black tracking-widest uppercase text-muted-foreground">
@@ -891,7 +880,7 @@ export default function ProjectUnitsPage({
                     {selectedUnit.isTokenized &&
                     (selectedUnit.totalTokens ||
                       0) > 0 ? (
-                      <div className="space-y-2 pt-1">
+                      <div className="pt-1 space-y-2">
                         <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                           <span className="flex items-center gap-1.5">
                             <Layers className="w-3.5 h-3.5" />

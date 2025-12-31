@@ -8,12 +8,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/components/ui/button";
 import { Card } from "@repo/ui/components/ui/card";
 import { cn } from "@repo/ui/lib/utils";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/ui/dialog";
+import { UnitDetailsSheet } from "@/components/unit-details-sheet";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import {
@@ -1064,85 +1059,129 @@ export default function ExchangeDetailPage({
         </div>
       </main>
 
-      <Dialog
-        open={isTradeDialogOpen}
-        onOpenChange={
-          setIsTradeDialogOpen
+      <UnitDetailsSheet
+        isOpen={isTradeDialogOpen}
+        onClose={() =>
+          setIsTradeDialogOpen(false)
+        }
+        isExpanded={true}
+        symbol={token.symbol}
+        title={token.projectTitle}
+        price={token.priceUsd}
+        stockText={
+          tradeType === "BUY"
+            ? `SALDO: $${userBalance.toFixed(2)}`
+            : `DISPONIBLE: ${userTokens.toFixed(2)} ${token.symbol}`
+        }
+        features={
+          <span className="flex gap-1 items-center text-xs text-foreground/80 font-black">
+            {tradeType === "BUY"
+              ? "COMPRAR"
+              : "VENDER"}
+          </span>
+        }
+        actions={
+          <Button
+            className="w-full h-14 text-xs font-black tracking-widest uppercase rounded-xl shadow-xl bg-primary text-primary-foreground shadow-primary/25"
+            size="lg"
+            onClick={() =>
+              setIsTradeDialogOpen(
+                false
+              )
+            }
+          >
+            {tradeType === "BUY"
+              ? "CONFIRMAR COMPRA"
+              : "CONFIRMAR VENTA"}
+          </Button>
         }
       >
-        <DialogContent className="max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
-          <div className="p-6 space-y-6">
-            <DialogHeader>
-              <DialogTitle className="text-3xl font-black tracking-tighter uppercase leading-[1.05]">
-                <span>
-                  {tradeType === "BUY"
-                    ? "Comprar"
-                    : "Vender"}
-                </span>
-                <span className="block text-2xl font-black tracking-tight text-muted-foreground">
-                  {token.symbol}
-                </span>
-              </DialogTitle>
-            </DialogHeader>
+        <div className="pb-4">
+          <Tabs
+            value={orderType}
+            onValueChange={(v) =>
+              setOrderType(
+                v as "MARKET" | "LIMIT"
+              )
+            }
+          >
+            <TabsList className="grid grid-cols-2 p-1 w-full rounded-full bg-muted/20">
+              <TabsTrigger
+                value="MARKET"
+                className="rounded-full text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Mercado
+              </TabsTrigger>
+              <TabsTrigger
+                value="LIMIT"
+                className="rounded-full text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Orden
+              </TabsTrigger>
+            </TabsList>
 
-            <Tabs
-              value={orderType}
-              onValueChange={(v) =>
-                setOrderType(
-                  v as
-                    | "MARKET"
-                    | "LIMIT"
-                )
-              }
-            >
-              <TabsList className="grid grid-cols-2 p-1 w-full rounded-full bg-muted/20">
-                <TabsTrigger
-                  value="MARKET"
-                  className="rounded-full text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  Mercado
-                </TabsTrigger>
-                <TabsTrigger
-                  value="LIMIT"
-                  className="rounded-full text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  Orden
-                </TabsTrigger>
-              </TabsList>
+            <div className="py-6 space-y-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <Label>
+                    Detalles de la
+                    operación
+                  </Label>
+                  <button
+                    type="button"
+                    onClick={handleMax}
+                    className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
+                  >
+                    Max:{" "}
+                    {tradeType ===
+                    "SELL"
+                      ? userTokens.toFixed(
+                          2
+                        )
+                      : `$${userBalance.toFixed(2)}`}
+                  </button>
+                </div>
 
-              <div className="py-6 space-y-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <Label>
-                      Detalles de la
-                      operación
-                    </Label>
-                    <button
-                      type="button"
-                      onClick={
-                        handleMax
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                      Cantidad
+                    </span>
+                    <Input
+                      value={amount}
+                      onChange={(e) =>
+                        setAmount(
+                          e.target.value
+                        )
                       }
-                      className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
-                    >
-                      Max:{" "}
-                      {tradeType ===
-                      "SELL"
-                        ? userTokens.toFixed(
-                            2
-                          )
-                        : `$${userBalance.toFixed(2)}`}
-                    </button>
+                      type="number"
+                      placeholder="0.00"
+                      className="h-12 font-bold rounded-xl"
+                    />
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                        Cantidad
-                      </span>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                      {orderType ===
+                      "MARKET"
+                        ? "Precio Aprox."
+                        : "Precio Límite"}
+                    </span>
+                    {orderType ===
+                    "MARKET" ? (
+                      <div className="flex items-center px-3 h-12 font-bold truncate rounded-xl border bg-muted/20 border-border/50 text-muted-foreground">
+                        $
+                        {(
+                          marketSimulation?.avgPrice ||
+                          marketTradePrice
+                        ).toFixed(2)}
+                      </div>
+                    ) : (
                       <Input
-                        value={amount}
+                        value={
+                          limitPriceInput
+                        }
                         onChange={(e) =>
-                          setAmount(
+                          setLimitPriceInput(
                             e.target
                               .value
                           )
@@ -1151,147 +1190,95 @@ export default function ExchangeDetailPage({
                         placeholder="0.00"
                         className="h-12 font-bold rounded-xl"
                       />
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                        {orderType ===
-                        "MARKET"
-                          ? "Precio Aprox."
-                          : "Precio Límite"}
-                      </span>
-                      {orderType ===
-                      "MARKET" ? (
-                        <div className="flex items-center px-3 h-12 font-bold truncate rounded-xl border bg-muted/20 border-border/50 text-muted-foreground">
-                          $
-                          {(
-                            marketSimulation?.avgPrice ||
-                            marketTradePrice
-                          ).toFixed(2)}
-                        </div>
-                      ) : (
-                        <Input
-                          value={
-                            limitPriceInput
-                          }
-                          onChange={(
-                            e
-                          ) =>
-                            setLimitPriceInput(
-                              e.target
-                                .value
-                            )
-                          }
-                          type="number"
-                          placeholder="0.00"
-                          className="h-12 font-bold rounded-xl"
-                        />
-                      )}
-                    </div>
+                    )}
                   </div>
-
-                  {orderType ===
-                    "MARKET" &&
-                    marketSimulation &&
-                    marketSimulation
-                      .fills.length >
-                      0 && (
-                      <div className="overflow-hidden rounded-2xl border border-border/50 bg-muted/10">
-                        <div className="flex justify-between items-center px-4 py-3">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                            Órdenes
-                            ejecutadas
-                          </span>
-                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                            Prom: $
-                            {marketSimulation.avgPrice.toFixed(
-                              2
-                            )}
-                          </span>
-                        </div>
-                        <div className="divide-y divide-border/40">
-                          {marketSimulation.fills.map(
-                            (
-                              fill,
-                              idx
-                            ) => (
-                              <div
-                                key={
-                                  idx
-                                }
-                                className="flex justify-between items-center px-4 py-2"
-                              >
-                                <span
-                                  className={cn(
-                                    "font-mono text-xs font-bold",
-                                    tradeType ===
-                                      "BUY"
-                                      ? "text-red-400"
-                                      : "text-emerald-400"
-                                  )}
-                                >
-                                  $
-                                  {fill.price.toFixed(
-                                    2
-                                  )}
-                                </span>
-                                <span className="font-mono text-xs font-medium text-muted-foreground">
-                                  {fill.amount.toFixed(
-                                    4
-                                  )}
-                                </span>
-                              </div>
-                            )
-                          )}
-                        </div>
-                        <div className="px-4 py-3 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                          <span>
-                            Total
-                          </span>
-                          <span>
-                            $
-                            {marketSimulation.totalUsd.toFixed(
-                              2
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                  {orderType ===
-                    "MARKET" &&
-                    marketSimulation &&
-                    marketSimulation.remaining >
-                      0 && (
-                      <div className="text-[10px] font-black uppercase tracking-widest text-brand-pink">
-                        Liquidez
-                        insuficiente:
-                        faltan{" "}
-                        {marketSimulation.remaining.toFixed(
-                          4
-                        )}{" "}
-                        {token.symbol}
-                      </div>
-                    )}
                 </div>
 
-                <Button
-                  className="mt-6 w-full h-12 text-xs font-black tracking-widest uppercase rounded-xl shadow-xl bg-primary text-primary-foreground shadow-primary/25"
-                  size="lg"
-                  onClick={() =>
-                    setIsTradeDialogOpen(
-                      false
-                    )
-                  }
-                >
-                  {tradeType === "BUY"
-                    ? "CONFIRMAR COMPRA"
-                    : "CONFIRMAR VENTA"}
-                </Button>
+                {orderType ===
+                  "MARKET" &&
+                  marketSimulation &&
+                  marketSimulation.fills
+                    .length > 0 && (
+                    <div className="overflow-hidden rounded-2xl border border-border/50 bg-muted/10">
+                      <div className="flex justify-between items-center px-4 py-3">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                          Órdenes
+                          ejecutadas
+                        </span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                          Prom: $
+                          {marketSimulation.avgPrice.toFixed(
+                            2
+                          )}
+                        </span>
+                      </div>
+                      <div className="divide-y divide-border/40">
+                        {marketSimulation.fills.map(
+                          (
+                            fill,
+                            idx
+                          ) => (
+                            <div
+                              key={idx}
+                              className="flex justify-between items-center px-4 py-2"
+                            >
+                              <span
+                                className={cn(
+                                  "font-mono text-xs font-bold",
+                                  tradeType ===
+                                    "BUY"
+                                    ? "text-red-400"
+                                    : "text-emerald-400"
+                                )}
+                              >
+                                $
+                                {fill.price.toFixed(
+                                  2
+                                )}
+                              </span>
+                              <span className="font-mono text-xs font-medium text-muted-foreground">
+                                {fill.amount.toFixed(
+                                  4
+                                )}
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                      <div className="px-4 py-3 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                        <span>
+                          Total
+                        </span>
+                        <span>
+                          $
+                          {marketSimulation.totalUsd.toFixed(
+                            2
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                {orderType ===
+                  "MARKET" &&
+                  marketSimulation &&
+                  marketSimulation.remaining >
+                    0 && (
+                    <div className="text-[10px] font-black uppercase tracking-widest text-brand-pink">
+                      Liquidez
+                      insuficiente:
+                      faltan{" "}
+                      {marketSimulation.remaining.toFixed(
+                        4
+                      )}{" "}
+                      {token.symbol}
+                    </div>
+                  )}
               </div>
-            </Tabs>
-          </div>
-        </DialogContent>
-      </Dialog>
+            </div>
+          </Tabs>
+        </div>
+      </UnitDetailsSheet>
     </div>
   );
 }
