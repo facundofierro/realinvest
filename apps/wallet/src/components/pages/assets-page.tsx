@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useWalletHoldings, useWalletBalances, useWalletPositions, useMarketTokens } from "@/hooks/use-queries";
 import { UnitDetailsDialog } from "../unit-details-dialog";
 import { UnitDetailsActions } from "../unit-details-actions";
 import { Button } from "@repo/ui/components/ui/button";
@@ -35,59 +36,44 @@ import Link from "next/link";
 import { cn } from "@repo/ui/lib/utils";
 
 export default function AssetsPage() {
-  const myTokens = [
-    {
-      id: "1",
-      unitId: "12A",
-      tokenName: "VEX-TORRE-L-12-A",
-      projectName:
-        "Torre Libertador 8000",
-      location: "Nuñez, BA",
-      tokens: "500.00",
-      value: "52,000.00",
-      change: "+5.2%",
-      marketPrice: "104.00",
-      orderPrice: "100.00",
-      color: "bg-blue-500",
-      borderColor: "border-blue-500",
-    },
-    {
-      id: "2",
-      unitId: "P1",
-      tokenName: "VEX-CEIBO-P1-04",
-      projectName: "Barrio El Ceibo",
-      location: "Pilar, BA",
-      tokens: "3,500.00",
-      value: "38,500.00",
-      change: "+12.1%",
-      marketPrice: "11.00",
-      orderPrice: null,
-      color: "bg-emerald-500",
-      borderColor: "border-emerald-500",
-    },
-    {
-      id: "3",
-      unitId: "JR",
-      tokenName: "VEX-OFFICE-JR-02",
-      projectName: "Complex Office Jr",
-      location: "Palermo, BA",
-      tokens: "120.00",
-      value: "15,000.00",
-      change: "+1.8%",
-      marketPrice: "125.00",
-      orderPrice: "118.00",
-      color: "bg-orange-500",
-      borderColor: "border-orange-500",
-    },
-  ];
-
   const router = useRouter();
-  const [
-    selectedToken,
-    setSelectedToken,
-  ] = useState<
-    (typeof myTokens)[0] | null
-  >(null);
+  const { data: holdings = [] } = useWalletHoldings();
+  const { data: balances = [] } = useWalletBalances();
+  const { data: positions = [] } = useWalletPositions();
+  const { data: marketTokens = [] } = useMarketTokens();
+
+  const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
+  
+  const myTokens = useMemo(() => {
+    return holdings.map(holding => {
+      const position = positions.find(p => p.tokenSymbol === holding.tokenSymbol && p.status === "OPEN");
+      return {
+        ...holding,
+        tokenName: holding.tokenSymbol,
+        projectName: holding.projectTitle,
+        marketPrice: String(holding.marketPriceUsd),
+        value: holding.tokens * holding.marketPriceUsd,
+        orderPrice: position ? String(position.orderPriceUsd) : null,
+        change: holding.changePct ? `${holding.changePct > 0 ? "+" : ""}${holding.changePct}%` : "+0.0%",
+        unitId: holding.unitCode,
+        color: "bg-primary",
+        borderColor: "border-primary"
+      };
+    });
+  }, [holdings, positions]);
+
+  const selectedToken = useMemo(() => {
+    return myTokens.find(t => t.id === selectedTokenId) || null;
+  }, [myTokens, selectedTokenId]);
+
+  const totalValue = useMemo(() => {
+    return myTokens.reduce((acc, t) => acc + t.value, 0);
+  }, [myTokens]);
+
+  const availableUsdt = useMemo(() => {
+    return balances.find(b => b.currencyCode === "USDT")?.available ?? 0;
+  }, [balances]);
+
   const [
     isTradeDialogOpen,
     setIsTradeDialogOpen,
@@ -106,36 +92,21 @@ export default function AssetsPage() {
   ] = useState<string>("");
 
   const marketPrice = selectedToken
-    ? Number(
-        String(
-          selectedToken.marketPrice
-        ).replace(/,/g, "")
-      ) || 0
+    ? Number(selectedToken.marketPrice) || 0
     : 0;
   const ownedTokens = selectedToken
-    ? Number(
-        String(
-          selectedToken.tokens
-        ).replace(/,/g, "")
-      ) || 0
+    ? selectedToken.tokens
     : 0;
-  const availableUsdt = 19_000;
 
   const handleMax = () => {
     if (!selectedToken) return;
     if (tradeType === "SELL") {
-      setAmount(
-        String(ownedTokens.toFixed(4))
-      );
+      setAmount(String(ownedTokens));
       return;
     }
-    const p =
-      marketPrice > 0 ? marketPrice : 0;
-    const maxByBalance =
-      p > 0 ? availableUsdt / p : 0;
-    setAmount(
-      String(maxByBalance.toFixed(4))
-    );
+    const p = marketPrice > 0 ? marketPrice : 0;
+    const maxByBalance = p > 0 ? availableUsdt / p : 0;
+    setAmount(String(maxByBalance.toFixed(4)));
   };
 
   return (
@@ -151,7 +122,7 @@ export default function AssetsPage() {
                 Valor Total
               </span>
               <div className="text-4xl font-bold tracking-tighter">
-                $ 124,500.00
+                $ {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <div className="flex gap-2 items-center">
                 <span className="inline-flex items-center text-brand-green text-sm font-medium bg-brand-green/10 px-2 py-0.5 rounded-full">
@@ -214,7 +185,7 @@ export default function AssetsPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-bold">
-                    $ 19,000.00
+                    $ {availableUsdt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                   <div className="flex gap-2 justify-end mt-1 opacity-0 transition-opacity group-hover:opacity-100">
                     <Link
@@ -251,8 +222,8 @@ export default function AssetsPage() {
               <Card
                 key={asset.id}
                 onClick={() =>
-                  setSelectedToken(
-                    asset
+                  setSelectedTokenId(
+                    asset.id
                   )
                 }
                 className={cn(
@@ -298,7 +269,7 @@ export default function AssetsPage() {
 
                     <div className="flex flex-col items-end text-right">
                       <div className="text-lg font-black text-[#3B2146] tracking-tighter">
-                        $ {asset.value}
+                        $ {asset.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                       <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
                         {asset.tokens}{" "}
@@ -325,8 +296,8 @@ export default function AssetsPage() {
       </div>
 
       <UnitDetailsDialog
-        isOpen={!!selectedToken && !isTradeDialogOpen}
-        onClose={() => setSelectedToken(null)}
+        isOpen={!!selectedTokenId && !isTradeDialogOpen}
+        onClose={() => setSelectedTokenId(null)}
         data={selectedToken ? {
           symbol: selectedToken.tokenName,
           projectTitle: selectedToken.projectName,

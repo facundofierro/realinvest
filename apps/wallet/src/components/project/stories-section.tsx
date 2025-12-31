@@ -38,6 +38,7 @@ export function ProjectStories({
 }: {
   stories: Story[];
 }) {
+  if (!stories || stories.length === 0) return null;
   const [activeIndex, setActiveIndex] =
     useState<number | null>(null);
   const [progress, setProgress] =
@@ -201,7 +202,7 @@ export function ProjectStories({
                     src={
                       stories[
                         activeIndex
-                      ].image
+                      ]!.image
                     }
                     alt=""
                     fill
@@ -213,7 +214,7 @@ export function ProjectStories({
                     {
                       stories[
                         activeIndex
-                      ].title
+                      ]!.title
                     }
                   </span>
                   <span className="text-[10px] opacity-80 font-medium uppercase tracking-wider">
@@ -250,11 +251,11 @@ export function ProjectStories({
             <div className="relative w-full h-full flex items-center justify-center">
               <Image
                 src={
-                  stories[activeIndex]
+                  stories[activeIndex]!
                     .image
                 }
                 alt={
-                  stories[activeIndex]
+                  stories[activeIndex]!
                     .title
                 }
                 fill

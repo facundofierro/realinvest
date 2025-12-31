@@ -148,3 +148,38 @@ export interface MarketOrderBook {
 export interface MarketSeries {
   series: number[];
 }
+
+export interface ProjectStory {
+  id: number;
+  title: string;
+  image: string;
+  color: string;
+}
+
+export interface ProjectStage {
+  id: number;
+  name: string;
+  date: string;
+  status: string;
+  units: number;
+  available: number;
+  minPrice: number;
+}
+
+export interface ProjectPurchaseOption {
+  key: string;
+  title: string;
+  subtitle: string;
+  headerIcon: string;
+  headerIconClassName: string;
+  watermarkIcon: string;
+  cardClassName: string;
+  badgeText: string;
+  badgeClassName: string;
+  valueLabel: string;
+  value: string;
+  actionText: string;
+  getHref: string;
+  actionClassName: string;
+  iconContainerClassName: string;
+}

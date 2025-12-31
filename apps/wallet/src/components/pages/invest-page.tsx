@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useProjects } from "@/hooks/use-queries";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -47,6 +48,7 @@ interface Project {
 }
 
 export default function InvestPage() {
+  const { data: fetchedProjects = [] } = useProjects();
   const [
     selectedCategory,
     setSelectedCategory,
@@ -57,127 +59,54 @@ export default function InvestPage() {
       id: "all",
       label: "Todos",
       icon: Building2,
-      color:
-        "bg-primary text-primary-foreground",
+      color: "bg-primary text-primary-foreground",
     },
     {
       id: "PRE-VENTA",
       label: "Lanzamientos",
       icon: Clock,
-      color:
-        "bg-blue-500/10 text-blue-600",
+      color: "bg-blue-500/10 text-blue-600",
     },
     {
       id: "EN CONSTRUCCION",
       label: "En obra",
       icon: Hammer,
-      color:
-        "bg-amber-500/10 text-amber-600",
+      color: "bg-amber-500/10 text-amber-600",
     },
     {
       id: "COMPLETADO",
       label: "Completados",
       icon: Key,
-      color:
-        "bg-purple-500/10 text-purple-600",
+      color: "bg-purple-500/10 text-purple-600",
     },
   ];
 
-  const projects: Project[] = [
-    {
-      id: "1",
-      title: "Torre Libertador 8000",
-      location: "Nuñez, Buenos Aires",
-      image:
-        "/projects/torre-libertador.png",
-      status: "EN CONSTRUCCION",
-      roi: "15%",
-      progress: 65,
-      precioRange: "$100K - $250K",
-      rentaFija: "12%",
-      tokensTotal: "$450K",
-      nextLaunchDate:
-        "10 de Junio 2026",
-    },
-    {
-      id: "2",
-      title: "Barrio El Ceibo",
-      location: "Pilar, Buenos Aires",
-      image:
-        "/projects/barrio-el-ceibo.png",
-      status: "PRE-VENTA",
-      roi: "22%",
-      progress: 30,
-      precioRange: "$100K - $180K",
-      rentaFija: "18%",
-      tokensTotal: "$1.2M",
-      launchDate: "28 de Agosto 2026",
-    },
-    {
-      id: "3",
-      title: "Residencial Las Heras",
-      location: "Recoleta, BSAS",
-      image:
-        "/projects/torre-libertador.png",
-      status: "EN CONSTRUCCION",
-      roi: "18%",
-      progress: 85,
-      precioRange: "$150K - $300K",
-      rentaFija: "14%",
-      tokensTotal: "$320K",
-    },
-    {
-      id: "4",
-      title: "Oficinas Madero",
-      location: "Puerto Madero, CABA",
-      image:
-        "/projects/barrio-el-ceibo.png",
-      status: "COMPLETADO",
-      roi: "10%",
-      progress: 100,
-      precioRange: "$250K+",
-      rentaFija: "8.5%",
-      tokensTotal: "$0",
-    },
-    {
-      id: "5",
-      title: "Paseo del Sol",
-      location: "Mendoza, Argentina",
-      image:
-        "/projects/torre-libertador.png",
-      status: "PRE-VENTA",
-      roi: "28%",
-      progress: 0,
-      precioRange: "$80K - $150K",
-      rentaFija: "22%",
-      tokensTotal: "$2.5M",
-      launchDate:
-        "15 de Diciembre 2026",
-    },
-    {
-      id: "6",
-      title: "Eco-Habitat",
-      location: "Tigre, Buenos Aires",
-      image:
-        "/projects/barrio-el-ceibo.png",
-      status: "EN CONSTRUCCION",
-      roi: "20%",
-      progress: 45,
-      precioRange: "$120K+",
-      rentaFija: "15%",
-      tokensTotal: "$180K",
-      nextLaunchDate: "20 de Mayo 2026",
-    },
-  ];
+  const projects = useMemo(() => {
+    return fetchedProjects.map(p => ({
+      id: p.id,
+      title: p.title,
+      location: p.location,
+      image: p.image,
+      status: p.status === "PRE_SALE" ? "PRE-VENTA" : p.status === "IN_CONSTRUCTION" ? "EN CONSTRUCCION" : "COMPLETADO" as any,
+      roi: `${p.roiPct}%`,
+      progress: p.progressPct,
+      precioRange: p.priceRangeUsd,
+      rentaFija: p.fixedRentPct ? `${p.fixedRentPct}%` : undefined,
+      tokensTotal: p.tokensTotal ? `$${p.tokensTotal.toLocaleString()}` : undefined,
+      launchDate: p.launchDate,
+      nextLaunchDate: p.nextLaunchDate
+    }));
+  }, [fetchedProjects]);
 
-  const filteredProjects =
-    selectedCategory === "all"
+  const filteredProjects = useMemo(() => {
+    return selectedCategory === "all"
       ? projects
       : projects.filter(
           (p) =>
             p.status ===
             selectedCategory
         );
+  }, [selectedCategory, projects]);
 
   return (
     <div className="overflow-x-hidden p-4 pb-32 mx-auto space-y-6 max-w-2xl duration-500 animate-in fade-in">

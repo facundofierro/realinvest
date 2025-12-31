@@ -43,11 +43,11 @@ import type {
   Transaction,
 } from "@/types/wallet";
 import {
-  getMarketTokens,
-  getTransactions,
-  getWalletPositions,
-  closePosition,
-} from "@/lib/api-client";
+  useMarketTokens,
+  useTransactions,
+  useWalletPositions,
+  useClosePosition,
+} from "@/hooks/use-queries";
 
 type SortBy = "marketCap" | "change";
 type Timeframe =
@@ -120,34 +120,12 @@ function ExchangePageInner({
   const tabParam =
     searchParams.get("tab");
 
-  const [isLoading, setIsLoading] = useState(!initialTokens.length);
-  const [tokens, setTokens] = useState<MarketToken[]>(initialTokens);
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
-  const [positions, setPositions] = useState<Position[]>(initialPositions);
+  const { data: tokens = [], isLoading: isTokensLoading } = useMarketTokens();
+  const { data: positions = [], isLoading: isPositionsLoading } = useWalletPositions();
+  const { data: transactions = [], isLoading: isTransactionsLoading } = useTransactions();
+  const { mutateAsync: closePositionMutate } = useClosePosition();
 
-  // Fetch data if not provided
-  useEffect(() => {
-    if (initialTokens.length > 0) return;
-
-    async function loadData() {
-      try {
-        const [tokensData, positionsData, transactionsData] = await Promise.all([
-          getMarketTokens(),
-          getWalletPositions(),
-          getTransactions(),
-        ]);
-        setTokens(tokensData);
-        setPositions(positionsData);
-        setTransactions(transactionsData);
-      } catch (error) {
-        console.error("Failed to load exchange data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadData();
-  }, [initialTokens.length]);
+  const isLoading = isTokensLoading || isPositionsLoading || isTransactionsLoading;
 
   const [activeTab, setActiveTab] =
     useState(tabParam || "market");
@@ -319,18 +297,8 @@ function ExchangePageInner({
 
     try {
       setIsClosingOrder(true);
-      await closePosition(selectedPosition.id);
-
-      setPositions((prev) =>
-        prev.map((p) =>
-          p.id === selectedPosition.id
-            ? {
-                ...p,
-                status: "CANCELLED",
-              }
-            : p
-        )
-      );
+      await closePositionMutate(selectedPosition.id);
+      // Optimistic update or invalidation handled by mutation hook
       setSelectedPositionId(null);
       setIsOrderDetailsOpen(false);
     } finally {

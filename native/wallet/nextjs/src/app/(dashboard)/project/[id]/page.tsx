@@ -23,5 +23,5 @@ export default async function Page({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <ProjectDetailPage id={id} />;
+  return <ProjectDetailPage id={id} backHref="/" />;
 }

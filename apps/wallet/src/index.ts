@@ -12,6 +12,7 @@ export { default as DepositPage } from "./components/pages/deposit-page";
 export { default as WithdrawPage } from "./components/pages/withdraw-page";
 
 export { BottomNav } from "./components/bottom-nav";
+export { Providers } from "./components/providers";
 
 // Export types
 export * from "./types/wallet";

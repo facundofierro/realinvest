@@ -1,3 +1,7 @@
+"use client";
+
+import { useWalletBalances } from "@/hooks/use-queries";
+import { useMemo } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Card, CardContent } from "@repo/ui/components/ui/card";
 import { Input } from "@repo/ui/components/ui/input";
@@ -6,6 +10,11 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function WithdrawPage() {
+  const { data: balances = [] } = useWalletBalances();
+  const availableUsdt = useMemo(() => {
+    return balances.find(b => b.currencyCode === "USDT")?.available ?? 0;
+  }, [balances]);
+
   return (
     <div className="p-4 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center gap-2">
@@ -25,7 +34,7 @@ export default function WithdrawPage() {
                     <span className="absolute left-3 top-2.5 text-muted-foreground">$</span>
                     <Input type="number" placeholder="0.00" className="pl-6" />
                 </div>
-                <p className="text-xs text-muted-foreground text-right">Disponible: $124,500.00</p>
+                <p className="text-xs text-muted-foreground text-right">Disponible: ${availableUsdt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             </div>
 
             <div className="space-y-2">

@@ -34,13 +34,13 @@ import type {
   WalletBalance,
 } from "@/types/wallet";
 import {
-  getMarketTokenBySymbol,
-  getMarketOrderBook,
-  getMarketSeries,
-  getWalletBalances,
-  getWalletHoldings,
-  getWalletPositions,
-} from "@/lib/api-client";
+  useMarketToken,
+  useMarketOrderBook,
+  useMarketSeries,
+  useWalletBalances,
+  useWalletHoldings,
+  useWalletPositions,
+} from "@/hooks/use-queries";
 
 type Timeframe =
   | "all"
@@ -121,6 +121,8 @@ function LineChart({
   isUp: boolean;
   currentPrice: number;
 }) {
+  if (!series || series.length === 0) return <div className="h-[200px] w-full" />;
+
   const min = Math.min(...series);
   const max = Math.max(...series);
   const w = 320;
@@ -133,7 +135,7 @@ function LineChart({
     val: number
   ) => {
     const lastVal =
-      series[series.length - 1];
+      series[series.length - 1]!;
     return (
       (val / lastVal) * currentPrice
     );
@@ -300,6 +302,7 @@ function CandlesChart({
   isUp: boolean;
   currentPrice: number;
 }) {
+  if (!series || series.length === 0) return <div className="h-[200px] w-full" />;
   const min = Math.min(...series);
   const max = Math.max(...series);
   const w = 320;
@@ -323,13 +326,11 @@ function CandlesChart({
       start,
       end
     );
-    const open = chunk[0] ?? series[0];
-    const close =
-      chunk.at(-1) ??
-      series.at(-1) ??
-      open;
-    const high = Math.max(...chunk);
-    const low = Math.min(...chunk);
+    const fallback = series[0]!;
+    const open = chunk[0] ?? fallback;
+    const close = (chunk.length > 0 ? chunk[chunk.length-1] : series[series.length-1]) ?? fallback;
+    const high = chunk.length > 0 ? Math.max(...chunk) : fallback;
+    const low = chunk.length > 0 ? Math.min(...chunk) : fallback;
     return { open, close, high, low };
   });
 
@@ -337,7 +338,7 @@ function CandlesChart({
     val: number
   ) => {
     const lastVal =
-      series[series.length - 1];
+      series[series.length - 1]!;
     return (
       (val / lastVal) * currentPrice
     );
@@ -594,72 +595,21 @@ export default function ExchangeDetailPage({
   const router = useRouter();
 
   // Loading and error states
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Timeframe state hoisted for query usage
+  const [timeframe, setTimeframe] = useState<Timeframe>("24h");
 
-  // Data states
-  const [token, setToken] = useState<MarketToken | null>(null);
-  const [orderBook, setOrderBook] = useState<MarketOrderBook | null>(null);
-  const [series, setSeries] = useState<MarketSeries | null>(null);
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [balances, setBalances] = useState<WalletBalance[]>([]);
-  const [holdings, setHoldings] = useState<Holding[]>([]);
+  // Queries
+  const { data: token, isLoading: isTokenLoading } = useMarketToken(symbol);
+  const { data: orderBook, isLoading: isOrderBookLoading } = useMarketOrderBook(symbol);
+  const { data: series, isLoading: isSeriesLoading } = useMarketSeries(symbol, timeframe, 100);
+  const { data: allPositions = [], isLoading: isPositionsLoading } = useWalletPositions();
+  const { data: balances = [] } = useWalletBalances();
+  const { data: holdings = [] } = useWalletHoldings();
 
-  // Fetch data on mount or when symbol changes
-  useEffect(() => {
-    let isMounted = true;
+  const positions = useMemo(() => allPositions.filter(p => p.tokenSymbol === symbol), [allPositions, symbol]);
 
-    async function fetchData() {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const [
-          tokenData,
-          orderBookData,
-          seriesData,
-          positionsData,
-          balancesData,
-          holdingsData,
-        ] = await Promise.all([
-          getMarketTokenBySymbol(symbol),
-          getMarketOrderBook(symbol),
-          getMarketSeries(symbol, "24h", 100),
-          getWalletPositions(),
-          getWalletBalances(),
-          getWalletHoldings(),
-        ]);
-
-        if (!isMounted) return;
-
-        if (!tokenData) {
-          setError("Token not found");
-          return;
-        }
-
-        setToken(tokenData);
-        setOrderBook(orderBookData);
-        setSeries(seriesData);
-        setPositions(positionsData.filter((p) => p.tokenSymbol === symbol));
-        setBalances(balancesData);
-        setHoldings(holdingsData);
-      } catch (err) {
-        if (!isMounted) return;
-        setError("Error loading token data");
-        console.error("Failed to fetch exchange data:", err);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [symbol]);
+  const isLoading = isTokenLoading || isOrderBookLoading || isSeriesLoading || isPositionsLoading;
+  const error = !token && !isTokenLoading ? "Token not found" : null;
 
   const [
     isTradeDialogOpen,
@@ -678,8 +628,7 @@ export default function ExchangeDetailPage({
     setLimitPriceInput,
   ] = useState<string>("");
 
-  const [timeframe, setTimeframe] =
-    useState<Timeframe>("24h");
+
   const [view, setView] =
     useState<ChartView>("linea");
 
@@ -728,23 +677,24 @@ export default function ExchangeDetailPage({
     );
   }
 
-  const price = token.priceUsd;
-  const change = getChangePct(
+  const price = token?.priceUsd ?? 0;
+  const change = token ? getChangePct(
     token,
     timeframe
-  );
+  ) : 0;
   const isUp = change >= 0;
 
   const computedSeries = useMemo(() => {
+    if (!series) return [];
     if (timeframe === "24h")
-      return series.series;
+      return series.series || [];
     return makeSeries(
       symbol,
       change,
       100
     );
   }, [
-    series.series,
+    series,
     symbol,
     timeframe,
     change,
@@ -793,35 +743,19 @@ export default function ExchangeDetailPage({
     );
   }, [positions, symbol]);
 
-  const displaySellPrice =
-    useMemo(() => {
-      if (orderBook.bids.length > 0) {
-        // Returns the price of the first bid displayed in the UI (lowest bid price)
-        return orderBook.bids[
-          orderBook.bids.length - 1
-        ].price;
-      }
-      return (
-        token.sellPriceUsd ?? price
-      );
-    }, [
-      orderBook.bids,
-      token.sellPriceUsd,
-      price,
-    ]);
+  const displaySellPrice = useMemo(() => {
+    if (orderBook?.bids && orderBook.bids.length > 0) {
+      return orderBook.bids[orderBook.bids.length - 1]!.price;
+    }
+    return token?.sellPriceUsd ?? price;
+  }, [orderBook, token, price]);
 
-  const displayBuyPrice =
-    useMemo(() => {
-      if (orderBook.asks.length > 0) {
-        // Returns the price of the first ask displayed in the UI (lowest ask price)
-        return orderBook.asks[0].price;
-      }
-      return token.buyPriceUsd ?? price;
-    }, [
-      orderBook.asks,
-      token.buyPriceUsd,
-      price,
-    ]);
+  const displayBuyPrice = useMemo(() => {
+    if (orderBook?.asks && orderBook.asks.length > 0) {
+      return orderBook.asks[0]!.price;
+    }
+    return token?.buyPriceUsd ?? price;
+  }, [orderBook, token, price]);
 
   const marketTradePrice =
     tradeType === "BUY"

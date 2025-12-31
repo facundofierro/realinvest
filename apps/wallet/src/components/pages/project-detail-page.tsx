@@ -42,6 +42,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ProjectStories } from "@/components/project/stories-section";
 import type { ProjectPurchaseOption } from "@/lib/api/project-purchase-options";
+import { useProjectStories, useProjectStages, useProjectPurchaseOptions } from "@/hooks/use-queries";
 
 export interface PurchaseOption {
   key: string;
@@ -118,70 +119,7 @@ interface ProjectDetailPageProps {
   stages?: Stage[];
 }
 
-async function fetchProjectStories(): Promise<
-  Story[]
-> {
-  const response = await fetch(
-    "/api/projects/stories"
-  );
-  if (!response.ok) {
-    throw new Error(
-      "Failed to fetch stories"
-    );
-  }
-  const json = (await response
-    .json()
-    .catch(() => null)) as {
-    stories?: Story[];
-  } | null;
-  return Array.isArray(json?.stories)
-    ? json.stories
-    : [];
-}
 
-async function fetchProjectStages(): Promise<
-  Stage[]
-> {
-  const response = await fetch(
-    "/api/projects/stages"
-  );
-  if (!response.ok) {
-    throw new Error(
-      "Failed to fetch stages"
-    );
-  }
-  const json = (await response
-    .json()
-    .catch(() => null)) as {
-    stages?: Stage[];
-  } | null;
-  return Array.isArray(json?.stages)
-    ? json.stages
-    : [];
-}
-
-async function fetchProjectPurchaseOptions(): Promise<
-  ProjectPurchaseOption[]
-> {
-  const response = await fetch(
-    "/api/projects/purchase-options"
-  );
-  if (!response.ok) {
-    throw new Error(
-      "Failed to fetch purchase options"
-    );
-  }
-  const json = (await response
-    .json()
-    .catch(() => null)) as {
-    purchaseOptions?: ProjectPurchaseOption[];
-  } | null;
-  return Array.isArray(
-    json?.purchaseOptions
-  )
-    ? json.purchaseOptions
-    : [];
-}
 
 export default function ProjectDetailPage({
   id,
@@ -191,103 +129,24 @@ export default function ProjectDetailPage({
     initialPurchaseOptions,
   stages: initialStages,
 }: ProjectDetailPageProps) {
-  const [stories, setStories] =
-    useState<Story[]>(
-      initialStories ?? []
-    );
-  const [stages, setStages] = useState<
-    Stage[]
-  >(initialStages ?? []);
-  const [
-    purchaseOptions,
-    setPurchaseOptions,
-  ] = useState<ProjectPurchaseOption[]>(
-    initialPurchaseOptions ?? []
-  );
-  const [loading, setLoading] =
-    useState(
-      initialStories == null ||
-        initialStages == null ||
-        initialPurchaseOptions == null
-    );
-  const [error, setError] = useState<
-    string | null
-  >(null);
+  // Queries
+  const { data: storiesData = [], isLoading: isStoriesLoading } = useProjectStories(id);
+  const { data: stagesData = [], isLoading: isStagesLoading } = useProjectStages(id);
+  const { data: purchaseOptionsData = [], isLoading: isOptionsLoading } = useProjectPurchaseOptions(id);
 
-  const mappedPurchaseOptions =
-    mapPurchaseOptions(purchaseOptions);
-  const [isCollapsed, setIsCollapsed] =
-    useState(false);
-  const [showTitle, setShowTitle] =
-    useState(false);
-  const [activeTab, setActiveTab] =
-    useState("stages");
-  const [
-    isStoryActive,
-    setIsStoryActive,
-  ] = useState(false);
+  const stories = (initialStories && initialStories.length > 0) ? initialStories : storiesData;
+  const stages = (initialStages && initialStages.length > 0) ? initialStages : stagesData;
+  const purchaseOptions = (initialPurchaseOptions && initialPurchaseOptions.length > 0) ? initialPurchaseOptions : purchaseOptionsData;
 
-  useEffect(() => {
-    if (
-      initialStories &&
-      initialStages &&
-      initialPurchaseOptions
-    ) {
-      setLoading(false);
-      return;
-    }
+  const loading = (!initialStories && isStoriesLoading) || (!initialStages && isStagesLoading) || (!initialPurchaseOptions && isOptionsLoading);
+  const error = null;
 
-    let cancelled = false;
-
-    async function load() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const [
-          storiesData,
-          stagesData,
-          purchaseOptionsData,
-        ] = await Promise.all([
-          initialStories ??
-            fetchProjectStories(),
-          initialStages ??
-            fetchProjectStages(),
-          initialPurchaseOptions ??
-            fetchProjectPurchaseOptions(),
-        ]);
-
-        if (cancelled) return;
-
-        setStories(storiesData);
-        setStages(stagesData);
-        setPurchaseOptions(
-          purchaseOptionsData
-        );
-      } catch (e) {
-        if (cancelled) return;
-        setError(
-          e instanceof Error
-            ? e.message
-            : "Failed to load project content"
-        );
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    initialStories,
-    initialStages,
-    initialPurchaseOptions,
-  ]);
+  const mappedPurchaseOptions = mapPurchaseOptions(purchaseOptions);
+  
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showTitle, setShowTitle] = useState(false);
+  const [activeTab, setActiveTab] = useState("stages");
+  const [isStoryActive, setIsStoryActive] = useState(false);
 
   useEffect(() => {
     const handleStoryActive = (

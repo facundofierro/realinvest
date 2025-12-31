@@ -1,6 +1,6 @@
 "use client";
 
-import { getProjectUnits } from "@/lib/api-client";
+import { useProjectUnits } from "@/hooks/use-queries";
 
 import { UnitDetailsDialog } from "../unit-details-dialog";
 import { UnitDetailsActions } from "../unit-details-actions";
@@ -51,72 +51,20 @@ export default function ProjectUnitsPage({
   filter,
 }: ProjectUnitsPageProps) {
   const router = useRouter();
-  const [unitsState, setUnitsState] =
-    useState<ProjectUnit[] | null>(
-      units ?? null
-    );
-  const [loading, setLoading] =
-    useState(units == null);
-  const [error, setError] = useState<
-    string | null
-  >(null);
-  const [
-    selectedUnitId,
-    setSelectedUnitId,
-  ] = useState<string | null>(null);
-  const [
-    isContactDialogOpen,
-    setIsContactDialogOpen,
-  ] = useState(false);
-  const [contactForm, setContactForm] =
-    useState({
-      name: "",
-      phone: "",
-      email: "",
-      preference: "whatsapp", // whatsapp, call, telegram
-    });
+  const { data: fetchedUnits = [], isLoading: isFetching, error: queryError } = useProjectUnits(projectId);
 
-  useEffect(() => {
-    if (units) {
-      setUnitsState(units);
-      setLoading(false);
-      return;
-    }
+  const unitsState = units ?? fetchedUnits;
+  const loading = !units && isFetching;
+  const error = queryError ? (queryError as Error).message : null;
 
-    let cancelled = false;
-
-    async function loadUnits() {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const fetchedUnits = await getProjectUnits(projectId);
-
-        if (!cancelled) {
-          setUnitsState(fetchedUnits);
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setError(
-            e instanceof Error
-              ? e.message
-              : "Failed to load units"
-          );
-          setUnitsState([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadUnits();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId, units]);
+  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    preference: "whatsapp",
+  });
 
   const filteredUnits = useMemo(() => {
     const allUnits = unitsState ?? [];
@@ -347,7 +295,7 @@ export default function ProjectUnitsPage({
       unit.type ?? ""
     )
       .trim()
-      .split(/\s+/)[0];
+      .split(/\s+/)[0] ?? "";
     const n = Number.parseInt(
       first,
       10

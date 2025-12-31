@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+
 import {
   Avatar,
   AvatarFallback,
@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { SimilarProjectsCarousel } from "@/components/project/stories-section";
-import { getDashboardProjects } from "@/lib/api-client";
+import { useDashboardProjects, useWalletBalances, useWalletHoldings, useTransactions } from "@/hooks/use-queries";
+import { useMemo } from "react";
 
 interface DashboardProject {
   id: string;
@@ -35,22 +36,18 @@ interface DashboardProject {
 }
 
 export default function DashboardPage() {
-  const [projects, setProjects] = useState<DashboardProject[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: projects = [], isLoading: isProjectsLoading } = useDashboardProjects();
+  const { data: balances = [], isLoading: isBalancesLoading } = useWalletBalances();
+  const { data: holdings = [], isLoading: isHoldingsLoading } = useWalletHoldings();
+  const { data: transactions = [], isLoading: isTransactionsLoading } = useTransactions();
 
-  useEffect(() => {
-    async function loadProjects() {
-      try {
-        const data = await getDashboardProjects();
-        setProjects(data);
-      } catch (error) {
-        console.error("Failed to load dashboard projects:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadProjects();
-  }, []);
+  const totalBalance = useMemo(() => {
+    const cash = balances.find(b => b.currencyCode === "USDT")?.available ?? 0;
+    const assets = holdings.reduce((acc, h) => acc + (h.tokens * h.marketPriceUsd), 0);
+    return cash + assets;
+  }, [balances, holdings]);
+
+  const isLoading = isProjectsLoading || isBalancesLoading || isHoldingsLoading;
 
   if (isLoading) {
     return (
@@ -103,7 +100,7 @@ export default function DashboardPage() {
               Balance Total
             </span>
             <div className="text-4xl font-bold tracking-tighter">
-              $ 124,500.00
+                $ {totalBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div className="flex items-center text-sm font-medium text-brand-green">
               <TrendingUp className="mr-1 w-4 h-4" />
@@ -160,14 +157,14 @@ export default function DashboardPage() {
           Actividad Reciente
         </h2>
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
+          {transactions.slice(0, 3).map((tx) => (
             <div
-              key={i}
+              key={tx.id}
               className="flex justify-between items-center p-3 rounded-2xl border shadow-sm transition-colors bg-card hover:bg-muted/50"
             >
               <div className="flex gap-3 items-center">
                 <div className="flex justify-center items-center w-10 h-10 rounded-2xl border bg-primary/10 text-primary border-primary/10">
-                  {i === 1 ? (
+                  {tx.type === "DEPOSIT" || tx.type === "DIVIDEND" ? (
                     <ArrowDownLeft className="w-5 h-5" />
                   ) : (
                     <Building2 className="w-5 h-5" />
@@ -175,21 +172,17 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium">
-                    {i === 1
-                      ? "Depósito USD"
-                      : "Compra Token Torre L."}
+                    {tx.description}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Hoy, 10:23 AM
+                    {new Date(tx.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>
               <div
-                className={`font-semibold text-sm ${i === 1 ? "text-primary" : ""}`}
+                className={`font-semibold text-sm ${tx.type === "DEPOSIT" || tx.type === "DIVIDEND" ? "text-primary" : ""}`}
               >
-                {i === 1
-                  ? "+ $1,000.00"
-                  : "- $500.00"}
+                {tx.type === "DEPOSIT" || tx.type === "DIVIDEND" || tx.type === "SELL" ? "+" : "-"} $ {tx.amount.amount.toLocaleString()}
               </div>
             </div>
           ))}

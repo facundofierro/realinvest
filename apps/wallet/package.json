@@ -14,14 +14,15 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "^5.90.16",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.446.0",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "@repo/ui": "workspace:*",
-    "tailwindcss-animate": "^1.0.7",
-    "lucide-react": "^0.446.0",
-    "clsx": "^2.1.0",
-    "tailwind-merge": "^2.2.1"
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

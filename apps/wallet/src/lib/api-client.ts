@@ -13,7 +13,7 @@ import type {
   ProjectUnit,
   ProjectStory,
   ProjectStage,
-  PurchaseOption,
+  ProjectPurchaseOption,
 } from "@/types/wallet";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
@@ -132,7 +132,7 @@ export async function getProjectStages(projectId: string): Promise<ProjectStage[
   return data.stages || [];
 }
 
-export async function getProjectPurchaseOptions(projectId: string): Promise<PurchaseOption[]> {
+export async function getProjectPurchaseOptions(projectId: string): Promise<ProjectPurchaseOption[]> {
   const res = await fetch(`${API_BASE}/api/projects/${projectId}/purchase-options`);
   if (!res.ok) throw new Error("Failed to fetch purchase options");
   const data = await res.json();
