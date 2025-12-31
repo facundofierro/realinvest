@@ -1,6 +1,7 @@
 "use client";
 
-import { UnitDetailsSheet } from "../unit-details-sheet";
+import { UnitDetailsDialog } from "../unit-details-dialog";
+import { UnitDetailsActions } from "../unit-details-actions";
 import {
   Suspense,
   useEffect,
@@ -436,7 +437,7 @@ function ExchangePageInner({
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] -mb-24 pb-24 bg-background overflow-hidden">
+    <div className="flex flex-col h-dvh -mb-24 pb-24 bg-background overflow-hidden">
       <header className="relative px-4 pt-6 pb-8 bg-linear-to-br from-primary via-[#3B2146] to-black shadow-xl border-none overflow-hidden shrink-0">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
         <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10" />
@@ -1009,104 +1010,10 @@ function ExchangePageInner({
         </DialogContent>
       </Dialog>
 
-      <UnitDetailsSheet
+      <UnitDetailsDialog
         isOpen={!!selectedToken}
-        onClose={() =>
-          setSelectedTokenId(null)
-        }
-        symbol={
-          selectedToken?.symbol ?? ""
-        }
-        title={
-          selectedToken?.projectTitle ??
-          ""
-        }
-        price={
-          selectedToken?.priceUsd ?? 0
-        }
-        stockText={`${(selectedToken?.tokensAvailable ?? 0).toLocaleString()} TOKENS AVAILABLE`}
-        features={
-          selectedToken ? (
-            <>
-              <span className="flex gap-1.5 items-center">
-                <MapPin className="w-3.5 h-3.5" />{" "}
-                Nuñez, BA
-              </span>
-              <span className="flex gap-1.5 items-center">
-                <Layers className="w-3.5 h-3.5" />{" "}
-                ROI Est:{" "}
-                {typeof selectedToken.roiPct ===
-                "number"
-                  ? selectedToken.roiPct.toFixed(
-                      1
-                    )
-                  : "0.0"}
-                %
-              </span>
-            </>
-          ) : null
-        }
-        actions={
-          selectedToken ? (
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
-                onClick={() => {
-                  const symbol =
-                    encodeURIComponent(
-                      selectedToken.symbol
-                    );
-                  const returnTo =
-                    encodeURIComponent(
-                      `/exchange/${symbol}`
-                    );
-                  router.push(
-                    `/project/1?returnTo=${returnTo}`
-                  );
-                }}
-              >
-                PROYECTO
-              </Button>
-              <Button
-                disabled={
-                  !positions.some(
-                    (p) =>
-                      p.tokenSymbol ===
-                        selectedToken.symbol &&
-                      p.filledAmount > 0
-                  )
-                }
-                className="flex-1 h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px] disabled:opacity-30 disabled:scale-100"
-                onClick={() => {
-                  const symbol =
-                    encodeURIComponent(
-                      selectedToken.symbol
-                    );
-                  router.push(
-                    `/exchange/${symbol}`
-                  );
-                }}
-              >
-                VENDER
-              </Button>
-              <Button
-                className="flex-[1.5] h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
-                onClick={() => {
-                  const symbol =
-                    encodeURIComponent(
-                      selectedToken.symbol
-                    );
-                  router.push(
-                    `/exchange/${symbol}`
-                  );
-                }}
-              >
-                COMPRAR
-              </Button>
-            </div>
-          ) : null
-        }
+        onClose={() => setSelectedTokenId(null)}
+        data={selectedToken}
       />
     </div>
   );

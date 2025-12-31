@@ -35,7 +35,7 @@ export function UnitDetailsSheet({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[100] transition-colors duration-300",
+        "fixed inset-0 z-100 transition-colors duration-300",
         isExpanded
           ? "bg-background"
           : "bg-black/30 backdrop-blur-xs"
@@ -64,7 +64,7 @@ export function UnitDetailsSheet({
             size="icon"
             onClick={onClose}
             className={cn(
-              "absolute z-[110] w-9 h-9 bg-white rounded-full border-none shadow-lg hover:bg-white/90 text-slate-500",
+              "absolute z-110 w-9 h-9 bg-white rounded-full border-none shadow-lg hover:bg-white/90 text-slate-500",
               isExpanded
                 ? "top-6 right-6"
                 : "top-6 right-6"
@@ -82,14 +82,14 @@ export function UnitDetailsSheet({
             )}
           >
             {/* Header Section */}
-            <div className="flex justify-between items-start shrink-0">
-              <div className="space-y-1 min-w-0 pr-4">
+            <div className="flex justify-between items-end shrink-0 min-h-[100px] mb-2">
+              <div className="space-y-1 min-w-0 flex-1 pr-2">
                 <div className="flex gap-2 items-center">
-                  <span className="font-mono text-xs font-black bg-[#3B2146]/10 text-[#3B2146] px-2 py-0.5 rounded uppercase tracking-tighter truncate">
+                  <span className="font-mono text-[9px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
                     {symbol}
                   </span>
                 </div>
-                <h3 className="text-xl font-black text-foreground uppercase leading-tight truncate">
+                <h3 className="text-lg font-black text-foreground uppercase leading-tight tracking-tight">
                   {title}
                 </h3>
                 {features && (
@@ -98,12 +98,9 @@ export function UnitDetailsSheet({
                   </div>
                 )}
               </div>
-              <div className="mt-14 text-right shrink-0">
-                <div className="text-2xl font-black text-foreground">
-                  {typeof price ===
-                  "number"
-                    ? `$${price.toFixed(2)}`
-                    : price}
+              <div className="text-right shrink-0 pb-1">
+                <div className="text-2xl font-black text-foreground tracking-tighter">
+                  {typeof price === "number" ? `$${price.toFixed(2)}` : price}
                 </div>
                 {stockText && (
                   <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
