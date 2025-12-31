@@ -14,9 +14,10 @@ interface UnitDetailsDialogProps {
   onClose: () => void;
   data: MarketToken | ProjectUnit | null;
   onInvest?: (data: MarketToken | ProjectUnit) => void;
+  actions?: React.ReactNode;
 }
 
-export function UnitDetailsDialog({ isOpen, onClose, data, onInvest }: UnitDetailsDialogProps) {
+export function UnitDetailsDialog({ isOpen, onClose, data, onInvest, actions: actionsProp }: UnitDetailsDialogProps) {
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("plano");
@@ -29,6 +30,12 @@ export function UnitDetailsDialog({ isOpen, onClose, data, onInvest }: UnitDetai
     }
   }, [isOpen]);
 
+  const parsePriceToNumber = (price?: string): number => {
+    if (!price) return 0;
+    const n = Number(price.replace(/[^\d.-]/g, ""));
+    return Number.isFinite(n) ? n : 0;
+  };
+
   if (!data) return null;
 
   // Unified mapping
@@ -36,17 +43,27 @@ export function UnitDetailsDialog({ isOpen, onClose, data, onInvest }: UnitDetai
   
   const symbol = isMarketToken ? data.symbol : (data.tokenSymbol || data.unitCode);
   const title = isMarketToken ? data.projectTitle : "Torre Libertador 8000";
-  const price = isMarketToken ? data.priceUsd : data.price;
   
   let stockCount = 0;
+  let displayPrice = 0;
+
   if (isMarketToken) {
     stockCount = data.tokensAvailable || 0;
+    displayPrice = (data.priceUsd || 0) * stockCount;
   } else {
-    // Correctly handle the tokens remaining for ProjectUnit
-    const total = data.totalTokens || 0;
-    const sold = data.tokensSold || 0;
-    stockCount = total - sold;
+    const unit = data as ProjectUnit;
+    const total = unit.totalTokens || 0;
+    const sold = unit.tokensSold || 0;
+    stockCount = Math.max(0, total - sold);
+    const unitPriceNum = parsePriceToNumber(unit.price);
+    
+    if (unit.isTokenized && total > 0) {
+      displayPrice = (unitPriceNum / total) * stockCount;
+    } else {
+      displayPrice = (unit.statusRaw === 'available' || unit.status === 'Disponible') ? unitPriceNum : 0;
+    }
   }
+
   const stockText = `${stockCount.toLocaleString()} TOKENS AVAILABLE`;
 
   // Features mapping
@@ -137,6 +154,8 @@ export function UnitDetailsDialog({ isOpen, onClose, data, onInvest }: UnitDetai
     }
   ];
 
+  const finalActions = actionsProp || <UnitDetailsActions actions={actions} />;
+
   return (
     <UnitDetailsSheet
       isOpen={isOpen}
@@ -144,7 +163,7 @@ export function UnitDetailsDialog({ isOpen, onClose, data, onInvest }: UnitDetai
       isExpanded={isExpanded}
       symbol={symbol}
       title={title}
-      price={price}
+      price={displayPrice}
       stockText={stockText}
       features={
         <div className={`flex flex-col gap-1.5 ${featuresList.length > 2 ? 'mt-1' : 'mt-0'}`}>
@@ -155,7 +174,7 @@ export function UnitDetailsDialog({ isOpen, onClose, data, onInvest }: UnitDetai
           ))}
         </div>
       }
-      actions={<UnitDetailsActions actions={actions} />}
+      actions={finalActions}
     >
       {isExpanded && (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col w-full h-full">

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { UnitDetailsDialog } from "../unit-details-dialog";
+import { UnitDetailsActions } from "../unit-details-actions";
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -322,120 +324,57 @@ export default function AssetsPage() {
         </div>
       </div>
 
-      {selectedToken && (
-        <div className="fixed inset-x-0 bottom-0 z-[60] p-4 animate-in slide-in-from-bottom-full duration-300">
-          <div className="bg-card/95 backdrop-blur-3xl border border-primary/30 shadow-[0_-10px_50px_-15px_rgba(0,0,0,0.4)] rounded-[32px] p-6 overflow-hidden relative">
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={() => {
-                setSelectedToken(null);
-                setIsTradeDialogOpen(
-                  false
-                );
-              }}
-              className="absolute top-6 right-6 z-50 w-9 h-9 bg-white rounded-full border-none shadow-lg hover:bg-white/90 text-slate-500"
-            >
-              <X className="w-5 h-5" />
-            </Button>
-
-            <div className="flex flex-col gap-6">
-              <div className="flex justify-between items-start">
-                <div className="space-y-1">
-                  <div className="flex gap-2 items-center">
-                    <span className="font-mono text-[10px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
-                      {
-                        selectedToken.tokenName
-                      }
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-black text-foreground">
-                    {
-                      selectedToken.projectName
-                    }
-                  </h3>
-                  <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                    <span className="flex gap-1.5 items-center">
-                      <Building2 className="w-3.5 h-3.5" />{" "}
-                      {
-                        selectedToken.location
-                      }
-                    </span>
-                    <span className="flex gap-1.5 items-center">
-                      <div className="w-3.5 h-3.5 rounded-full bg-muted/50" />
-                      {
-                        selectedToken.tokens
-                      }{" "}
-                      TOKENS
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-10 text-right">
-                  <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
-                    Valor Total
-                  </div>
-                  <div className="text-xl font-black text-foreground">
-                    ${" "}
-                    {
-                      selectedToken.value
-                    }
-                  </div>
-                  <div className="text-[10px] font-black text-brand-green uppercase mt-0.5">
-                    {
-                      selectedToken.change
-                    }
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    router.push(
-                      `/exchange?tab=positions`
-                    );
-                  }}
-                  className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted hover:text-foreground"
-                >
-                  POSICIONES
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setTradeType(
-                      "SELL"
-                    );
-                    setOrderType(
-                      "MARKET"
-                    );
-                    setIsTradeDialogOpen(
-                      true
-                    );
-                  }}
-                  className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted hover:text-foreground"
-                >
-                  VENDER
-                </Button>
-                <Button
-                  className="flex-[1.5] h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
-                  onClick={() => {
-                    setTradeType("BUY");
-                    setOrderType(
-                      "MARKET"
-                    );
-                    setIsTradeDialogOpen(
-                      true
-                    );
-                  }}
-                >
-                  COMPRAR
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <UnitDetailsDialog
+        isOpen={!!selectedToken && !isTradeDialogOpen}
+        onClose={() => setSelectedToken(null)}
+        data={selectedToken ? {
+          symbol: selectedToken.tokenName,
+          projectTitle: selectedToken.projectName,
+          priceUsd: Number(selectedToken.marketPrice.replace(/,/g, "")),
+          tokensAvailable: 1250, // Mocking available tokens to show "Market Opportunity"
+          marketCapUsd: 520000,
+          id: selectedToken.id,
+          projectId: "1",
+          change24hPct: 0.5,
+          change7dPct: 2.1,
+          change30dPct: 5.4,
+          changeAllPct: 12.4,
+          liveSince: "6 meses",
+          isFavorite: true,
+          roiPct: 12.4
+        } : null}
+        actions={
+          <UnitDetailsActions
+            actions={[
+              {
+                label: "POSICIONES",
+                variant: "outline",
+                onClick: () => {
+                  router.push("/exchange?tab=positions");
+                },
+              },
+              {
+                label: "VENDER",
+                variant: "outline",
+                onClick: () => {
+                  setTradeType("SELL");
+                  setOrderType("MARKET");
+                  setIsTradeDialogOpen(true);
+                },
+              },
+              {
+                label: "COMPRAR",
+                variant: "primary",
+                onClick: () => {
+                  setTradeType("BUY");
+                  setOrderType("MARKET");
+                  setIsTradeDialogOpen(true);
+                },
+              },
+            ]}
+          />
+        }
+      />
 
       <Dialog
         open={
