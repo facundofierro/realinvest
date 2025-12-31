@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -32,6 +33,14 @@ import type {
   Position,
   WalletBalance,
 } from "@/types/wallet";
+import {
+  getMarketTokenBySymbol,
+  getMarketOrderBook,
+  getMarketSeries,
+  getWalletBalances,
+  getWalletHoldings,
+  getWalletPositions,
+} from "@/lib/api-client";
 
 type Timeframe =
   | "all"
@@ -576,28 +585,81 @@ function OrderBook({
 }
 
 export interface ExchangeDetailPageProps {
-  token: MarketToken;
-  orderBook: MarketOrderBook;
-  series: MarketSeries;
-  positions: Position[];
-  balances: WalletBalance[];
-  holdings: Holding[];
-  onFavorite: (tokenId: string) => void;
-  isFavorite: boolean;
+  symbol: string;
 }
 
 export default function ExchangeDetailPage({
-  token,
-  orderBook,
-  series,
-  positions,
-  balances,
-  holdings,
-  onFavorite,
-  isFavorite,
+  symbol,
 }: ExchangeDetailPageProps) {
   const router = useRouter();
-  const symbol = token.symbol;
+
+  // Loading and error states
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Data states
+  const [token, setToken] = useState<MarketToken | null>(null);
+  const [orderBook, setOrderBook] = useState<MarketOrderBook | null>(null);
+  const [series, setSeries] = useState<MarketSeries | null>(null);
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [balances, setBalances] = useState<WalletBalance[]>([]);
+  const [holdings, setHoldings] = useState<Holding[]>([]);
+
+  // Fetch data on mount or when symbol changes
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchData() {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const [
+          tokenData,
+          orderBookData,
+          seriesData,
+          positionsData,
+          balancesData,
+          holdingsData,
+        ] = await Promise.all([
+          getMarketTokenBySymbol(symbol),
+          getMarketOrderBook(symbol),
+          getMarketSeries(symbol, "24h", 100),
+          getWalletPositions(),
+          getWalletBalances(),
+          getWalletHoldings(),
+        ]);
+
+        if (!isMounted) return;
+
+        if (!tokenData) {
+          setError("Token not found");
+          return;
+        }
+
+        setToken(tokenData);
+        setOrderBook(orderBookData);
+        setSeries(seriesData);
+        setPositions(positionsData.filter((p) => p.tokenSymbol === symbol));
+        setBalances(balancesData);
+        setHoldings(holdingsData);
+      } catch (err) {
+        if (!isMounted) return;
+        setError("Error loading token data");
+        console.error("Failed to fetch exchange data:", err);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [symbol]);
 
   const [
     isTradeDialogOpen,
@@ -620,6 +682,51 @@ export default function ExchangeDetailPage({
     useState<Timeframe>("24h");
   const [view, setView] =
     useState<ChartView>("linea");
+
+  // Favorite state
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Update favorite state when token is loaded
+  useEffect(() => {
+    if (token) {
+      setIsFavorite(token.isFavorite);
+    }
+  }, [token]);
+
+  // Handle favorite toggle
+  const handleFavorite = async () => {
+    if (!token) return;
+    setIsFavorite(!isFavorite);
+    // TODO: Call API to toggle favorite on server
+    console.log("Toggle favorite for token:", token.id);
+  };
+
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="w-8 h-8 mx-auto mb-4 rounded-full border-4 border-primary/20 animate-spin border-t-primary" />
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error || !token || !orderBook || !series) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <p className="text-lg font-semibold text-destructive mb-2">
+            {error || "Token not found"}
+          </p>
+          <Button onClick={() => router.back()}>Go Back</Button>
+        </div>
+      </div>
+    );
+  }
 
   const price = token.priceUsd;
   const change = getChangePct(
@@ -829,9 +936,7 @@ export default function ExchangeDetailPage({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() =>
-              onFavorite(token.id)
-            }
+            onClick={handleFavorite}
             className="text-white rounded-full hover:bg-white/10"
           >
             {isFavorite ? (

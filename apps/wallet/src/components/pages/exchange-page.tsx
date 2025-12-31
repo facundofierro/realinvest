@@ -42,6 +42,11 @@ import type {
   Position,
   Transaction,
 } from "@/types/wallet";
+import {
+  getMarketTokens,
+  getTransactions,
+  getWalletPositions,
+} from "@/lib/api-client";
 
 type SortBy = "marketCap" | "change";
 type Timeframe =
@@ -51,9 +56,9 @@ type Timeframe =
   | "all";
 
 export interface ExchangePageProps {
-  tokens: MarketToken[];
-  positions: Position[];
-  transactions: Transaction[];
+  tokens?: MarketToken[];
+  positions?: Position[];
+  transactions?: Transaction[];
 }
 
 function formatUsd(
@@ -102,9 +107,9 @@ function isActivePosition(
 }
 
 function ExchangePageInner({
-  tokens,
-  positions: initialPositions,
-  transactions,
+  tokens: initialTokens = [],
+  positions: initialPositions = [],
+  transactions: initialTransactions = [],
 }: ExchangePageProps) {
   const router = useRouter();
   const searchParams =
@@ -114,6 +119,35 @@ function ExchangePageInner({
   const tabParam =
     searchParams.get("tab");
 
+  const [isLoading, setIsLoading] = useState(!initialTokens.length);
+  const [tokens, setTokens] = useState<MarketToken[]>(initialTokens);
+  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [positions, setPositions] = useState<Position[]>(initialPositions);
+
+  // Fetch data if not provided
+  useEffect(() => {
+    if (initialTokens.length > 0) return;
+
+    async function loadData() {
+      try {
+        const [tokensData, positionsData, transactionsData] = await Promise.all([
+          getMarketTokens(),
+          getWalletPositions(),
+          getTransactions(),
+        ]);
+        setTokens(tokensData);
+        setPositions(positionsData);
+        setTransactions(transactionsData);
+      } catch (error) {
+        console.error("Failed to load exchange data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+  }, [initialTokens.length]);
+
   const [activeTab, setActiveTab] =
     useState(tabParam || "market");
 
@@ -122,14 +156,7 @@ function ExchangePageInner({
       setActiveTab(tabParam);
   }, [tabParam]);
 
-  const [positions, setPositions] =
-    useState<Position[]>(
-      initialPositions
-    );
 
-  useEffect(() => {
-    setPositions(initialPositions);
-  }, [initialPositions]);
 
   const [sortBy, setSortBy] =
     useState<SortBy>("marketCap");
@@ -435,6 +462,17 @@ function ExchangePageInner({
       </div>
     );
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="w-8 h-8 mx-auto mb-4 rounded-full border-4 border-primary/20 animate-spin border-t-primary" />
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-dvh -mb-24 pb-24 bg-background overflow-hidden">

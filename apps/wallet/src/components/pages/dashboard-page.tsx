@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   Avatar,
   AvatarFallback,
@@ -17,6 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { SimilarProjectsCarousel } from "@/components/project/stories-section";
+import { getDashboardProjects } from "@/lib/api-client";
 
 interface DashboardProject {
   id: string;
@@ -30,11 +34,35 @@ interface DashboardProject {
   fixedRent: number;
 }
 
-interface DashboardPageProps {
-  projects: DashboardProject[];
-}
+export default function DashboardPage() {
+  const [projects, setProjects] = useState<DashboardProject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-export default function DashboardPage({ projects }: DashboardPageProps) {
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        const data = await getDashboardProjects();
+        setProjects(data);
+      } catch (error) {
+        console.error("Failed to load dashboard projects:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadProjects();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="w-8 h-8 mx-auto mb-4 rounded-full border-4 border-primary/20 animate-spin border-t-primary" />
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 space-y-6 duration-500 animate-in fade-in slide-in-from-bottom-4">
       {/* Header */}
