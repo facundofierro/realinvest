@@ -1,5 +1,6 @@
 "use client";
 
+import { UnitDetailsSheet } from "../unit-details-sheet";
 import {
   Suspense,
   useEffect,
@@ -20,7 +21,6 @@ import {
   MapPin,
   Search,
   TrendingUp,
-  X,
 } from "lucide-react";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { Card } from "@repo/ui/components/ui/card";
@@ -1009,135 +1009,105 @@ function ExchangePageInner({
         </DialogContent>
       </Dialog>
 
-      {selectedToken ? (
-        <div className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-xs">
-          <div className="absolute inset-x-0 bottom-0 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
-            <div className="relative p-5 rounded-[36px] bg-white shadow-2xl border border-border/40">
+      <UnitDetailsSheet
+        isOpen={!!selectedToken}
+        onClose={() =>
+          setSelectedTokenId(null)
+        }
+        symbol={
+          selectedToken?.symbol ?? ""
+        }
+        title={
+          selectedToken?.projectTitle ??
+          ""
+        }
+        price={
+          selectedToken?.priceUsd ?? 0
+        }
+        stockText={`STOCK: ${selectedToken?.tokensAvailable ?? 0} TOKENS`}
+        features={
+          selectedToken ? (
+            <>
+              <span className="flex gap-1.5 items-center">
+                <MapPin className="w-3.5 h-3.5" />{" "}
+                Nuñez, BA
+              </span>
+              <span className="flex gap-1.5 items-center">
+                <Layers className="w-3.5 h-3.5" />{" "}
+                ROI Est:{" "}
+                {typeof selectedToken.roiPct ===
+                "number"
+                  ? selectedToken.roiPct.toFixed(
+                      1
+                    )
+                  : "0.0"}
+                %
+              </span>
+            </>
+          ) : null
+        }
+        actions={
+          selectedToken ? (
+            <div className="flex gap-2">
               <Button
-                variant="ghost"
-                size="icon"
-                onClick={() =>
-                  setSelectedTokenId(
-                    null
+                variant="outline"
+                className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
+                onClick={() => {
+                  const symbol =
+                    encodeURIComponent(
+                      selectedToken.symbol
+                    );
+                  const returnTo =
+                    encodeURIComponent(
+                      `/exchange/${symbol}`
+                    );
+                  router.push(
+                    `/project/1?returnTo=${returnTo}`
+                  );
+                }}
+              >
+                PROYECTO
+              </Button>
+              <Button
+                disabled={
+                  !positions.some(
+                    (p) =>
+                      p.tokenSymbol ===
+                        selectedToken.symbol &&
+                      p.filledAmount > 0
                   )
                 }
-                className="absolute top-6 right-6 z-[110] w-9 h-9 bg-white rounded-full border-none shadow-lg hover:bg-white/90 text-slate-500"
+                className="flex-1 h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px] disabled:opacity-30 disabled:scale-100"
+                onClick={() => {
+                  const symbol =
+                    encodeURIComponent(
+                      selectedToken.symbol
+                    );
+                  router.push(
+                    `/exchange/${symbol}`
+                  );
+                }}
               >
-                <X className="w-5 h-5" />
+                VENDER
               </Button>
-
-              <div className="flex flex-col gap-6">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <div className="flex gap-2 items-center">
-                      <span className="font-mono text-xs font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
-                        {
-                          selectedToken.symbol
-                        }
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-black text-foreground">
-                      {
-                        selectedToken.projectTitle
-                      }
-                    </h3>
-                    <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                      <span className="flex gap-1.5 items-center">
-                        <MapPin className="w-3.5 h-3.5" />{" "}
-                        Nuñez, BA
-                      </span>
-                      <span className="flex gap-1.5 items-center">
-                        <Layers className="w-3.5 h-3.5" />{" "}
-                        ROI Est:{" "}
-                        {typeof selectedToken.roiPct ===
-                        "number"
-                          ? selectedToken.roiPct.toFixed(
-                              1
-                            )
-                          : "0.0"}
-                        %
-                      </span>
-                    </div>
-                  </div>
-                  <div className="mt-10 text-right">
-                    <div className="text-2xl font-black text-foreground">
-                      $
-                      {selectedToken.priceUsd.toFixed(
-                        2
-                      )}
-                    </div>
-                    <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
-                      STOCK:{" "}
-                      {selectedToken.tokensAvailable ??
-                        0}{" "}
-                      TOKENS
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
-                    onClick={() => {
-                      const symbol =
-                        encodeURIComponent(
-                          selectedToken.symbol
-                        );
-                      const returnTo =
-                        encodeURIComponent(
-                          `/exchange/${symbol}`
-                        );
-                      router.push(
-                        `/project/1?returnTo=${returnTo}`
-                      );
-                    }}
-                  >
-                    PROYECTO
-                  </Button>
-                  <Button
-                    disabled={
-                      !positions.some(
-                        (p) =>
-                          p.tokenSymbol ===
-                            selectedToken.symbol &&
-                          p.filledAmount >
-                            0
-                      )
-                    }
-                    className="flex-1 h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px] disabled:opacity-30 disabled:scale-100"
-                    onClick={() => {
-                      const symbol =
-                        encodeURIComponent(
-                          selectedToken.symbol
-                        );
-                      router.push(
-                        `/exchange/${symbol}`
-                      );
-                    }}
-                  >
-                    VENDER
-                  </Button>
-                  <Button
-                    className="flex-[1.5] h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
-                    onClick={() => {
-                      const symbol =
-                        encodeURIComponent(
-                          selectedToken.symbol
-                        );
-                      router.push(
-                        `/exchange/${symbol}`
-                      );
-                    }}
-                  >
-                    COMPRAR
-                  </Button>
-                </div>
-              </div>
+              <Button
+                className="flex-[1.5] h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
+                onClick={() => {
+                  const symbol =
+                    encodeURIComponent(
+                      selectedToken.symbol
+                    );
+                  router.push(
+                    `/exchange/${symbol}`
+                  );
+                }}
+              >
+                COMPRAR
+              </Button>
             </div>
-          </div>
-        </div>
-      ) : null}
+          ) : null
+        }
+      />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { UnitDetailsSheet } from "../unit-details-sheet";
 import {
   useState,
   useMemo,
@@ -9,6 +10,9 @@ import { Button } from "@repo/ui/components/ui/button";
 import {
   ArrowLeft,
   Layers,
+  MapPin,
+  Maximize2,
+  Building2,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -17,6 +21,12 @@ import {
   CardContent,
 } from "@repo/ui/components/ui/card";
 import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@repo/ui/components/ui/tabs";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -24,7 +34,6 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import { Badge } from "@repo/ui/components/ui/badge";
 import type { ProjectUnit } from "@/types/wallet";
 
 export interface ProjectUnitsPageProps {
@@ -60,6 +69,8 @@ export default function ProjectUnitsPage({
     isContactDialogOpen,
     setIsContactDialogOpen,
   ] = useState(false);
+  const [activeTab, setActiveTab] =
+    useState("plano");
   const [contactForm, setContactForm] =
     useState({
       name: "",
@@ -255,15 +266,11 @@ export default function ProjectUnitsPage({
     unitId: string
   ) => {
     setSelectedUnitId(unitId);
-    setIsDetailsOpen(true);
+    setIsDetailsOpen(false);
   };
 
   const handleBackClick = () => {
     router.back();
-  };
-
-  const handleContactClick = () => {
-    setIsContactDialogOpen(true);
   };
 
   const statusMeta = (
@@ -483,8 +490,8 @@ export default function ProjectUnitsPage({
             const statusTextClassName =
               unit.statusRaw ===
               "available"
-                ? "text-brand-green"
-                : "text-primary";
+                ? "text-primary"
+                : "text-muted-foreground";
 
             return (
               <Card
@@ -549,14 +556,17 @@ export default function ProjectUnitsPage({
                         <div className="text-[17px] font-black text-[#3B2146] leading-tight">
                           {unit.price}
                         </div>
-                        <div
-                          className={`mt-1 font-black uppercase text-[10px] ${statusTextClassName}`}
-                        >
-                          {String(
-                            meta.label ??
-                              ""
-                          ).toUpperCase()}
-                        </div>
+                        {unit.statusRaw ===
+                        "available" ? null : (
+                          <div
+                            className={`mt-1 font-black uppercase text-[10px] ${statusTextClassName}`}
+                          >
+                            {String(
+                              meta.label ??
+                                ""
+                            ).toUpperCase()}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -648,168 +658,282 @@ export default function ProjectUnitsPage({
         )}
       </main>
 
-      {/* Unit Details Dialog */}
-      <Dialog
-        open={isDetailsOpen}
-        onOpenChange={setIsDetailsOpen}
+      <UnitDetailsSheet
+        isOpen={!!selectedUnit}
+        onClose={() => {
+          setSelectedUnitId(null);
+          setIsDetailsOpen(false);
+        }}
+        isExpanded={isDetailsOpen}
+        symbol={
+          selectedUnit?.unitCode ?? ""
+        }
+        title={
+          selectedUnit
+            ? `${selectedUnit.type} • Piso ${selectedUnit.floor}`
+            : ""
+        }
+        price={selectedUnit?.price ?? 0}
+        stockText={
+          selectedUnit?.isTokenized &&
+          selectedUnit.totalTokens
+            ? `${selectedUnit.tokensSold || 0}/${selectedUnit.totalTokens} TOKENS`
+            : undefined
+        }
+        features={
+          selectedUnit ? (
+            <>
+              <span className="flex gap-1 items-center text-xs text-foreground/80">
+                <Building2 className="w-3.5 h-3.5" />{" "}
+                Depto{" "}
+                {selectedUnit.unitCode}{" "}
+                • Piso{" "}
+                {selectedUnit.floor}
+              </span>
+              <span className="flex gap-1 items-center opacity-70">
+                <Layers className="w-3 h-3" />{" "}
+                {selectedUnit.type}
+              </span>
+              {selectedUnit.area ||
+              selectedUnit.areaM2 ? (
+                <span className="flex gap-1 items-center opacity-70">
+                  <Maximize2 className="w-3 h-3" />{" "}
+                  {selectedUnit.area ??
+                    `${selectedUnit.areaM2} M2`}
+                </span>
+              ) : null}
+              {selectedUnit.orientation ? (
+                <span className="flex gap-1 items-center opacity-70">
+                  <MapPin className="w-3 h-3" />{" "}
+                  Vista{" "}
+                  {
+                    selectedUnit.orientation
+                  }
+                </span>
+              ) : null}
+            </>
+          ) : null
+        }
+        actions={
+          selectedUnit ? (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
+                onClick={() => {
+                  setIsDetailsOpen(
+                    true
+                  );
+                  setActiveTab(
+                    "caracteristicas"
+                  );
+                }}
+              >
+                PROYECTO
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border hover:bg-muted/50 hover:text-foreground"
+                onClick={() => {
+                  setIsDetailsOpen(
+                    true
+                  );
+                  setActiveTab("plano");
+                }}
+              >
+                UNIDAD
+              </Button>
+              <Button
+                className="flex-[1.5] h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
+                onClick={() => {
+                  if (
+                    selectedUnit.isTokenized &&
+                    selectedUnit.tokenSymbol
+                  ) {
+                    router.push(
+                      `/exchange/${selectedUnit.tokenSymbol}`
+                    );
+                    return;
+                  }
+                  setIsContactDialogOpen(
+                    true
+                  );
+                }}
+              >
+                INVERTIR
+              </Button>
+            </div>
+          ) : null
+        }
       >
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              Detalles de la Unidad
-            </DialogTitle>
-          </DialogHeader>
-          {selectedUnit &&
-            (() => {
-              const meta = statusMeta(
-                selectedUnit
-              );
-              const tokenProgress =
-                getTokenProgress(
-                  selectedUnit
-                );
-              const isToken =
-                selectedUnit.isTokenized ===
-                true;
-              const floorPlanImage =
-                selectedUnit.floorPlanImage ||
-                "/building_floor_layout.png";
+        {selectedUnit && (
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="flex flex-col w-full h-full"
+          >
+            <TabsList className="grid grid-cols-2 p-1 mb-4 w-full rounded-xl bg-muted/50">
+              <TabsTrigger
+                value="plano"
+                className="rounded-lg text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              >
+                Plano
+              </TabsTrigger>
+              <TabsTrigger
+                value="caracteristicas"
+                className="rounded-lg text-[10px] font-black uppercase tracking-widest data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              >
+                Detalles
+              </TabsTrigger>
+            </TabsList>
 
-              return (
-                <div className="space-y-4">
-                  <div className="overflow-hidden relative w-full h-44 rounded-2xl border border-border/40 bg-muted/20">
-                    <Image
-                      src={
-                        floorPlanImage
-                      }
-                      alt={
-                        selectedUnit.title
-                      }
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+            <TabsContent
+              value="plano"
+              className="overflow-y-auto flex-1 mt-0 h-full"
+            >
+              <div className="overflow-hidden relative w-full h-64 rounded-2xl bg-muted shrink-0">
+                <Image
+                  src={
+                    selectedUnit.floorPlanImage ||
+                    "/building_floor_layout.png"
+                  }
+                  fill
+                  className="object-contain bg-white"
+                  alt={
+                    selectedUnit.title ||
+                    "Plano"
+                  }
+                />
+                <div className="absolute inset-0 to-transparent bg-linear-to-t from-black/60" />
+                <div className="absolute bottom-4 left-6 text-white">
+                  <h2 className="text-xl font-black uppercase">
+                    Plano Arquitectónico
+                  </h2>
+                  <p className="text-xs font-medium text-white/80">
+                    Piso{" "}
+                    {selectedUnit.floor}{" "}
+                    •{" "}
+                    {
+                      selectedUnit.unitCode
+                    }
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
 
-                  <div className="flex gap-3 justify-between items-start">
-                    <div className="min-w-0">
-                      <div className="text-xs font-black tracking-widest uppercase text-muted-foreground">
-                        Piso{" "}
+            <TabsContent
+              value="caracteristicas"
+              className="overflow-y-auto flex-1 mt-0"
+            >
+              <div className="space-y-4">
+                <Card className="border-border/40 shadow-sm">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-black tracking-widest uppercase text-muted-foreground">
+                        Precio
+                      </span>
+                      <span className="text-sm font-black">
                         {
-                          selectedUnit.floor
-                        }{" "}
-                        •{" "}
+                          selectedUnit.price
+                        }
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-black tracking-widest uppercase text-muted-foreground">
+                        Unidad
+                      </span>
+                      <span className="text-sm font-black">
                         {
                           selectedUnit.unitCode
                         }
-                      </div>
-                      <div className="mt-1 text-lg font-black leading-tight">
-                        {
-                          selectedUnit.title
-                        }
-                      </div>
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        {
-                          selectedUnit.type
-                        }{" "}
-                        {selectedUnit.area
-                          ? `• ${selectedUnit.area}`
-                          : ""}
-                      </div>
+                      </span>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={`text-[10px] font-black uppercase tracking-widest ${meta.badgeClassName}`}
-                    >
-                      {meta.label}
-                    </Badge>
-                  </div>
 
-                  <Card>
-                    <CardContent className="p-4 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-black tracking-widest uppercase text-muted-foreground">
+                        Piso
+                      </span>
+                      <span className="text-sm font-black">
+                        {
+                          selectedUnit.floor
+                        }
+                      </span>
+                    </div>
+
+                    {selectedUnit.orientation ? (
                       <div className="flex justify-between items-center">
                         <span className="text-xs font-black tracking-widest uppercase text-muted-foreground">
-                          Precio
+                          Vista
                         </span>
                         <span className="text-sm font-black">
                           {
-                            selectedUnit.price
+                            selectedUnit.orientation
                           }
                         </span>
                       </div>
+                    ) : null}
 
-                      {isToken &&
-                      selectedUnit.tokenSymbol ? (
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs font-black tracking-widest uppercase text-muted-foreground">
-                            Token
+                    {selectedUnit.isTokenized &&
+                    selectedUnit.tokenSymbol ? (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-black tracking-widest uppercase text-muted-foreground">
+                          Token
+                        </span>
+                        <span className="font-mono text-[10px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
+                          {
+                            selectedUnit.tokenSymbol
+                          }
+                        </span>
+                      </div>
+                    ) : null}
+
+                    {selectedUnit.isTokenized &&
+                    (selectedUnit.totalTokens ||
+                      0) > 0 ? (
+                      <div className="space-y-2 pt-1">
+                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <Layers className="w-3.5 h-3.5" />
+                            Tokens
+                            vendidos
                           </span>
-                          <span className="font-mono text-[10px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
+                          <span>
+                            {selectedUnit.tokensSold ||
+                              0}{" "}
+                            /{" "}
                             {
-                              selectedUnit.tokenSymbol
+                              selectedUnit.totalTokens
                             }
                           </span>
                         </div>
-                      ) : null}
-
-                      {isToken &&
-                      tokenProgress.total >
-                        0 ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                            <span className="flex items-center gap-1.5">
-                              <Layers className="w-3.5 h-3.5" />
-                              Tokens
-                              vendidos
-                            </span>
-                            <span>
-                              {
-                                tokenProgress.sold
-                              }
-                              /
-                              {
-                                tokenProgress.total
-                              }
-                            </span>
-                          </div>
-                          <div className="overflow-hidden w-full h-2 rounded-full bg-muted">
-                            <div
-                              className="h-full transition-all bg-primary"
-                              style={{
-                                width: `${tokenProgress.pct}%`,
-                              }}
-                            />
-                          </div>
+                        <div className="overflow-hidden w-full h-2 rounded-full bg-muted">
+                          <div
+                            className="h-full transition-all bg-primary"
+                            style={{
+                              width: `${Math.max(
+                                0,
+                                Math.min(
+                                  100,
+                                  ((selectedUnit.tokensSold ||
+                                    0) /
+                                    (selectedUnit.totalTokens ||
+                                      1)) *
+                                    100
+                                )
+                              )}%`,
+                            }}
+                          />
                         </div>
-                      ) : null}
-                    </CardContent>
-                  </Card>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() =>
-                        setIsDetailsOpen(
-                          false
-                        )
-                      }
-                    >
-                      Cerrar
-                    </Button>
-                    <Button
-                      className="flex-1"
-                      onClick={
-                        handleContactClick
-                      }
-                    >
-                      Contactar asesor
-                    </Button>
-                  </div>
-                </div>
-              );
-            })()}
-        </DialogContent>
-      </Dialog>
+                      </div>
+                    ) : null}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
+      </UnitDetailsSheet>
 
       {/* Contact Dialog */}
       <Dialog
