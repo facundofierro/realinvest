@@ -331,7 +331,7 @@ export default function AssetsPage() {
           symbol: selectedToken.tokenName,
           projectTitle: selectedToken.projectName,
           priceUsd: Number(selectedToken.marketPrice.replace(/,/g, "")),
-          tokensAvailable: 1250, // Mocking available tokens to show "Market Opportunity"
+          tokensAvailable: 1250,
           marketCapUsd: 520000,
           id: selectedToken.id,
           projectId: "1",
@@ -343,37 +343,11 @@ export default function AssetsPage() {
           isFavorite: true,
           roiPct: 12.4
         } : null}
-        actions={
-          <UnitDetailsActions
-            actions={[
-              {
-                label: "POSICIONES",
-                variant: "outline",
-                onClick: () => {
-                  router.push("/exchange?tab=positions");
-                },
-              },
-              {
-                label: "VENDER",
-                variant: "outline",
-                onClick: () => {
-                  setTradeType("SELL");
-                  setOrderType("MARKET");
-                  setIsTradeDialogOpen(true);
-                },
-              },
-              {
-                label: "COMPRAR",
-                variant: "primary",
-                onClick: () => {
-                  setTradeType("BUY");
-                  setOrderType("MARKET");
-                  setIsTradeDialogOpen(true);
-                },
-              },
-            ]}
-          />
-        }
+        onInvest={() => {
+          setTradeType("BUY");
+          setOrderType("MARKET");
+          setIsTradeDialogOpen(true);
+        }}
       />
 
       <Dialog

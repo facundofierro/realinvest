@@ -14,10 +14,9 @@ interface UnitDetailsDialogProps {
   onClose: () => void;
   data: MarketToken | ProjectUnit | null;
   onInvest?: (data: MarketToken | ProjectUnit) => void;
-  actions?: React.ReactNode;
 }
 
-export function UnitDetailsDialog({ isOpen, onClose, data, onInvest, actions: actionsProp }: UnitDetailsDialogProps) {
+export function UnitDetailsDialog({ isOpen, onClose, data, onInvest }: UnitDetailsDialogProps) {
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("plano");
@@ -154,8 +153,6 @@ export function UnitDetailsDialog({ isOpen, onClose, data, onInvest, actions: ac
     }
   ];
 
-  const finalActions = actionsProp || <UnitDetailsActions actions={actions} />;
-
   return (
     <UnitDetailsSheet
       isOpen={isOpen}
@@ -174,7 +171,7 @@ export function UnitDetailsDialog({ isOpen, onClose, data, onInvest, actions: ac
           ))}
         </div>
       }
-      actions={finalActions}
+      actions={<UnitDetailsActions actions={actions} />}
     >
       {isExpanded && (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col w-full h-full">

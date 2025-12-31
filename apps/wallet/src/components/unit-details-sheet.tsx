@@ -82,8 +82,9 @@ export function UnitDetailsSheet({
             )}
           >
             {/* Header Section */}
-            <div className="flex justify-between items-end shrink-0 min-h-[100px] mb-2">
-              <div className="space-y-1 min-w-0 flex-1 pr-2">
+            <div className="flex flex-col shrink-0 min-h-[100px] mb-2 gap-3">
+              {/* Row 1: Symbol and Title (full width) */}
+              <div className="space-y-1">
                 <div className="flex gap-2 items-center">
                   <span className="font-mono text-[9px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
                     {symbol}
@@ -92,21 +93,27 @@ export function UnitDetailsSheet({
                 <h3 className="text-lg font-black text-foreground uppercase leading-tight tracking-tight">
                   {title}
                 </h3>
-                {features && (
-                  <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
-                    {features}
-                  </div>
-                )}
               </div>
-              <div className="text-right shrink-0 pb-1">
-                <div className="text-2xl font-black text-foreground tracking-tighter">
-                  {typeof price === "number" ? `$${price.toFixed(2)}` : price}
+
+              {/* Row 2: Features and Price */}
+              <div className="flex justify-between items-end gap-4">
+                <div className="flex-1 min-w-0">
+                  {features && (
+                    <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                      {features}
+                    </div>
+                  )}
                 </div>
-                {stockText && (
-                  <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
-                    {stockText}
+                <div className="text-right shrink-0">
+                  <div className="text-2xl font-black text-foreground tracking-tighter">
+                    {typeof price === "number" ? `$${price.toFixed(2)}` : price}
                   </div>
-                )}
+                  {stockText && (
+                    <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
+                      {stockText}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
