@@ -1,5 +1,7 @@
 "use client";
 
+import { getProjectUnits } from "@/lib/api-client";
+
 import { UnitDetailsDialog } from "../unit-details-dialog";
 import { UnitDetailsActions } from "../unit-details-actions";
 import {
@@ -88,27 +90,10 @@ export default function ProjectUnitsPage({
         setLoading(true);
         setError(null);
 
-        const response = await fetch(
-          `/api/projects/${projectId}/units`
-        );
-        if (!response.ok) {
-          throw new Error(
-            "Failed to fetch project units"
-          );
-        }
-        const json = (await response
-          .json()
-          .catch(() => null)) as {
-          units?: ProjectUnit[];
-        } | null;
-
-        const fetchedUnits =
-          Array.isArray(json?.units)
-            ? json?.units
-            : [];
+        const fetchedUnits = await getProjectUnits(projectId);
 
         if (!cancelled) {
-          setUnitsState(fetchedUnits || []);
+          setUnitsState(fetchedUnits);
         }
       } catch (e) {
         if (!cancelled) {

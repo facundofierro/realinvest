@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.realinvest.wallet',
   appName: 'Real Invest Wallet',
-  webDir: '../../apps/wallet/out',
+  webDir: '../nextjs/out',
   ios: {
     scheme: "RealInvestWallet",
     backgroundColor: "#000000",

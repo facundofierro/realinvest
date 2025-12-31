@@ -11,6 +11,8 @@ export { default as ChatPage } from "./components/pages/chat-page";
 export { default as DepositPage } from "./components/pages/deposit-page";
 export { default as WithdrawPage } from "./components/pages/withdraw-page";
 
+export { BottomNav } from "./components/bottom-nav";
+
 // Export types
 export * from "./types/wallet";
 
