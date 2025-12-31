@@ -87,6 +87,15 @@ export async function createPosition(position: {
   return data.position;
 }
 
+export async function closePosition(positionId: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/wallet/positions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ positionId }),
+  });
+  if (!res.ok) throw new Error("Failed to close position");
+}
+
 // Projects API
 export async function getProjects(): Promise<Project[]> {
   const res = await fetch(`${API_BASE}/api/projects`);

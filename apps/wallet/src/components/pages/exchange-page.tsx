@@ -46,6 +46,7 @@ import {
   getMarketTokens,
   getTransactions,
   getWalletPositions,
+  closePosition,
 } from "@/lib/api-client";
 
 type SortBy = "marketCap" | "change";
@@ -318,24 +319,7 @@ function ExchangePageInner({
 
     try {
       setIsClosingOrder(true);
-      const res = await fetch(
-        "/api/wallet/positions",
-        {
-          method: "POST",
-          headers: {
-            "content-type":
-              "application/json",
-          },
-          body: JSON.stringify({
-            positionId:
-              selectedPosition.id,
-          }),
-        }
-      );
-      if (!res.ok)
-        throw new Error(
-          "Failed to close"
-        );
+      await closePosition(selectedPosition.id);
 
       setPositions((prev) =>
         prev.map((p) =>
