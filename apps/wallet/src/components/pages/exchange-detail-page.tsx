@@ -1,41 +1,112 @@
 "use client";
 
 import {
-  useState,
   useMemo,
+  useState,
 } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/components/ui/button";
+import { Card } from "@repo/ui/components/ui/card";
+import { cn } from "@repo/ui/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import { Badge } from "@repo/ui/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/ui/card";
 import {
   Tabs,
-  TabsContent,
   TabsList,
   TabsTrigger,
 } from "@repo/ui/components/ui/tabs";
 import {
   ArrowLeft,
-  TrendingUp,
-  TrendingDown,
+  BarChart3,
+  CandlestickChart,
+  List,
   Star,
   StarOff,
 } from "lucide-react";
-import { cn } from "@repo/ui/lib/utils";
-// Custom chart implementation - SVG based
 import type {
-  MarketToken,
+  Holding,
   MarketOrderBook,
   MarketSeries,
+  MarketToken,
   Position,
+  WalletBalance,
 } from "@/types/wallet";
+
+type Timeframe =
+  | "all"
+  | "30d"
+  | "7d"
+  | "24h";
+type ChartView =
+  | "linea"
+  | "velas"
+  | "ordenes";
+
+function formatPct(
+  value: number
+): string {
+  return `${Math.abs(value).toFixed(1)}%`;
+}
+
+function getChangePct(
+  token: MarketToken,
+  timeframe: Timeframe
+): number {
+  if (timeframe === "24h")
+    return token.change24hPct;
+  if (timeframe === "7d")
+    return token.change7dPct;
+  if (timeframe === "30d")
+    return token.change30dPct;
+  return token.changeAllPct;
+}
+
+function makeSeries(
+  seed: string,
+  changePct: number,
+  points: number
+): number[] {
+  const base = 100;
+  const seedSum = seed
+    .split("")
+    .reduce(
+      (acc, ch) =>
+        acc + ch.charCodeAt(0),
+      0
+    );
+  const drift = changePct / 100;
+  const out: number[] = [];
+
+  for (let i = 0; i < points; i++) {
+    const t =
+      i / Math.max(1, points - 1);
+    const wave =
+      Math.sin(
+        (t * 5 + seedSum / 37) *
+          Math.PI *
+          2
+      ) *
+        0.35 +
+      Math.sin(
+        (t * 11 + seedSum / 53) *
+          Math.PI *
+          2
+      ) *
+        0.2;
+    const trend = (t - 0.5) * drift * 2;
+    out.push(
+      base * (1 + trend + wave * 0.02)
+    );
+  }
+
+  return out;
+}
 
 function LineChart({
   series,
@@ -79,7 +150,9 @@ function LineChart({
         ((v - min) /
           Math.max(1e-6, max - min)) *
           (h - padTop - padBottom);
-      return `${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+      return `${i === 0 ? "M" : "L"} ${x.toFixed(
+        2
+      )} ${y.toFixed(2)}`;
     })
     .join(" ");
 
@@ -92,92 +165,428 @@ function LineChart({
       val: min,
       label: `$${getRealPrice(min).toFixed(2)}`,
     },
+    {
+      val: (max + min) / 2,
+      label: `$${getRealPrice(
+        (max + min) / 2
+      ).toFixed(2)}`,
+    },
   ];
 
   return (
-    <div className="relative">
+    <div className="flex justify-center items-center w-full h-full duration-300 animate-in fade-in zoom-in-95">
       <svg
-        width={w}
-        height={h}
-        className="w-full"
+        viewBox={`0 0 ${w} ${h}`}
+        className="w-full h-full"
+        preserveAspectRatio="none"
       >
         <defs>
           <linearGradient
-            id="gradient"
-            x1="0%"
-            y1="0%"
-            x2="0%"
-            y2="100%"
+            id="lineGradient"
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="0"
           >
             <stop
               offset="0%"
               stopColor={
                 isUp
-                  ? "#10b981"
-                  : "#ef4444"
+                  ? "#66c919"
+                  : "#ff3366"
               }
-              stopOpacity="0.3"
+              stopOpacity="0.9"
             />
             <stop
               offset="100%"
               stopColor={
                 isUp
-                  ? "#10b981"
-                  : "#ef4444"
+                  ? "#27ae8a"
+                  : "#ff3366"
+              }
+              stopOpacity="0.9"
+            />
+          </linearGradient>
+          <linearGradient
+            id="areaGradient"
+            x1="0"
+            y1="0"
+            x2="0"
+            y2="1"
+          >
+            <stop
+              offset="0%"
+              stopColor={
+                isUp
+                  ? "#66c919"
+                  : "#ff3366"
+              }
+              stopOpacity="0.25"
+            />
+            <stop
+              offset="100%"
+              stopColor={
+                isUp
+                  ? "#27ae8a"
+                  : "#ff3366"
               }
               stopOpacity="0"
             />
           </linearGradient>
         </defs>
 
-        {/* Gradient fill */}
         <path
-          d={`${d} L ${w - padRight} ${h - padBottom} L 0 ${h - padBottom} Z`}
-          fill="url(#gradient)"
+          d={`${d} L ${w - padRight} ${
+            h - padBottom
+          } L 0 ${h - padBottom} Z`}
+          fill="url(#areaGradient)"
         />
-
-        {/* Line */}
         <path
           d={d}
           fill="none"
-          stroke={
-            isUp ? "#10b981" : "#ef4444"
-          }
-          strokeWidth="2"
+          stroke="url(#lineGradient)"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
 
-        {/* Labels */}
-        {labels.map((label, i) => (
-          <text
-            key={i}
-            x={w - padRight + 5}
-            y={
-              h -
-              padBottom -
-              ((label.val - min) /
-                Math.max(
-                  1e-6,
-                  max - min
-                )) *
-                (h - padTop - padBottom)
-            }
-            fill="currentColor"
-            fontSize="10"
-            className="text-muted-foreground"
-          >
-            {label.label}
-          </text>
-        ))}
+        {labels.map((l, idx) => {
+          const y =
+            h -
+            padBottom -
+            ((l.val - min) /
+              Math.max(
+                1e-6,
+                max - min
+              )) *
+              (h - padTop - padBottom);
+          return (
+            <g key={idx}>
+              <line
+                x1={0}
+                y1={y}
+                x2={w - padRight}
+                y2={y}
+                stroke="rgba(255,255,255,0.06)"
+                strokeDasharray="3,4"
+              />
+              <text
+                x={w - padRight + 4}
+                y={y + 3}
+                fontSize="10"
+                fill="rgba(255,255,255,0.55)"
+                fontFamily="ui-monospace, SFMono-Regular"
+              >
+                {l.label}
+              </text>
+            </g>
+          );
+        })}
       </svg>
     </div>
   );
 }
 
-interface ExchangeDetailPageProps {
+function CandlesChart({
+  series,
+  isUp,
+  currentPrice,
+}: {
+  series: number[];
+  isUp: boolean;
+  currentPrice: number;
+}) {
+  const min = Math.min(...series);
+  const max = Math.max(...series);
+  const w = 320;
+  const h = 200;
+  const padTop = 10;
+  const padBottom = 10;
+  const candles = 28;
+  const step = Math.max(
+    1,
+    Math.floor(series.length / candles)
+  );
+  const sample = Array.from({
+    length: candles,
+  }).map((_, i) => {
+    const start = i * step;
+    const end = Math.min(
+      series.length,
+      (i + 1) * step
+    );
+    const chunk = series.slice(
+      start,
+      end
+    );
+    const open = chunk[0] ?? series[0];
+    const close =
+      chunk.at(-1) ??
+      series.at(-1) ??
+      open;
+    const high = Math.max(...chunk);
+    const low = Math.min(...chunk);
+    return { open, close, high, low };
+  });
+
+  const getRealPrice = (
+    val: number
+  ) => {
+    const lastVal =
+      series[series.length - 1];
+    return (
+      (val / lastVal) * currentPrice
+    );
+  };
+
+  const yFromVal = (v: number) =>
+    h -
+    padBottom -
+    ((v - min) /
+      Math.max(1e-6, max - min)) *
+      (h - padTop - padBottom);
+
+  const candleW = w / sample.length;
+
+  return (
+    <div className="flex justify-center items-center w-full h-full duration-300 animate-in fade-in zoom-in-95">
+      <svg
+        viewBox={`0 0 ${w} ${h}`}
+        className="w-full h-full"
+        preserveAspectRatio="none"
+      >
+        {sample.map((c, i) => {
+          const x =
+            i * candleW +
+            candleW * 0.25;
+          const bodyW = candleW * 0.5;
+          const openY = yFromVal(
+            c.open
+          );
+          const closeY = yFromVal(
+            c.close
+          );
+          const highY = yFromVal(
+            c.high
+          );
+          const lowY = yFromVal(c.low);
+          const up = c.close >= c.open;
+          const color = up
+            ? "#27b944"
+            : "#ff3366";
+          const top = Math.min(
+            openY,
+            closeY
+          );
+          const bottom = Math.max(
+            openY,
+            closeY
+          );
+          const bodyH = Math.max(
+            2,
+            bottom - top
+          );
+
+          return (
+            <g key={i}>
+              <line
+                x1={x + bodyW / 2}
+                y1={highY}
+                x2={x + bodyW / 2}
+                y2={lowY}
+                stroke={color}
+                strokeOpacity={0.65}
+                strokeWidth={2}
+              />
+              <rect
+                x={x}
+                y={top}
+                width={bodyW}
+                height={bodyH}
+                rx={2}
+                fill={color}
+                fillOpacity={0.85}
+              />
+            </g>
+          );
+        })}
+
+        <text
+          x={8}
+          y={16}
+          fontSize="10"
+          fill="rgba(255,255,255,0.55)"
+          fontFamily="ui-monospace, SFMono-Regular"
+        >
+          $
+          {getRealPrice(max).toFixed(2)}
+        </text>
+        <text
+          x={8}
+          y={h - 6}
+          fontSize="10"
+          fill="rgba(255,255,255,0.55)"
+          fontFamily="ui-monospace, SFMono-Regular"
+        >
+          $
+          {getRealPrice(min).toFixed(2)}
+        </text>
+
+        <rect
+          x={0}
+          y={0}
+          width={w}
+          height={h}
+          fill="transparent"
+          stroke={
+            isUp
+              ? "rgba(102,201,25,0.15)"
+              : "rgba(255,51,102,0.15)"
+          }
+        />
+      </svg>
+    </div>
+  );
+}
+
+function OrderBook({
+  orderBook,
+}: {
+  orderBook: MarketOrderBook;
+}) {
+  const asks = orderBook.asks.slice(
+    0,
+    6
+  );
+  const bids = orderBook.bids.slice(
+    0,
+    6
+  );
+
+  const asksAcc = asks.reduce(
+    (state, a) => {
+      const accumulated =
+        state.total + a.amount;
+      return {
+        total: accumulated,
+        list: [
+          ...state.list,
+          { ...a, accumulated },
+        ],
+      };
+    },
+    {
+      total: 0,
+      list: [] as Array<
+        MarketOrderBook["asks"][number] & {
+          accumulated: number;
+        }
+      >,
+    }
+  );
+  const asksWithWidth =
+    asksAcc.list.map((a) => ({
+      ...a,
+      width:
+        (a.accumulated /
+          (asksAcc.total || 1)) *
+        100,
+    }));
+
+  const bidsAcc = [...bids]
+    .reverse()
+    .reduce(
+      (state, b) => {
+        const accumulated =
+          state.total + b.amount;
+        return {
+          total: accumulated,
+          list: [
+            ...state.list,
+            { ...b, accumulated },
+          ],
+        };
+      },
+      {
+        total: 0,
+        list: [] as Array<
+          MarketOrderBook["bids"][number] & {
+            accumulated: number;
+          }
+        >,
+      }
+    );
+  const bidsWithWidth =
+    bidsAcc.list.map((b) => ({
+      ...b,
+      width:
+        (b.accumulated /
+          (bidsAcc.total || 1)) *
+        100,
+    }));
+
+  return (
+    <div className="flex gap-4 h-full duration-300 animate-in fade-in zoom-in-95">
+      <div className="flex-1 space-y-2">
+        <div className="text-[10px] font-black text-white/50 uppercase tracking-widest text-right">
+          Precio (USDT)
+        </div>
+        {asksWithWidth.map((ask, i) => (
+          <div
+            key={i}
+            className="flex relative justify-between items-center h-6 text-xs group"
+          >
+            <div
+              className="absolute top-0 right-0 bottom-0 rounded-l-sm transition-all bg-red-500/10 group-hover:bg-red-500/20"
+              style={{
+                width: `${ask.width}%`,
+              }}
+            />
+            <span className="relative z-10 font-mono font-medium text-white/70">
+              {ask.accumulated}
+            </span>
+            <span className="relative z-10 font-mono font-bold text-red-400">
+              {ask.price.toFixed(2)}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="w-px bg-white/10" />
+      <div className="flex-1 space-y-2">
+        <div className="text-[10px] font-black text-white/50 uppercase tracking-widest">
+          Precio (USDT)
+        </div>
+        {bidsWithWidth.map((bid, i) => (
+          <div
+            key={i}
+            className="flex relative justify-between items-center h-6 text-xs group"
+          >
+            <div
+              className="absolute top-0 bottom-0 left-0 rounded-r-sm transition-all bg-emerald-500/10 group-hover:bg-emerald-500/20"
+              style={{
+                width: `${bid.width}%`,
+              }}
+            />
+            <span className="relative z-10 font-mono font-bold text-emerald-400">
+              {bid.price.toFixed(2)}
+            </span>
+            <span className="relative z-10 font-mono font-medium text-white/70">
+              {bid.accumulated}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export interface ExchangeDetailPageProps {
   token: MarketToken;
   orderBook: MarketOrderBook;
   series: MarketSeries;
   positions: Position[];
+  balances: WalletBalance[];
+  holdings: Holding[];
   onFavorite: (tokenId: string) => void;
   isFavorite: boolean;
 }
@@ -187,96 +596,141 @@ export default function ExchangeDetailPage({
   orderBook,
   series,
   positions,
+  balances,
+  holdings,
   onFavorite,
   isFavorite,
 }: ExchangeDetailPageProps) {
   const router = useRouter();
+  const symbol = token.symbol;
+
+  const [
+    isTradeDialogOpen,
+    setIsTradeDialogOpen,
+  ] = useState(false);
+  const [tradeType, setTradeType] =
+    useState<"BUY" | "SELL">("BUY");
   const [orderType, setOrderType] =
-    useState<"buy" | "sell">("buy");
-  const [orderAmount, setOrderAmount] =
-    useState("");
-  const [orderPrice, setOrderPrice] =
-    useState(token.priceUsd.toString());
-  const [activeTab, setActiveTab] =
-    useState("chart");
-
-  // Prepare chart data (not used directly, but kept for reference)
-  const chartData = useMemo(() => {
-    return series.series.map(
-      (value, index) => ({
-        time: index,
-        value: value,
-      })
+    useState<"MARKET" | "LIMIT">(
+      "MARKET"
     );
-  }, [series]); // eslint-disable-line @typescript-eslint/no-unused-vars
 
-  // Calculate order total
-  const orderTotal = useMemo(() => {
-    const amount =
-      parseFloat(orderAmount) || 0;
-    const price =
-      parseFloat(orderPrice) || 0;
-    return amount * price;
-  }, [orderAmount, orderPrice]);
+  const [timeframe, setTimeframe] =
+    useState<Timeframe>("24h");
+  const [view, setView] =
+    useState<ChartView>("linea");
 
-  const handlePlaceOrder = () => {
-    // Implement order placement logic
-    console.log("Placing order:", {
-      type: orderType,
-      amount: orderAmount,
-      price: orderPrice,
-      total: orderTotal,
-    });
-  };
+  const price = token.priceUsd;
+  const change = getChangePct(
+    token,
+    timeframe
+  );
+  const isUp = change >= 0;
+
+  const computedSeries = useMemo(() => {
+    if (timeframe === "24h")
+      return series.series;
+    return makeSeries(
+      symbol,
+      change,
+      100
+    );
+  }, [
+    series.series,
+    symbol,
+    timeframe,
+    change,
+  ]);
+
+  const userBalance = useMemo(() => {
+    return (
+      balances.find(
+        (b) => b.currencyCode === "USDT"
+      )?.available ?? 0
+    );
+  }, [balances]);
+
+  const userHolding = useMemo(() => {
+    const holding = holdings.find(
+      (h) => h.tokenSymbol === symbol
+    );
+    return holding
+      ? holding.tokens * price
+      : 0;
+  }, [holdings, symbol, price]);
+
+  const openOrders = useMemo(() => {
+    const relevant = positions.filter(
+      (p) =>
+        p.tokenSymbol === symbol &&
+        (p.status === "OPEN" ||
+          p.status ===
+            "PARTIALLY_FILLED")
+    );
+    return relevant.reduce(
+      (acc, p) =>
+        acc +
+        (p.totalAmount -
+          p.filledAmount) *
+          p.orderPriceUsd,
+      0
+    );
+  }, [positions, symbol]);
+
+  const displaySellPrice =
+    useMemo(() => {
+      if (orderBook.bids.length > 0) {
+        // Returns the price of the first bid displayed in the UI (lowest bid price)
+        return orderBook.bids[
+          orderBook.bids.length - 1
+        ].price;
+      }
+      return (
+        token.sellPriceUsd ?? price
+      );
+    }, [
+      orderBook.bids,
+      token.sellPriceUsd,
+      price,
+    ]);
+
+  const displayBuyPrice =
+    useMemo(() => {
+      if (orderBook.asks.length > 0) {
+        // Returns the price of the first ask displayed in the UI (lowest ask price)
+        return orderBook.asks[0].price;
+      }
+      return token.buyPriceUsd ?? price;
+    }, [
+      orderBook.asks,
+      token.buyPriceUsd,
+      price,
+    ]);
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 border-b">
-        <div className="flex items-center gap-3 p-4">
+    <div className="flex flex-col h-[100dvh] -mb-24 pb-24 bg-linear-to-b from-gray-900 via-slate-900 to-black duration-500 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
+      <header className="overflow-hidden sticky top-0 z-50 px-4 pt-4 pb-3 text-white bg-transparent from-gray-900 rounded-none border-none shadow-xl shrink-0">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
+        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10" />
+
+        <div className="flex relative z-10 gap-4 items-center">
           <Button
             variant="ghost"
             size="icon"
             onClick={() =>
               router.back()
             }
+            className="text-white rounded-full hover:bg-white/10"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="w-6 h-6" />
           </Button>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight">
-                {token.symbol}
-              </h1>
-              <Badge
-                variant="outline"
-                className="text-xs"
-              >
-                {token.projectTitle}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">
-                ${token.priceUsd}
-              </span>
-              <span
-                className={cn(
-                  "text-sm font-medium",
-                  token.change24hPct >=
-                    0
-                    ? "text-green-500"
-                    : "text-red-500"
-                )}
-              >
-                {token.change24hPct >= 0
-                  ? "+"
-                  : ""}
-                {token.change24hPct.toFixed(
-                  2
-                )}
-                %
-              </span>
-            </div>
+          <div className="flex-1 pr-10 text-center">
+            <h1 className="text-xl font-black tracking-tight leading-none text-white uppercase">
+              {token.symbol}
+            </h1>
+            <p className="text-[10px] italic font-medium text-white/70">
+              Mercado de Tokens
+            </p>
           </div>
           <Button
             variant="ghost"
@@ -284,351 +738,338 @@ export default function ExchangeDetailPage({
             onClick={() =>
               onFavorite(token.id)
             }
+            className="text-white rounded-full hover:bg-white/10"
           >
             {isFavorite ? (
-              <Star className="h-5 w-5 fill-yellow-500 text-yellow-500" />
+              <Star className="w-5 h-5 fill-white" />
             ) : (
-              <StarOff className="h-5 w-5" />
+              <StarOff className="w-5 h-5" />
             )}
           </Button>
         </div>
+      </header>
 
-        {/* Tabs */}
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger
-              value="chart"
-              className="text-xs font-bold uppercase tracking-wider"
-            >
-              Gráfico
-            </TabsTrigger>
-            <TabsTrigger
-              value="orderbook"
-              className="text-xs font-bold uppercase tracking-wider"
-            >
-              Libro
-            </TabsTrigger>
-            <TabsTrigger
-              value="positions"
-              className="text-xs font-bold uppercase tracking-wider"
-            >
-              Órdenes
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto">
-        <Tabs value={activeTab}>
-          <TabsContent
-            value="chart"
-            className="mt-0 space-y-4 p-4"
-          >
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">
-                  Precio en USD
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <LineChart
-                  series={series.series}
-                  isUp={
-                    token.change24hPct >=
-                    0
-                  }
-                  currentPrice={
-                    token.priceUsd
-                  }
-                />
-              </CardContent>
-            </Card>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-3">
-              <Card>
-                <CardContent className="p-3">
-                  <div className="text-xs text-muted-foreground">
-                    24h
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span
-                      className={cn(
-                        "text-sm font-semibold",
-                        token.change24hPct >=
-                          0
-                          ? "text-green-500"
-                          : "text-red-500"
-                      )}
-                    >
-                      {token.change24hPct >=
-                      0
-                        ? "+"
-                        : ""}
-                      {token.change24hPct.toFixed(
-                        2
-                      )}
-                      %
-                    </span>
-                    {token.change24hPct >=
-                    0 ? (
-                      <TrendingUp className="h-3 w-3 text-green-500" />
-                    ) : (
-                      <TrendingDown className="h-3 w-3 text-red-500" />
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-3">
-                  <div className="text-xs text-muted-foreground">
-                    7d
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span
-                      className={cn(
-                        "text-sm font-semibold",
-                        token.change7dPct >=
-                          0
-                          ? "text-green-500"
-                          : "text-red-500"
-                      )}
-                    >
-                      {token.change7dPct >=
-                      0
-                        ? "+"
-                        : ""}
-                      {token.change7dPct.toFixed(
-                        2
-                      )}
-                      %
-                    </span>
-                    {token.change7dPct >=
-                    0 ? (
-                      <TrendingUp className="h-3 w-3 text-green-500" />
-                    ) : (
-                      <TrendingDown className="h-3 w-3 text-red-500" />
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent
-            value="orderbook"
-            className="mt-0 space-y-4 p-4"
-          >
-            <div className="grid gap-4">
-              <div>
-                <h3 className="text-sm font-semibold mb-2">
-                  Compras
-                </h3>
-                <div className="space-y-1">
-                  {orderBook.bids
-                    .slice(0, 10)
-                    .map(
-                      (bid, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between text-sm"
-                        >
-                          <span className="text-green-500">
-                            ${bid.price}
-                          </span>
-                          <span>
-                            {bid.amount}
-                          </span>
-                        </div>
-                      )
-                    )}
+      <main className="flex overflow-hidden flex-col flex-1 p-4 space-y-3">
+        <Card className="overflow-hidden border-none shadow-sm bg-white shrink-0 rounded-[32px]">
+          <div className="flex gap-4 justify-between items-start p-5">
+            <div className="flex gap-6 justify-around items-center w-full">
+              <div className="space-y-0.5 text-center">
+                <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                  TENENCIA
+                </div>
+                <div className="text-xl font-black tracking-tighter text-[#3B2146]">
+                  $
+                  {userHolding.toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                 </div>
               </div>
-              <div>
-                <h3 className="text-sm font-semibold mb-2">
-                  Ventas
-                </h3>
-                <div className="space-y-1">
-                  {orderBook.asks
-                    .slice(0, 10)
-                    .map(
-                      (ask, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between text-sm"
-                        >
-                          <span className="text-red-500">
-                            ${ask.price}
-                          </span>
-                          <span>
-                            {ask.amount}
-                          </span>
-                        </div>
-                      )
-                    )}
+              <div className="w-px h-8 bg-gray-100" />
+              <div className="space-y-0.5 text-center">
+                <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                  LIQUIDEZ
+                </div>
+                <div className="text-xl font-black tracking-tighter text-[#3B2146]">
+                  $
+                  {userBalance.toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
+                </div>
+              </div>
+              <div className="w-px h-8 bg-gray-100" />
+              <div className="space-y-0.5 text-center">
+                <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                  ORDENES
+                </div>
+                <div className="text-xl font-black tracking-tighter text-[#3B2146]">
+                  $
+                  {openOrders.toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                 </div>
               </div>
             </div>
-          </TabsContent>
+          </div>
 
-          <TabsContent
-            value="positions"
-            className="mt-0 space-y-3 p-4"
-          >
-            {positions.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No hay órdenes activas
-              </div>
-            ) : (
-              positions.map(
-                (position) => (
-                  <Card
-                    key={position.id}
+          <div className="grid grid-cols-4 gap-2 px-4 pb-5">
+            {(
+              [
+                ["ALL", "all"],
+                ["30D", "30d"],
+                ["7D", "7d"],
+                ["24H", "24h"],
+              ] as const
+            ).map(([label, tf]) => {
+              const v = getChangePct(
+                token,
+                tf
+              );
+              const up = v >= 0;
+              const isSelected =
+                timeframe === tf;
+              return (
+                <button
+                  key={tf}
+                  type="button"
+                  onClick={() =>
+                    setTimeframe(tf)
+                  }
+                  className={cn(
+                    "h-[52px] rounded-2xl border text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center",
+                    isSelected
+                      ? "bg-primary/20 text-primary border-primary/20 shadow-lg shadow-primary/5 scale-[1.05] z-10"
+                      : "bg-primary/5 border-primary/10 text-primary hover:bg-primary/10"
+                  )}
+                >
+                  <span className="block leading-none">
+                    {label}
+                  </span>
+                  <span
+                    className={cn(
+                      "mt-1 px-2 py-1 rounded-[10px] text-[10px] font-black inline-block shadow-sm text-white border-none min-w-[50px]",
+                      up
+                        ? "bg-linear-to-r from-brand-lime via-brand-green to-brand-teal shadow-brand-green/20"
+                        : "bg-[#FF3366] shadow-brand-pink/20"
+                    )}
                   >
-                    <CardContent className="p-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <div className="text-sm font-medium">
-                            {position.side ===
-                            "BUY"
-                              ? "Compra"
-                              : "Venta"}{" "}
-                            {
-                              position.tokenSymbol
-                            }
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {
-                              position.filledAmount
-                            }
-                            /
-                            {
-                              position.totalAmount
-                            }{" "}
-                            tokens
-                          </div>
-                        </div>
-                        <Badge
-                          variant="outline"
-                          className="text-xs"
-                        >
-                          {
-                            position.status
-                          }
-                        </Badge>
-                      </div>
-                      <div className="mt-2 flex justify-between text-xs">
-                        <span>
-                          Precio: $
-                          {
-                            position.orderPriceUsd
-                          }
-                        </span>
-                        <span>
-                          Total: $
-                          {position.orderPriceUsd *
-                            position.filledAmount}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              )
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
+                    {formatPct(v)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </Card>
 
-      {/* Order Form */}
-      <div className="border-t p-4 space-y-4 bg-card">
-        <div className="flex gap-2">
-          <Button
-            variant={
-              orderType === "buy"
-                ? "default"
-                : "outline"
-            }
-            className="flex-1"
-            onClick={() =>
-              setOrderType("buy")
-            }
-          >
-            Comprar
-          </Button>
-          <Button
-            variant={
-              orderType === "sell"
-                ? "default"
-                : "outline"
-            }
-            className="flex-1"
-            onClick={() =>
-              setOrderType("sell")
-            }
-          >
-            Vender
-          </Button>
+        <div className="flex flex-col flex-1 min-h-0 -mx-4 w-[calc(100%+2rem)] bg-linear-to-b from-gray-900 via-slate-900 to-black text-white shadow-inner">
+          <div className="flex justify-between items-center p-4 shrink-0">
+            <div className="flex gap-2 p-1 w-full rounded-2xl border backdrop-blur-md bg-white/5 border-white/10">
+              <button
+                type="button"
+                onClick={() =>
+                  setView("linea")
+                }
+                className={cn(
+                  "flex-1 h-9 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
+                  view === "linea"
+                    ? "bg-white/10 text-white shadow-lg shadow-black/20 border border-white/10"
+                    : "text-white/40 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <BarChart3 className="w-4 h-4" />
+                LÍNEA
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setView("velas")
+                }
+                className={cn(
+                  "flex-1 h-9 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
+                  view === "velas"
+                    ? "bg-white/10 text-white shadow-lg shadow-black/20 border border-white/10"
+                    : "text-white/40 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <CandlestickChart className="w-4 h-4" />
+                VELAS
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setView("ordenes")
+                }
+                className={cn(
+                  "flex-1 h-9 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all",
+                  view === "ordenes"
+                    ? "bg-white/10 text-white shadow-lg shadow-black/20 border border-white/10"
+                    : "text-white/40 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <List className="w-4 h-4" />
+                ORDENES
+              </button>
+            </div>
+          </div>
+          <div className="flex-1 p-4 min-h-0">
+            {view === "linea" ? (
+              <LineChart
+                series={computedSeries}
+                isUp={isUp}
+                currentPrice={price}
+              />
+            ) : view === "velas" ? (
+              <CandlesChart
+                series={computedSeries}
+                isUp={isUp}
+                currentPrice={price}
+              />
+            ) : (
+              <OrderBook
+                orderBook={orderBook}
+              />
+            )}
+          </div>
         </div>
-        <div className="space-y-3">
-          <div>
-            <Label>Cantidad</Label>
-            <Input
-              placeholder="0.00"
-              value={orderAmount}
-              onChange={(e) =>
-                setOrderAmount(
-                  e.target.value
-                )
-              }
-              type="number"
-            />
-          </div>
-          <div>
-            <Label>
-              Precio por token
-            </Label>
-            <Input
-              placeholder="0.00"
-              value={orderPrice}
-              onChange={(e) =>
-                setOrderPrice(
-                  e.target.value
-                )
-              }
-              type="number"
-            />
-          </div>
-          <div className="flex justify-between text-sm">
-            <span>Total:</span>
-            <span className="font-semibold">
-              ${orderTotal.toFixed(2)}
+
+        <div className="flex gap-3 pt-4 pb-6 shrink-0">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setTradeType("SELL");
+              setOrderType("MARKET");
+              setIsTradeDialogOpen(
+                true
+              );
+            }}
+            className="flex-1 h-20 flex-col gap-0.5 text-[12px] font-black tracking-widest uppercase rounded-[24px] border-brand-pink bg-gray-100 text-[#3B2146] shadow-sm hover:bg-gray-200 hover:text-[#3B2146] active:scale-95 transition-all"
+          >
+            <span>VENDER</span>
+            <span className="text-3xl font-bold tracking-normal normal-case opacity-100">
+              $
+              {displaySellPrice.toFixed(
+                2
+              )}
             </span>
-          </div>
+          </Button>
           <Button
-            className="w-full"
-            variant={
-              orderType === "buy"
-                ? "default"
-                : "destructive"
-            }
-            onClick={handlePlaceOrder}
-            disabled={
-              !orderAmount ||
-              !orderPrice
-            }
+            variant="outline"
+            onClick={() => {
+              setTradeType("BUY");
+              setOrderType("MARKET");
+              setIsTradeDialogOpen(
+                true
+              );
+            }}
+            className="flex-1 h-20 flex-col gap-0.5 text-[12px] font-black tracking-widest uppercase rounded-[24px] border-brand-green bg-gray-100 text-[#3B2146] shadow-sm hover:bg-gray-200 hover:text-[#3B2146] active:scale-95 transition-all"
           >
-            {orderType === "buy"
-              ? "Comprar"
-              : "Vender"}{" "}
-            {token.symbol}
+            <span>COMPRAR</span>
+            <span className="text-3xl font-bold tracking-normal normal-case opacity-100">
+              $
+              {displayBuyPrice.toFixed(
+                2
+              )}
+            </span>
           </Button>
         </div>
-      </div>
+      </main>
+
+      <Dialog
+        open={isTradeDialogOpen}
+        onOpenChange={
+          setIsTradeDialogOpen
+        }
+      >
+        <DialogContent className="max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
+          <div className="p-6 space-y-6">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black tracking-tight uppercase">
+                {tradeType === "BUY"
+                  ? "Comprar"
+                  : "Vender"}{" "}
+                {token.symbol}
+              </DialogTitle>
+            </DialogHeader>
+
+            <Tabs
+              value={orderType}
+              onValueChange={(v) =>
+                setOrderType(
+                  v as
+                    | "MARKET"
+                    | "LIMIT"
+                )
+              }
+            >
+              <TabsList className="grid grid-cols-2 w-full">
+                <TabsTrigger value="MARKET">
+                  Mercado
+                </TabsTrigger>
+                <TabsTrigger value="LIMIT">
+                  Orden
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="py-4 space-y-4">
+                {orderType ===
+                "MARKET" ? (
+                  <p className="text-sm text-muted-foreground">
+                    Operar al precio
+                    actual del mercado.
+                    La orden se
+                    ejecutará
+                    inmediatamente al
+                    mejor precio
+                    disponible.
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Establece un precio
+                    específico para
+                    comprar o vender. La
+                    orden se ejecutará
+                    solo cuando el
+                    mercado alcance tu
+                    precio.
+                  </p>
+                )}
+
+                <div className="space-y-4">
+                  {orderType ===
+                    "LIMIT" && (
+                    <div className="space-y-2">
+                      <Label>
+                        Precio Objetivo
+                        ({token.symbol})
+                      </Label>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        className="h-12 rounded-xl"
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label>
+                      Cantidad
+                    </Label>
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      className="h-12 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  className="mt-6 w-full h-12 text-xs font-black tracking-widest uppercase rounded-xl shadow-xl bg-primary text-primary-foreground shadow-primary/25"
+                  size="lg"
+                  onClick={() =>
+                    setIsTradeDialogOpen(
+                      false
+                    )
+                  }
+                >
+                  {tradeType === "BUY"
+                    ? "Confirmar Compra"
+                    : "Confirmar Venta"}
+                </Button>
+              </div>
+            </Tabs>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

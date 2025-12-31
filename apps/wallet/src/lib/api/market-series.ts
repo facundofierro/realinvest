@@ -1,7 +1,5 @@
 import type {
   MarketToken,
-  MarketOrderBook,
-  OrderBookLevel,
 } from "@/types/wallet";
 import { readSampleJson } from "@/lib/sample-data";
 

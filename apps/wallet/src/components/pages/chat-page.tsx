@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
 import { Send, Bot, User, Search, Settings } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@repo/ui/components/ui/avatar";
 
 interface Message {
   role: "assistant" | "user";

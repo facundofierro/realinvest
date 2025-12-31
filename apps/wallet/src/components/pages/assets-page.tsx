@@ -3,7 +3,23 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/components/ui/button";
-import { Card, CardContent } from "@repo/ui/components/ui/card";
+import {
+  Card,
+  CardContent,
+} from "@repo/ui/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@repo/ui/components/ui/dialog";
+import { Input } from "@repo/ui/components/ui/input";
+import { Label } from "@repo/ui/components/ui/label";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "@repo/ui/components/ui/tabs";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -22,7 +38,8 @@ export default function AssetsPage() {
       id: "1",
       unitId: "12A",
       tokenName: "VEX-TORRE-L-12-A",
-      projectName: "Torre Libertador 8000",
+      projectName:
+        "Torre Libertador 8000",
       location: "Nuñez, BA",
       tokens: "500.00",
       value: "52,000.00",
@@ -63,9 +80,22 @@ export default function AssetsPage() {
   ];
 
   const router = useRouter();
-  const [selectedToken, setSelectedToken] = useState<
+  const [
+    selectedToken,
+    setSelectedToken,
+  ] = useState<
     (typeof myTokens)[0] | null
   >(null);
+  const [
+    isTradeDialogOpen,
+    setIsTradeDialogOpen,
+  ] = useState(false);
+  const [tradeType, setTradeType] =
+    useState<"BUY" | "SELL">("BUY");
+  const [orderType, setOrderType] =
+    useState<"MARKET" | "LIMIT">(
+      "MARKET"
+    );
 
   return (
     <div className="pb-24 duration-500 animate-in fade-in slide-in-from-bottom-4">
@@ -133,7 +163,8 @@ export default function AssetsPage() {
                   </div>
                   <div>
                     <p className="text-sm font-bold">
-                      Liquidez Disponible
+                      Liquidez
+                      Disponible
                     </p>
                     <p className="text-[10px] text-muted-foreground">
                       USDT (TRC20)
@@ -178,10 +209,15 @@ export default function AssetsPage() {
             {myTokens.map((asset) => (
               <Card
                 key={asset.id}
-                onClick={() => setSelectedToken(asset)}
+                onClick={() =>
+                  setSelectedToken(
+                    asset
+                  )
+                }
                 className={cn(
                   "overflow-hidden border border-border/40 shadow-sm hover:shadow-md transition-all group rounded-[28px] bg-card cursor-pointer",
-                  selectedToken?.id === asset.id
+                  selectedToken?.id ===
+                    asset.id
                     ? "ring-2 ring-primary"
                     : ""
                 )}
@@ -199,16 +235,22 @@ export default function AssetsPage() {
                       </div>
                       <div className="min-w-0">
                         <div className="font-black text-[14px] uppercase text-[#3B2146] leading-tight truncate">
-                          {asset.tokenName}
+                          {
+                            asset.tokenName
+                          }
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
                           <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase truncate">
-                            {asset.projectName}
+                            {
+                              asset.projectName
+                            }
                           </div>
                         </div>
                         <p className="text-[10px] font-bold text-muted-foreground/60 flex items-center tracking-widest uppercase mt-0.5">
                           <Building2 className="h-2.5 w-2.5 mr-1" />{" "}
-                          {asset.location}
+                          {
+                            asset.location
+                          }
                         </p>
                       </div>
                     </div>
@@ -218,14 +260,18 @@ export default function AssetsPage() {
                         $ {asset.value}
                       </div>
                       <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
-                        {asset.tokens} Tokens
+                        {asset.tokens}{" "}
+                        Tokens
                       </div>
                       {asset.orderPrice && (
                         <Badge
                           variant="outline"
                           className="mt-1 bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[8px] px-2 py-0.5 h-auto font-black uppercase tracking-tighter"
                         >
-                          Posición: ${asset.orderPrice}
+                          Posición: $
+                          {
+                            asset.orderPrice
+                          }
                         </Badge>
                       )}
                     </div>
@@ -243,7 +289,12 @@ export default function AssetsPage() {
             <Button
               variant="secondary"
               size="icon"
-              onClick={() => setSelectedToken(null)}
+              onClick={() => {
+                setSelectedToken(null);
+                setIsTradeDialogOpen(
+                  false
+                );
+              }}
               className="absolute top-6 right-6 z-50 w-9 h-9 bg-white rounded-full border-none shadow-lg hover:bg-white/90 text-slate-500"
             >
               <X className="w-5 h-5" />
@@ -254,20 +305,29 @@ export default function AssetsPage() {
                 <div className="space-y-1">
                   <div className="flex gap-2 items-center">
                     <span className="font-mono text-[10px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
-                      {selectedToken.tokenName}
+                      {
+                        selectedToken.tokenName
+                      }
                     </span>
                   </div>
                   <h3 className="text-lg font-black text-foreground">
-                    {selectedToken.projectName}
+                    {
+                      selectedToken.projectName
+                    }
                   </h3>
                   <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     <span className="flex gap-1.5 items-center">
                       <Building2 className="w-3.5 h-3.5" />{" "}
-                      {selectedToken.location}
+                      {
+                        selectedToken.location
+                      }
                     </span>
                     <span className="flex gap-1.5 items-center">
                       <div className="w-3.5 h-3.5 rounded-full bg-muted/50" />
-                      {selectedToken.tokens} TOKENS
+                      {
+                        selectedToken.tokens
+                      }{" "}
+                      TOKENS
                     </span>
                   </div>
                 </div>
@@ -277,10 +337,14 @@ export default function AssetsPage() {
                   </div>
                   <div className="text-xl font-black text-foreground">
                     ${" "}
-                    {selectedToken.value}
+                    {
+                      selectedToken.value
+                    }
                   </div>
                   <div className="text-[10px] font-black text-brand-green uppercase mt-0.5">
-                    {selectedToken.change}
+                    {
+                      selectedToken.change
+                    }
                   </div>
                 </div>
               </div>
@@ -289,7 +353,9 @@ export default function AssetsPage() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    router.push(`/exchange?tab=positions`);
+                    router.push(
+                      `/exchange?tab=positions`
+                    );
                   }}
                   className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted hover:text-foreground"
                 >
@@ -298,10 +364,15 @@ export default function AssetsPage() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const symbol = encodeURIComponent(
-                      selectedToken.tokenName
+                    setTradeType(
+                      "SELL"
                     );
-                    router.push(`/exchange/${symbol}/sell`);
+                    setOrderType(
+                      "MARKET"
+                    );
+                    setIsTradeDialogOpen(
+                      true
+                    );
                   }}
                   className="flex-1 h-14 text-[10px] font-black tracking-widest uppercase rounded-xl border-border/50 hover:bg-muted hover:text-foreground"
                 >
@@ -310,10 +381,13 @@ export default function AssetsPage() {
                 <Button
                   className="flex-[1.5] h-14 rounded-xl bg-primary text-primary-foreground shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all font-black uppercase tracking-widest text-[10px]"
                   onClick={() => {
-                    const symbol = encodeURIComponent(
-                      selectedToken.tokenName
+                    setTradeType("BUY");
+                    setOrderType(
+                      "MARKET"
                     );
-                    router.push(`/exchange/${symbol}/buy`);
+                    setIsTradeDialogOpen(
+                      true
+                    );
                   }}
                 >
                   COMPRAR
@@ -323,7 +397,121 @@ export default function AssetsPage() {
           </div>
         </div>
       )}
+
+      <Dialog
+        open={
+          isTradeDialogOpen &&
+          !!selectedToken
+        }
+        onOpenChange={
+          setIsTradeDialogOpen
+        }
+      >
+        <DialogContent className="max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
+          <div className="p-6 space-y-6">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black tracking-tight uppercase">
+                {tradeType === "BUY"
+                  ? "Comprar"
+                  : "Vender"}{" "}
+                {
+                  selectedToken?.tokenName
+                }
+              </DialogTitle>
+            </DialogHeader>
+
+            <Tabs
+              value={orderType}
+              onValueChange={(v) =>
+                setOrderType(
+                  v as
+                    | "MARKET"
+                    | "LIMIT"
+                )
+              }
+            >
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="MARKET">
+                  Mercado
+                </TabsTrigger>
+                <TabsTrigger value="LIMIT">
+                  Orden
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="py-4 space-y-4">
+                {orderType ===
+                "MARKET" ? (
+                  <p className="text-sm text-muted-foreground">
+                    Operar al precio
+                    actual del mercado.
+                    La orden se
+                    ejecutará
+                    inmediatamente al
+                    mejor precio
+                    disponible.
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Establece un precio
+                    específico para
+                    comprar o vender. La
+                    orden se ejecutará
+                    solo cuando el
+                    mercado alcance tu
+                    precio.
+                  </p>
+                )}
+
+                <div className="space-y-4">
+                  {orderType ===
+                    "LIMIT" && (
+                    <div className="space-y-2">
+                      <Label>
+                        Precio Objetivo
+                        (
+                        {
+                          selectedToken?.tokenName
+                        }
+                        )
+                      </Label>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        className="h-12 rounded-xl"
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label>
+                      Cantidad
+                    </Label>
+                    <Input
+                      type="number"
+                      placeholder="0.00"
+                      className="h-12 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                <Button
+                  className="w-full h-12 mt-6 rounded-xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/25"
+                  size="lg"
+                  onClick={() =>
+                    setIsTradeDialogOpen(
+                      false
+                    )
+                  }
+                >
+                  {tradeType === "BUY"
+                    ? "Confirmar Compra"
+                    : "Confirmar Venta"}
+                </Button>
+              </div>
+            </Tabs>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-

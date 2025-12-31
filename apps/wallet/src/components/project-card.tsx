@@ -35,7 +35,6 @@ export function ProjectCard({
   progress,
   priceRange,
   fixedRent,
-  isPreSale,
 }: ProjectCardProps) {
   return (
     <Link href={`/project/${id}`}>

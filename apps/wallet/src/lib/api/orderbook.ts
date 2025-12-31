@@ -1,5 +1,4 @@
 import type { MarketOrderBook, OrderBookLevel } from "@/types/wallet";
-import { readSampleJson } from "@/lib/sample-data";
 
 function makeDepth(currentPrice: number): {
   asks: OrderBookLevel[];

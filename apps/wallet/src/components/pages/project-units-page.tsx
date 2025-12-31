@@ -8,16 +8,14 @@ import {
 import { Button } from "@repo/ui/components/ui/button";
 import {
   ArrowLeft,
-  Info,
-  MapPin,
   Layers,
-  CheckCircle2,
-  Maximize2,
-  X,
-  Lock,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+} from "@repo/ui/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +24,7 @@ import {
 } from "@repo/ui/components/ui/dialog";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
+import { Badge } from "@repo/ui/components/ui/badge";
 import type { ProjectUnit } from "@/types/wallet";
 
 export interface ProjectUnitsPageProps {
@@ -132,32 +131,30 @@ export default function ProjectUnitsPage({
     const allUnits = unitsState ?? [];
     return allUnits
       .filter((unit) => {
-        // 1. Filter out blocked units
-        if (
-          unit.statusRaw === "blocked"
-        )
-          return false;
+        const investmentType =
+          unit.investmentType ?? "";
 
-        // 2. Apply requested filter
         if (
           filter === "full_property"
         ) {
           return (
-            unit.investmentType ===
-            "full_property"
+            unit.isTokenized !== true &&
+            investmentType ===
+              "full_property"
           );
         }
         if (filter === "tokenized") {
-          // "Tokens en lanzamiento" - excludes fixed rent
           return (
-            unit.investmentType ===
-            "appreciation"
+            unit.isTokenized === true &&
+            investmentType ===
+              "appreciation"
           );
         }
         if (filter === "fixed_rent") {
           return (
-            unit.investmentType ===
-            "fixed_rent"
+            unit.isTokenized === true &&
+            investmentType ===
+              "fixed_rent"
           );
         }
 
@@ -269,6 +266,127 @@ export default function ProjectUnitsPage({
     setIsContactDialogOpen(true);
   };
 
+  const statusMeta = (
+    unit: ProjectUnit
+  ) => {
+    const statusRaw =
+      unit.statusRaw ?? "";
+    if (statusRaw === "available") {
+      return {
+        label: "Disponible",
+        badgeClassName:
+          "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+        isLocked: false,
+      };
+    }
+    if (statusRaw === "sold_out") {
+      return {
+        label: "Vendido",
+        badgeClassName:
+          "bg-muted text-muted-foreground border-border",
+        isLocked: true,
+      };
+    }
+    if (statusRaw === "upcoming") {
+      return {
+        label: "Próximamente",
+        badgeClassName:
+          "bg-blue-500/10 text-blue-600 border-blue-500/20",
+        isLocked: true,
+      };
+    }
+    if (statusRaw === "blocked") {
+      return {
+        label: "Bloqueado",
+        badgeClassName:
+          "bg-amber-500/10 text-amber-600 border-amber-500/20",
+        isLocked: true,
+      };
+    }
+
+    return {
+      label: unit.status,
+      badgeClassName:
+        "bg-muted text-muted-foreground border-border",
+      isLocked: true,
+    };
+  };
+
+  const getTokenProgress = (
+    unit: ProjectUnit
+  ) => {
+    const total = unit.totalTokens ?? 0;
+    const sold = unit.tokensSold ?? 0;
+    if (!total) {
+      return {
+        sold: 0,
+        total: 0,
+        pct: 0,
+      };
+    }
+    const pct = Math.max(
+      0,
+      Math.min(
+        100,
+        (sold / total) * 100
+      )
+    );
+    return { sold, total, pct };
+  };
+
+  const parsePriceToNumber = (
+    price?: string
+  ): number => {
+    if (!price) return 0;
+    const n = Number(
+      price.replace(/[^\d.-]/g, "")
+    );
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const formatCompactUsd = (
+    amount: number
+  ): string => {
+    const abs = Math.abs(amount);
+    if (abs >= 1000) {
+      return `$${Math.round(amount / 1000)}K`;
+    }
+    return `$${Math.round(amount)}`;
+  };
+
+  const getAmbCount = (
+    unit: ProjectUnit
+  ): number => {
+    const first = String(
+      unit.type ?? ""
+    )
+      .trim()
+      .split(/\s+/)[0];
+    const n = Number.parseInt(
+      first,
+      10
+    );
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const getUnitBadgeNumber = (
+    unit: ProjectUnit
+  ): string => {
+    const floor = Number.parseInt(
+      String(unit.floor ?? ""),
+      10
+    );
+    const amb = getAmbCount(unit);
+    if (
+      Number.isFinite(floor) &&
+      floor > 0 &&
+      amb > 0
+    ) {
+      return `${floor}${amb}`;
+    }
+    return "";
+  };
+
   return (
     <div className="flex flex-col pb-40 min-h-screen bg-background">
       {/* Sticky Header Container */}
@@ -337,15 +455,197 @@ export default function ProjectUnitsPage({
 
       {/* Units List */}
       <main className="flex-1 p-4 space-y-4">
-        {/* Unit cards would be rendered here */}
-        {filteredUnits.map((unit) => (
-          <div
-            key={unit.id}
-            id={`unit-${unit.id}`}
-          >
-            {/* Unit card content */}
+        {filteredUnits.length === 0 ? (
+          <div className="pt-10 text-sm text-center text-muted-foreground">
+            No hay unidades para este
+            filtro.
           </div>
-        ))}
+        ) : (
+          filteredUnits.map((unit) => {
+            const meta =
+              statusMeta(unit);
+            const tokenProgress =
+              getTokenProgress(unit);
+            const isToken =
+              unit.isTokenized === true;
+            const badgeNumber =
+              getUnitBadgeNumber(unit);
+            const tokenLabel = String(
+              unit.tokenSymbol ??
+                unit.tokenName ??
+                ""
+            ).trim();
+            const badgeLabel = isToken
+              ? badgeNumber
+              : String(
+                  unit.unitCode ?? ""
+                ).trim();
+            const statusTextClassName =
+              unit.statusRaw ===
+              "available"
+                ? "text-brand-green"
+                : "text-primary";
+
+            return (
+              <Card
+                key={unit.id}
+                id={`unit-${unit.id}`}
+                className={`overflow-hidden rounded-[28px] bg-white border border-border/40 shadow-sm transition-all ${
+                  meta.isLocked
+                    ? "opacity-90"
+                    : "hover:shadow-md"
+                }`}
+                onClick={() =>
+                  handleUnitClick(
+                    unit.id
+                  )
+                }
+              >
+                <CardContent className="p-4">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-4 justify-between items-center">
+                      <div className="flex gap-4 items-center min-w-0">
+                        <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-black text-lg bg-muted/30 text-[#3B2146] border border-border/50 shrink-0">
+                          {badgeLabel}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-black text-[15px] uppercase text-[#3B2146] leading-tight truncate">
+                            {String(
+                              unit.type ??
+                                ""
+                            ).toUpperCase()}{" "}
+                            • PISO{" "}
+                            {unit.floor}
+                          </div>
+                          <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase mt-0.5 truncate">
+                            {isToken
+                              ? tokenLabel
+                              : "Venta tradicional no tokenizada"}
+                          </div>
+                        </div>
+                      </div>
+
+                      {isToken &&
+                      unit.negotiatedAmount ? (
+                        <div className="flex flex-col items-center mx-2 min-w-max">
+                          <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">
+                            Tokens en
+                            venta
+                          </span>
+                          <div className="w-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white py-1.5 px-3 rounded-full shadow-md shadow-brand-green/20 flex items-center justify-center gap-1">
+                            <span className="text-[14px] font-black leading-none">
+                              {
+                                unit.negotiatedAmount
+                              }
+                            </span>
+                            <span className="text-[8px] font-black leading-none opacity-80 uppercase tracking-tighter">
+                              USDT
+                            </span>
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <div className="text-right shrink-0">
+                        <div className="text-[17px] font-black text-[#3B2146] leading-tight">
+                          {unit.price}
+                        </div>
+                        <div
+                          className={`mt-1 font-black uppercase text-[10px] ${statusTextClassName}`}
+                        >
+                          {String(
+                            meta.label ??
+                              ""
+                          ).toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
+
+                    {isToken &&
+                    tokenProgress.total >
+                      0 ? (
+                      <div className="mt-2 space-y-2">
+                        <div className="flex gap-4 justify-between items-end">
+                          <div className="flex-1 space-y-2 min-w-0">
+                            <div className="text-[11px] font-black text-primary">
+                              {
+                                tokenProgress.sold
+                              }{" "}
+                              /{" "}
+                              {
+                                tokenProgress.total
+                              }
+                              <span className="text-muted-foreground text-[9px] font-bold ml-1">
+                                TOKENS
+                              </span>
+                            </div>
+                            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full transition-all duration-1000 bg-primary"
+                                style={{
+                                  width: `${tokenProgress.pct}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          {unit.statusRaw ===
+                          "available"
+                            ? (() => {
+                                const tokensRemaining =
+                                  Math.max(
+                                    0,
+                                    tokenProgress.total -
+                                      tokenProgress.sold
+                                  );
+                                const unitPriceNum =
+                                  parsePriceToNumber(
+                                    unit.price
+                                  );
+                                const tokenUnitPrice =
+                                  tokenProgress.total >
+                                    0 &&
+                                  unitPriceNum >
+                                    0
+                                    ? unitPriceNum /
+                                      tokenProgress.total
+                                    : 0;
+                                const remainingValueUsd =
+                                  tokensRemaining *
+                                  tokenUnitPrice;
+
+                                if (
+                                  !remainingValueUsd
+                                )
+                                  return null;
+
+                                return (
+                                  <div className="flex flex-col gap-1 items-center min-w-max shrink-0">
+                                    <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground text-center">
+                                      TOKENS
+                                    </div>
+                                    <div className="h-9 px-3 rounded-full bg-linear-to-r from-brand-lime via-brand-green to-brand-teal text-white flex items-center gap-1.5 shadow-md shadow-brand-green/20">
+                                      <span className="text-[14px] font-black leading-none">
+                                        {formatCompactUsd(
+                                          remainingValueUsd
+                                        )}
+                                      </span>
+                                      <span className="text-[8px] font-black leading-none opacity-80 uppercase tracking-tighter">
+                                        USDT
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              })()
+                            : null}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
       </main>
 
       {/* Unit Details Dialog */}
@@ -359,11 +659,155 @@ export default function ProjectUnitsPage({
               Detalles de la Unidad
             </DialogTitle>
           </DialogHeader>
-          {selectedUnit && (
-            <div className="space-y-4">
-              {/* Unit details content */}
-            </div>
-          )}
+          {selectedUnit &&
+            (() => {
+              const meta = statusMeta(
+                selectedUnit
+              );
+              const tokenProgress =
+                getTokenProgress(
+                  selectedUnit
+                );
+              const isToken =
+                selectedUnit.isTokenized ===
+                true;
+              const floorPlanImage =
+                selectedUnit.floorPlanImage ||
+                "/building_floor_layout.png";
+
+              return (
+                <div className="space-y-4">
+                  <div className="overflow-hidden relative w-full h-44 rounded-2xl border border-border/40 bg-muted/20">
+                    <Image
+                      src={
+                        floorPlanImage
+                      }
+                      alt={
+                        selectedUnit.title
+                      }
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
+                  <div className="flex gap-3 justify-between items-start">
+                    <div className="min-w-0">
+                      <div className="text-xs font-black tracking-widest uppercase text-muted-foreground">
+                        Piso{" "}
+                        {
+                          selectedUnit.floor
+                        }{" "}
+                        •{" "}
+                        {
+                          selectedUnit.unitCode
+                        }
+                      </div>
+                      <div className="mt-1 text-lg font-black leading-tight">
+                        {
+                          selectedUnit.title
+                        }
+                      </div>
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        {
+                          selectedUnit.type
+                        }{" "}
+                        {selectedUnit.area
+                          ? `• ${selectedUnit.area}`
+                          : ""}
+                      </div>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] font-black uppercase tracking-widest ${meta.badgeClassName}`}
+                    >
+                      {meta.label}
+                    </Badge>
+                  </div>
+
+                  <Card>
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-black tracking-widest uppercase text-muted-foreground">
+                          Precio
+                        </span>
+                        <span className="text-sm font-black">
+                          {
+                            selectedUnit.price
+                          }
+                        </span>
+                      </div>
+
+                      {isToken &&
+                      selectedUnit.tokenSymbol ? (
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-black tracking-widest uppercase text-muted-foreground">
+                            Token
+                          </span>
+                          <span className="font-mono text-[10px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
+                            {
+                              selectedUnit.tokenSymbol
+                            }
+                          </span>
+                        </div>
+                      ) : null}
+
+                      {isToken &&
+                      tokenProgress.total >
+                        0 ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                            <span className="flex items-center gap-1.5">
+                              <Layers className="w-3.5 h-3.5" />
+                              Tokens
+                              vendidos
+                            </span>
+                            <span>
+                              {
+                                tokenProgress.sold
+                              }
+                              /
+                              {
+                                tokenProgress.total
+                              }
+                            </span>
+                          </div>
+                          <div className="overflow-hidden w-full h-2 rounded-full bg-muted">
+                            <div
+                              className="h-full transition-all bg-primary"
+                              style={{
+                                width: `${tokenProgress.pct}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ) : null}
+                    </CardContent>
+                  </Card>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() =>
+                        setIsDetailsOpen(
+                          false
+                        )
+                      }
+                    >
+                      Cerrar
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={
+                        handleContactClick
+                      }
+                    >
+                      Contactar asesor
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
         </DialogContent>
       </Dialog>
 
@@ -380,9 +824,116 @@ export default function ProjectUnitsPage({
               Contactar Asesor
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            {/* Contact form content */}
-          </div>
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setIsContactDialogOpen(
+                false
+              );
+            }}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="contact-name">
+                Nombre
+              </Label>
+              <Input
+                id="contact-name"
+                value={contactForm.name}
+                onChange={(e) =>
+                  setContactForm(
+                    (prev) => ({
+                      ...prev,
+                      name: e.target
+                        .value,
+                    })
+                  )
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contact-phone">
+                Teléfono
+              </Label>
+              <Input
+                id="contact-phone"
+                value={
+                  contactForm.phone
+                }
+                onChange={(e) =>
+                  setContactForm(
+                    (prev) => ({
+                      ...prev,
+                      phone:
+                        e.target.value,
+                    })
+                  )
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contact-email">
+                Email
+              </Label>
+              <Input
+                id="contact-email"
+                type="email"
+                value={
+                  contactForm.email
+                }
+                onChange={(e) =>
+                  setContactForm(
+                    (prev) => ({
+                      ...prev,
+                      email:
+                        e.target.value,
+                    })
+                  )
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contact-preference">
+                Preferencia
+              </Label>
+              <select
+                id="contact-preference"
+                className="px-3 py-2 w-full text-sm rounded-md border border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={
+                  contactForm.preference
+                }
+                onChange={(e) =>
+                  setContactForm(
+                    (prev) => ({
+                      ...prev,
+                      preference:
+                        e.target.value,
+                    })
+                  )
+                }
+              >
+                <option value="whatsapp">
+                  WhatsApp
+                </option>
+                <option value="call">
+                  Llamada
+                </option>
+                <option value="telegram">
+                  Telegram
+                </option>
+              </select>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+            >
+              Enviar
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
