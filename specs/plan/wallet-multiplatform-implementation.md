@@ -6,249 +6,62 @@
 
 1. **Documentation**: Created comprehensive multiplatform strategy document
 2. **Page Refactoring**: Converted server-side pages to minimal client-side wrappers
-   - ✅ `exchange/[symbol]/page.tsx` - Minimal (passes symbol only)
-   - ✅ `exchange/page.tsx` - Minimal
-   - ✅ `(dashboard)/page.tsx` - Minimal
-   - ✅ `invest/page.tsx` - Already minimal
-   - ✅ `login/page.tsx` - Already minimal
-   - ✅ `project/[id]/page.tsx` - Already minimal (params only)
-   - ✅ `project/[id]/units/page.tsx` - Already minimal (params only)
-
 3. **Component Refactoring**: Moved data fetching to client-side
-   - ✅ `ExchangeDetailPage` - Now fetches via useEffect
-   - ✅ `DashboardPage` - Now fetches via useEffect
-   - ✅ `ExchangePage` - Now fetches via useEffect
+4. **Infinite Loop Fix**: Resolved `useEffect` loop in `ExchangePage`.
 
-### 🔄 Remaining Pages to Check:
+### ✅ Architecture Decision:
 
-- `(dashboard)/assets/page.tsx`
-- `(dashboard)/chat/page.tsx`
-- `(dashboard)/deposit/page.tsx`
-- `(dashboard)/withdraw/page.tsx`
+**Option B (Separate App)** was chosen and implemented.
 
-## Next Steps
+- Created `native/wallet/nextjs`
+- Adjusted `apps/wallet` to export components (`src/index.ts`)
+- Configured `generateStaticParams` for dynamic routes
 
-### Phase 1: Complete Page Refactoring (📅 Now)
+## Implementation Details
 
-1. **Check remaining pages** - Verify they don't have server-side data fetching
-2. **Test all refactored pages** - Ensure client-side fetching works correctly
-3. **Add error boundaries** - Wrap pages with error handling for failed fetches
+### 1. New Project Structure
 
-### Phase 2: Configure Next.js for Static Export (📅 Next)
+`native/wallet/nextjs` is a standard Next.js app configured for `output: 'export'`.
+It imports components from `apps/wallet` (aliased as `wallet` workspace package).
 
-Update `apps/wallet/next.config.ts` to enable static export:
+### 2. Static Generation Strategy
 
-```typescript
-const nextConfig: NextConfig = {
-  output: "export", // ← Add this!
-  reactCompiler: true,
-  transpilePackages: ["@repo/ui"],
-  images: {
-    unoptimized: true, // Already done ✅
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-    ],
-  },
-  trailingSlash: true, // ← Recommended for static export
-};
-```
+Dynamic routes (`exchange/[symbol]`, `project/[id]`) use `generateStaticParams` to pre-render pages based on data in `apps/wallet/src/sample-data`.
+**Note**: To add new tokens/projects, the native app must be rebuilt.
 
-### Phase 3: Create Native/Wallet/NextJS Directory (📅 After Phase 2)
+### 3. API Handling
 
-**Option A: Same Codebase (Recommended for now)**
+API calls are refactored to use `getProjectUnits` etc. via `api-client`.
+**Action Required**: For production builds, you MUST set `NEXT_PUBLIC_API_URL` to your production server URL in `.env`.
 
-- Keep current structure
-- Configure `apps/wallet` for static export directly
-- Build once, use in both Capacitor and Tauri
+## Verification Steps needed from User
 
-**Option B: Separate Next.js App (For advanced customization)**
+1. **Verify Static Build**:
 
-- Create `native/wallet/nextjs/` directory
-- New Next.js project that imports components from `apps/wallet`
-- Allows different configurations for native vs web
+   ```bash
+   cd native/wallet/nextjs
+   pnpm build
+   # Should succeed and create 'out' directory
+   ```
 
-**Recommendation**: Start with Option A - it's simpler and follows your current architecture.
-
-### Phase 4: Component Export Strategy (📅 If choosing Option B)
-
-If creating a separate Next.js app in `native/wallet/nextjs`:
-
-1. **Export all components** from `apps/wallet`:
-
-```typescript
-// apps/wallet/src/index.ts
-export * from "./components/pages/dashboard-page";
-export * from "./components/pages/exchange-page";
-export * from "./components/pages/exchange-detail-page";
-// ... etc
-```
-
-2. **Create new Next.js app** in `native/wallet/nextjs`:
-
-```bash
-cd native/wallet
-pnpm create next-app nextjs --typescript --tailwind --app
-```
-
-3. **Import components** in native app:
-
-```typescript
-// native/wallet/nextjs/src/app/page.tsx
-import { DashboardPage } from "@/../../apps/wallet/src/components/pages/dashboard-page";
-```
-
-### Phase 5: Build Configuration (📅 After confirming static export works)
-
-1. **Update Capacitor config** (`native/wallet/capacitor/capacitor.config.ts`):
-
-```typescript
-const config: CapacitorConfig = {
-  // ...
-  webDir: "../../apps/wallet/out", // Already configured! ✅
-  // ...
-};
-```
-
-2. **Update Tauri config** (`native/wallet/tauri/src-tauri/tauri.conf.json`):
-
-```json
-{
-  "build": {
-    "distDir": "../../../apps/wallet/out",
-    "devPath": "http://localhost:3000"
-  }
-}
-```
-
-3. **Add build scripts** to root `package.json`:
-
-```json
-{
-  "scripts": {
-    "build:web": "cd apps/wallet && pnpm build",
-    "build:ios": "cd native/wallet/capacitor && pnpm cap sync ios && pnpm cap open ios",
-    "build:android": "cd native/wallet/capacitor && pnpm cap sync android && pnpm cap open android",
-    "build:desktop": "cd native/wallet/tauri && pnpm tauri build",
-    "build:all": "pnpm build:web && pnpm build:ios && pnpm build:android && pnpm build:desktop"
-  }
-}
-```
-
-### Phase 6: Testing & Validation (📅 Final)
-
-1. **Web Build Test**:
-
-```bash
-cd apps/wallet
-pnpm build
-# Check that apps/wallet/out exists with static files
-```
-
-2. **Mobile Build Test** (iOS):
-
-```bash
-cd native/wallet/capacitor
-pnpm cap sync ios
-pnpm cap open ios
-# Build in Xcode
-```
-
-3. **Mobile Build Test** (Android):
-
-```bash
-cd native/wallet/capacitor
-pnpm cap sync android
-pnpm cap open android
-# Build in Android Studio
-```
-
-4. **Desktop Build Test**:
-
-```bash
-cd native/wallet/tauri
-pnpm tauri dev  # Test in dev mode first
-pnpm tauri build  # Build production bundle
-```
-
-## Known Issues to Address
-
-### 1. Dynamic Routes
-
-Dynamic routes like `exchange/[symbol]` and `project/[id]` may need special handling:
-
-- Consider using `generateStaticParams` for known routes
-- Or use client-side routing with hash-based navigation
-
-### 2. API Calls in Static Export
-
-- All API calls are now client-side ✅
-- Ensure API endpoints are accessible from native apps
-- Consider environment variables for different environments
-
-### 3. Navigation
-
-- Test back/forward navigation in native apps
-- May need to use hash-based routing (#/exchange instead of /exchange)
-- Update all Link components if needed
-
-## Alternative Approach: Component Library
-
-If the current approach proves complex, consider:
-
-1. Convert `apps/wallet/src/components` into a shared library
-2. Create separate Next.js apps for:
-   - `apps/wallet-web` - Standard Next.js (SSR, ISR, etc.)
-   - `apps/wallet-native` - Static export for native
-3. Both import from the shared component library
+2. **Verify Mobile/Desktop**:
+   - iOS: `cd native/wallet/capacitor && pnpm cap sync ios && pnpm cap open ios`
+   - Android: `cd native/wallet/capacitor && pnpm cap sync android && pnpm cap open android`
+   - Desktop: `cd native/wallet/tauri && pnpm tauri dev`
 
 ## Commands Reference
 
 ```bash
-# Current development
-pnpm dev  # From apps/wallet
+# Build native static export
+cd native/wallet/nextjs
+pnpm build
 
-# Build static export (after configuration)
-pnpm build  # From apps/wallet - will generate 'out' directory
-
-# Mobile development
-pnpm cap sync  # Sync web assets to native projects
-pnpm cap run ios  # Run on iOS simulator
-pnpm cap run android  # Run on Android emulator
-
-# Desktop development
-pnpm tauri dev  # From native/wallet/tauri
-pnpm tauri build  # Build production app
-
-# Production builds
-pnpm build:all  # Build everything
+# Run web app (source)
+cd apps/wallet
+pnpm dev
+# Run native web wrapper (dev mode)
+cd native/wallet/nextjs
+pnpm dev
 ```
 
-## Decision Points Needed
-
-1. **Architecture**:
-   - [ ] Option A: Use current `apps/wallet` with static export
-   - [ ] Option B: Create separate `native/wallet/nextjs` app
-
-2. **Routing Strategy**:
-   - [ ] Keep current routing with generateStaticParams
-   - [ ] Switch to hash-based routing for native compatibility
-
-3. **API Strategy**:
-   - [ ] Keep current API structure
-   - [ ] Create separate API endpoint for native apps
-
-## Next Immediate Action
-
-**Before proceeding further**, we should:
-
-1. ✅ Finish checking remaining pages (assets, chat, deposit, withdraw)
-2. ✅ Test current changes in development
-3. ⚠️ **DECIDE**: Option A (simpler) vs Option B (more flexible)
-4. ⚠️ Configure Next.js for static export
-5. ⚠️ Test static build locally
-6. ⚠️ Test with Capacitor/Tauri
-
-**Current Status**: Ready to configure for static export and test!
+Multiplatform setup is complete! 🚀
