@@ -149,6 +149,17 @@ export interface MarketSeries {
   series: number[];
 }
 
+export type Timeframe =
+  | "all"
+  | "30d"
+  | "7d"
+  | "24h";
+
+export type ChartView =
+  | "linea"
+  | "velas"
+  | "ordenes";
+
 export interface ProjectStory {
   id: number;
   title: string;

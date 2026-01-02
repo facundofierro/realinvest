@@ -1,8 +1,21 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import {
+  formatCurrency,
+  formatPrice,
+  formatTokenAmount,
+} from "@/lib/format";
+import {
+  useState,
+  useMemo,
+} from "react";
 import { useRouter } from "next/navigation";
-import { useWalletHoldings, useWalletBalances, useWalletPositions, useMarketTokens } from "@/hooks/use-queries";
+import {
+  useWalletHoldings,
+  useWalletBalances,
+  useWalletPositions,
+  useMarketTokens,
+} from "@/hooks/use-queries";
 import { useIsDesktop } from "@/hooks/use-is-desktop";
 import { DesktopTokenTabs } from "../desktop-token-tabs";
 import { UnitDetailsDialog } from "../unit-details-dialog";
@@ -40,43 +53,77 @@ import { cn } from "@repo/ui/lib/utils";
 
 export default function AssetsPage() {
   const router = useRouter();
-  const { data: holdings = [] } = useWalletHoldings();
-  const { data: balances = [] } = useWalletBalances();
-  const { data: positions = [] } = useWalletPositions();
-  const { data: marketTokens = [] } = useMarketTokens();
+  const { data: holdings = [] } =
+    useWalletHoldings();
+  const { data: balances = [] } =
+    useWalletBalances();
+  const { data: positions = [] } =
+    useWalletPositions();
+  const { data: marketTokens = [] } =
+    useMarketTokens();
 
   const isDesktop = useIsDesktop();
 
-  const [selectedTokenId, setSelectedTokenId] = useState<string | null>(null);
-  
+  const [
+    selectedTokenId,
+    setSelectedTokenId,
+  ] = useState<string | null>(null);
+
   const myTokens = useMemo(() => {
-    return holdings.map(holding => {
-      const position = positions.find(p => p.tokenSymbol === holding.tokenSymbol && p.status === "OPEN");
+    return holdings.map((holding) => {
+      const position = positions.find(
+        (p) =>
+          p.tokenSymbol ===
+            holding.tokenSymbol &&
+          p.status === "OPEN"
+      );
       return {
         ...holding,
         tokenName: holding.tokenSymbol,
-        projectName: holding.projectTitle,
-        marketPrice: String(holding.marketPriceUsd),
-        value: holding.tokens * holding.marketPriceUsd,
-        orderPrice: position ? String(position.orderPriceUsd) : null,
-        change: holding.changePct ? `${holding.changePct > 0 ? "+" : ""}${holding.changePct}%` : "+0.0%",
+        projectName:
+          holding.projectTitle,
+        marketPrice: String(
+          holding.marketPriceUsd
+        ),
+        value:
+          holding.tokens *
+          holding.marketPriceUsd,
+        orderPrice: position
+          ? String(
+              position.orderPriceUsd
+            )
+          : null,
+        change: holding.changePct
+          ? `${holding.changePct > 0 ? "+" : ""}${holding.changePct}%`
+          : "+0.0%",
         unitId: holding.unitCode,
         color: "bg-primary",
-        borderColor: "border-primary"
+        borderColor: "border-primary",
       };
     });
   }, [holdings, positions]);
 
   const selectedToken = useMemo(() => {
-    return myTokens.find(t => t.id === selectedTokenId) || null;
+    return (
+      myTokens.find(
+        (t) => t.id === selectedTokenId
+      ) || null
+    );
   }, [myTokens, selectedTokenId]);
 
   const totalValue = useMemo(() => {
-    return myTokens.reduce((acc, t) => acc + t.value, 0);
+    return myTokens.reduce(
+      (acc, t) => acc + t.value,
+      0
+    );
   }, [myTokens]);
 
   const availableUsdt = useMemo(() => {
-    return balances.find(b => b.currencyCode === "USDT")?.available ?? 0;
+    return (
+      balances.find(
+        (b) => b.currencyCode === "USDT"
+      )?.available ?? 0
+    );
   }, [balances]);
 
   const [
@@ -97,7 +144,9 @@ export default function AssetsPage() {
   ] = useState<string>("");
 
   const marketPrice = selectedToken
-    ? Number(selectedToken.marketPrice) || 0
+    ? Number(
+        selectedToken.marketPrice
+      ) || 0
     : 0;
   const ownedTokens = selectedToken
     ? selectedToken.tokens
@@ -109,9 +158,13 @@ export default function AssetsPage() {
       setAmount(String(ownedTokens));
       return;
     }
-    const p = marketPrice > 0 ? marketPrice : 0;
-    const maxByBalance = p > 0 ? availableUsdt / p : 0;
-    setAmount(String(maxByBalance.toFixed(4)));
+    const p =
+      marketPrice > 0 ? marketPrice : 0;
+    const maxByBalance =
+      p > 0 ? availableUsdt / p : 0;
+    setAmount(
+      String(maxByBalance.toFixed(4))
+    );
   };
 
   return (
@@ -119,108 +172,177 @@ export default function AssetsPage() {
       {isDesktop ? (
         <div className="flex flex-1 min-h-0 divide-x bg-muted/5">
           <div className="w-1/3 min-w-[400px] flex flex-col bg-background relative z-10 border-r shadow-sm">
-             <header className="p-6 bg-linear-to-br from-[#1a1c2e] to-[#0f172a] text-white">
-                <div className="space-y-1">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Valor Total Portafolio</span>
-                  <div className="text-3xl font-black tracking-tighter">
-                    $ {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                  <div className="flex gap-2 items-center mt-1">
-                    <span className="text-brand-green text-[10px] font-black bg-brand-green/10 px-2 py-0.5 rounded-full">+12.5%</span>
-                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Último mes</span>
-                  </div>
+            <header className="p-6 bg-linear-to-br from-[#1a1c2e] to-[#0f172a] text-white">
+              <div className="space-y-1">
+                <span className="text-[10px] font-black uppercase tracking-widest text-white/50">
+                  Valor Total Portafolio
+                </span>
+                <div className="text-3xl font-black tracking-tighter">
+                  {formatCurrency(
+                    totalValue
+                  )}
                 </div>
-                <div className="grid grid-cols-2 gap-3 mt-6">
-                   <Button variant="outline" className="h-10 text-[10px] font-black uppercase bg-white/5 border-white/10 text-white hover:bg-white/10" asChild>
-                      <Link href="/deposit"><ArrowDownLeft className="mr-2 h-4 w-4" /> Ingresar</Link>
-                   </Button>
-                   <Button variant="outline" className="h-10 text-[10px] font-black uppercase bg-white/5 border-white/10 text-white hover:bg-white/10" asChild>
-                      <Link href="/withdraw"><ArrowUpRight className="mr-2 h-4 w-4" /> Retirar</Link>
-                   </Button>
+                <div className="flex gap-2 items-center mt-1">
+                  <span className="text-brand-green text-[10px] font-black bg-brand-green/10 px-2 py-0.5 rounded-full">
+                    +12.5%
+                  </span>
+                  <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
+                    Último mes
+                  </span>
                 </div>
-             </header>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-6">
+                <Button
+                  variant="outline"
+                  className="h-10 text-[10px] font-black uppercase bg-white/5 border-white/10 text-white hover:bg-white/10"
+                  asChild
+                >
+                  <Link href="/deposit">
+                    <ArrowDownLeft className="mr-2 h-4 w-4" />{" "}
+                    Ingresar
+                  </Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-10 text-[10px] font-black uppercase bg-white/5 border-white/10 text-white hover:bg-white/10"
+                  asChild
+                >
+                  <Link href="/withdraw">
+                    <ArrowUpRight className="mr-2 h-4 w-4" />{" "}
+                    Retirar
+                  </Link>
+                </Button>
+              </div>
+            </header>
 
-             <div className="p-4 border-b bg-muted/5 flex justify-between items-center">
-                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Mis Activos</h2>
-                <Badge variant="outline" className="text-[10px] font-black uppercase">{myTokens.length} Tokens</Badge>
-             </div>
+            <div className="p-4 border-b bg-muted/5 flex justify-between items-center">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                Mis Activos
+              </h2>
+              <Badge
+                variant="outline"
+                className="text-[10px] font-black uppercase"
+              >
+                {myTokens.length} Tokens
+              </Badge>
+            </div>
 
-             <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                <Card className="p-4 border-none bg-primary/5 shadow-none mb-4">
-                   <div className="flex justify-between items-center text-primary">
-                      <div className="flex gap-3 items-center">
-                         <Wallet className="h-5 w-5 opacity-60" />
-                         <span className="text-[11px] font-black uppercase tracking-widest leading-none">Liquidez USDT</span>
-                      </div>
-                      <span className="font-black text-lg">${availableUsdt.toLocaleString()}</span>
-                   </div>
-                </Card>
-
-                {myTokens.map((asset) => (
-                  <div
-                    key={asset.id}
-                    onClick={() => setSelectedTokenId(asset.id)}
-                    className={cn(
-                      "p-4 rounded-3xl border transition-all cursor-pointer flex justify-between items-center group",
-                      selectedTokenId === asset.id
-                        ? "bg-white border-primary shadow-xl scale-[1.02] z-10 relative"
-                        : "bg-card border-border/40 hover:border-primary/30 shadow-sm"
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <Card className="p-4 border-none bg-primary/5 shadow-none mb-4">
+                <div className="flex justify-between items-center text-primary">
+                  <div className="flex gap-3 items-center">
+                    <Wallet className="h-5 w-5 opacity-60" />
+                    <span className="text-[11px] font-black uppercase tracking-widest leading-none">
+                      Liquidez USDT
+                    </span>
+                  </div>
+                  <span className="font-black text-lg">
+                    {formatCurrency(
+                      availableUsdt
                     )}
-                  >
-                    <div className="flex gap-3 items-center min-w-0">
-                       <div className="w-10 h-10 rounded-2xl bg-muted/30 border flex items-center justify-center font-black text-xs text-[#3B2146] shrink-0">
-                          {asset.unitId}
-                       </div>
-                       <div className="min-w-0">
-                          <div className="font-black text-[13px] uppercase text-[#3B2146] truncate">{asset.tokenName}</div>
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase truncate mt-0.5">{asset.projectName}</div>
-                       </div>
-                    </div>
-                    <div className="text-right">
-                       <div className="font-black text-sm">${asset.value.toLocaleString()}</div>
-                       <div className="text-[9px] font-black text-brand-green uppercase mt-0.5">{asset.change}</div>
+                  </span>
+                </div>
+              </Card>
+
+              {myTokens.map((asset) => (
+                <div
+                  key={asset.id}
+                  onClick={() =>
+                    setSelectedTokenId(
+                      asset.id
+                    )
+                  }
+                  className={cn(
+                    "p-4 rounded-3xl border transition-all cursor-pointer flex justify-between items-center group",
+                    selectedTokenId ===
+                      asset.id
+                      ? "bg-white border-primary shadow-xl scale-[1.02] z-10 relative"
+                      : "bg-card border-border/40 hover:border-primary/30 shadow-sm"
+                  )}
+                >
+                  <div className="flex gap-3 items-center min-w-0">
+                    <div className="min-w-0">
+                      <div className="font-black text-[13px] uppercase text-[#3B2146] truncate">
+                        {
+                          asset.tokenName
+                        }
+                      </div>
+                      <div className="text-[9px] font-bold text-muted-foreground uppercase truncate mt-0.5">
+                        {
+                          asset.projectName
+                        }
+                      </div>
                     </div>
                   </div>
-                ))}
-             </div>
+                  <div className="text-right">
+                    <div className="font-black text-sm">
+                      {formatCurrency(
+                        asset.value
+                      )}
+                    </div>
+                    <div className="text-[9px] font-black text-brand-green uppercase mt-0.5">
+                      {asset.change}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="flex-1 flex flex-col p-8 bg-muted/10 overflow-hidden">
-             {selectedToken ? (
-                <div className="h-full animate-in fade-in slide-in-from-right-8 duration-500">
-                   <DesktopTokenTabs 
-                      token={{
-                        id: selectedToken.id,
-                        symbol: selectedToken.tokenName,
-                        projectTitle: selectedToken.projectName,
-                        priceUsd: Number(selectedToken.marketPrice),
-                        tokensAvailable: 1250,
-                        marketCapUsd: 520000,
-                        projectId: "1",
-                        change24hPct: 0.5,
-                        change7dPct: 2.1,
-                        change30dPct: 5.4,
-                        changeAllPct: 12.4,
-                        isFavorite: true,
-                        roiPct: 12.4,
-                        unitId: selectedToken.unitId,
-                        sellPriceUsd: Number(selectedToken.marketPrice),
-                        buyPriceUsd: Number(selectedToken.marketPrice),
-                        liveSince: "6 meses"
-                      }} 
-                    />
+            {selectedToken ? (
+              <div className="h-full animate-in fade-in slide-in-from-right-8 duration-500">
+                <DesktopTokenTabs
+                  token={{
+                    id: selectedToken.id,
+                    symbol:
+                      selectedToken.tokenName,
+                    projectTitle:
+                      selectedToken.projectName,
+                    priceUsd: Number(
+                      selectedToken.marketPrice
+                    ),
+                    tokensAvailable: 1250,
+                    marketCapUsd: 520000,
+                    projectId: "1",
+                    change24hPct: 0.5,
+                    change7dPct: 2.1,
+                    change30dPct: 5.4,
+                    changeAllPct: 12.4,
+                    isFavorite: true,
+                    roiPct: 12.4,
+                    unitId:
+                      selectedToken.unitId,
+                    sellPriceUsd:
+                      Number(
+                        selectedToken.marketPrice
+                      ),
+                    buyPriceUsd: Number(
+                      selectedToken.marketPrice
+                    ),
+                    liveSince:
+                      "6 meses",
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-center max-w-sm mx-auto p-12 rounded-[40px] border-2 border-dashed border-muted-foreground/20 bg-white/50 backdrop-blur-sm">
+                <div className="w-20 h-20 rounded-[30px] bg-primary/5 flex items-center justify-center mb-6">
+                  <PieChart className="h-10 w-10 text-primary/40" />
                 </div>
-             ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-center max-w-sm mx-auto p-12 rounded-[40px] border-2 border-dashed border-muted-foreground/20 bg-white/50 backdrop-blur-sm">
-                   <div className="w-20 h-20 rounded-[30px] bg-primary/5 flex items-center justify-center mb-6">
-                      <PieChart className="h-10 w-10 text-primary/40" />
-                   </div>
-                   <h3 className="text-xl font-black text-[#3B2146] uppercase mb-4">Análisis de Portafolio</h3>
-                   <p className="text-sm font-medium text-muted-foreground leading-relaxed">
-                      Selecciona uno de tus activos para ver el rendimiento histórico, la distribución de dividendos y los planos de la unidad.
-                   </p>
-                </div>
-             )}
+                <h3 className="text-xl font-black text-[#3B2146] uppercase mb-4">
+                  Análisis de Portafolio
+                </h3>
+                <p className="text-sm font-medium text-muted-foreground leading-relaxed">
+                  Selecciona uno de tus
+                  activos para ver el
+                  rendimiento histórico,
+                  la distribución de
+                  dividendos y los
+                  planos de la unidad.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -236,7 +358,9 @@ export default function AssetsPage() {
                     Valor Total
                   </span>
                   <div className="text-4xl font-bold tracking-tighter">
-                    $ {totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {formatCurrency(
+                      totalValue
+                    )}
                   </div>
                   <div className="flex gap-2 items-center">
                     <span className="inline-flex items-center text-brand-green text-sm font-medium bg-brand-green/10 px-2 py-0.5 rounded-full">
@@ -299,7 +423,9 @@ export default function AssetsPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold">
-                        $ {availableUsdt.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {formatCurrency(
+                          availableUsdt
+                        )}
                       </p>
                       <div className="flex gap-2 justify-end mt-1 opacity-0 transition-opacity group-hover:opacity-100">
                         <Link
@@ -324,7 +450,7 @@ export default function AssetsPage() {
               </Card>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 pb-24">
               <div className="flex justify-between items-center px-1">
                 <h2 className="text-sm font-bold tracking-wider uppercase text-muted-foreground">
                   Mis Tokens
@@ -332,79 +458,77 @@ export default function AssetsPage() {
               </div>
 
               <div className="space-y-4">
-                {myTokens.map((asset) => (
-                  <Card
-                    key={asset.id}
-                    onClick={() =>
-                      setSelectedTokenId(
-                        asset.id
-                      )
-                    }
-                    className={cn(
-                      "overflow-hidden border border-border/40 shadow-sm hover:shadow-md transition-all group rounded-[28px] bg-card cursor-pointer",
-                      selectedTokenId ===
-                        asset.id
-                        ? "ring-2 ring-primary"
-                        : ""
-                    )}
-                  >
-                    <CardContent className="p-5">
-                      <div className="grid grid-cols-[1fr_120px] items-center gap-x-4">
-                        <div className="flex gap-3 items-center min-w-0">
-                          <div
-                            className={cn(
-                              "w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm transition-colors shrink-0",
-                              "bg-muted/30 text-[#3B2146] border border-border/50"
-                            )}
-                          >
-                            {asset.unitId}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="font-black text-[14px] uppercase text-[#3B2146] leading-tight truncate">
-                              {
-                                asset.tokenName
-                              }
-                            </div>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase truncate">
+                {myTokens.map(
+                  (asset) => (
+                    <Card
+                      key={asset.id}
+                      onClick={() =>
+                        setSelectedTokenId(
+                          asset.id
+                        )
+                      }
+                      className={cn(
+                        "overflow-hidden border border-border/40 shadow-sm hover:shadow-md transition-all group rounded-[28px] bg-card cursor-pointer",
+                        selectedTokenId ===
+                          asset.id
+                          ? "ring-2 ring-primary"
+                          : ""
+                      )}
+                    >
+                      <CardContent className="p-5">
+                        <div className="grid grid-cols-[1fr_120px] items-center gap-x-4">
+                          <div className="flex gap-3 items-center min-w-0">
+                            <div className="min-w-0">
+                              <div className="font-black text-[14px] uppercase text-[#3B2146] leading-tight truncate">
                                 {
-                                  asset.projectName
+                                  asset.tokenName
                                 }
                               </div>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <div className="text-[10px] font-bold text-muted-foreground tracking-widest uppercase truncate">
+                                  {
+                                    asset.projectName
+                                  }
+                                </div>
+                              </div>
+                              <p className="text-[10px] font-bold text-muted-foreground/60 flex items-center tracking-widest uppercase mt-0.5">
+                                {
+                                  asset.location
+                                }
+                              </p>
                             </div>
-                            <p className="text-[10px] font-bold text-muted-foreground/60 flex items-center tracking-widest uppercase mt-0.5">
-                              <Building2 className="h-2.5 w-2.5 mr-1" />{" "}
-                              {
-                                asset.location
-                              }
-                            </p>
                           </div>
-                        </div>
 
-                        <div className="flex flex-col items-end text-right">
-                          <div className="text-lg font-black text-[#3B2146] tracking-tighter">
-                            $ {asset.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          <div className="flex flex-col items-end text-right">
+                            <div className="text-lg font-black text-[#3B2146] tracking-tighter">
+                              {formatCurrency(
+                                asset.value
+                              )}
+                            </div>
+                            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
+                              {formatTokenAmount(
+                                asset.tokens
+                              )}
+                            </div>
+                            {asset.orderPrice && (
+                              <Badge
+                                variant="outline"
+                                className="mt-1 bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[8px] px-2 py-0.5 h-auto font-black uppercase tracking-tighter"
+                              >
+                                Posición:
+                                {formatCurrency(
+                                  Number(
+                                    asset.orderPrice
+                                  )
+                                )}
+                              </Badge>
+                            )}
                           </div>
-                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
-                            {asset.tokens}{" "}
-                            Tokens
-                          </div>
-                          {asset.orderPrice && (
-                            <Badge
-                              variant="outline"
-                              className="mt-1 bg-brand-pink/10 text-brand-pink border-brand-pink/20 text-[8px] px-2 py-0.5 h-auto font-black uppercase tracking-tighter"
-                            >
-                              Posición: $
-                              {
-                                asset.orderPrice
-                              }
-                            </Badge>
-                          )}
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -412,26 +536,53 @@ export default function AssetsPage() {
       )}
 
       <UnitDetailsDialog
-        isOpen={!!selectedTokenId && !isTradeDialogOpen}
-        onClose={() => setSelectedTokenId(null)}
-        data={selectedToken ? {
-          symbol: selectedToken.tokenName,
-          projectTitle: selectedToken.projectName,
-          priceUsd: Number(selectedToken.marketPrice.replace(/,/g, "")),
-          tokensAvailable: 1250,
-          marketCapUsd: 520000,
-          id: selectedToken.id,
-          projectId: "1",
-          change24hPct: 0.5,
-          change7dPct: 2.1,
-          change30dPct: 5.4,
-          changeAllPct: 12.4,
-          liveSince: "6 meses",
-          isFavorite: true,
-          roiPct: 12.4,
-          buyPriceUsd: Number(selectedToken.marketPrice.replace(/,/g, "")),
-          sellPriceUsd: Number(selectedToken.marketPrice.replace(/,/g, ""))
-        } : null}
+        isOpen={
+          !isDesktop &&
+          !!selectedTokenId &&
+          !isTradeDialogOpen
+        }
+        onClose={() =>
+          setSelectedTokenId(null)
+        }
+        data={
+          selectedToken
+            ? {
+                symbol:
+                  selectedToken.tokenName,
+                projectTitle:
+                  selectedToken.projectName,
+                priceUsd: Number(
+                  selectedToken.marketPrice.replace(
+                    /,/g,
+                    ""
+                  )
+                ),
+                tokensAvailable: 1250,
+                marketCapUsd: 520000,
+                id: selectedToken.id,
+                projectId: "1",
+                change24hPct: 0.5,
+                change7dPct: 2.1,
+                change30dPct: 5.4,
+                changeAllPct: 12.4,
+                liveSince: "6 meses",
+                isFavorite: true,
+                roiPct: 12.4,
+                buyPriceUsd: Number(
+                  selectedToken.marketPrice.replace(
+                    /,/g,
+                    ""
+                  )
+                ),
+                sellPriceUsd: Number(
+                  selectedToken.marketPrice.replace(
+                    /,/g,
+                    ""
+                  )
+                ),
+              }
+            : null
+        }
         onInvest={() => {
           setTradeType("BUY");
           setOrderType("MARKET");
@@ -507,10 +658,12 @@ export default function AssetsPage() {
                       Max:{" "}
                       {tradeType ===
                       "SELL"
-                        ? ownedTokens.toFixed(
-                            2
+                        ? formatTokenAmount(
+                            ownedTokens
                           )
-                        : `$${availableUsdt.toFixed(2)}`}
+                        : formatCurrency(
+                            availableUsdt
+                          )}
                     </button>
                   </div>
 
@@ -544,7 +697,9 @@ export default function AssetsPage() {
                         <div className="flex items-center px-3 h-12 font-bold truncate rounded-xl border bg-muted/20 border-border/50 text-muted-foreground">
                           {marketPrice >
                           0
-                            ? `$${marketPrice.toFixed(2)}`
+                            ? formatPrice(
+                                marketPrice
+                              )
                             : "Mercado"}
                         </div>
                       ) : (

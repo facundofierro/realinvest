@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import {
+  formatCurrency,
+  formatTokenAmount,
+} from "@/lib/format";
+import {
   MapPin,
   Layers,
   Building2,
@@ -103,7 +107,8 @@ export function UnitDetailsDialog({
     }
   }
 
-  const stockText = `${stockCount.toLocaleString()} TOKENS AVAILABLE`;
+  const stockText =
+    formatTokenAmount(stockCount);
 
   // Features mapping
   const featuresList = [];
@@ -241,7 +246,7 @@ export function UnitDetailsDialog({
             .map((f, i) => (
               <span
                 key={i}
-                className="flex gap-1.5 items-center"
+                className="flex gap-1 items-center"
               >
                 {f.icon} {f.text}
               </span>

@@ -1,3 +1,7 @@
+import {
+  formatCurrency,
+  formatPrice,
+} from "@/lib/format";
 import { ReactNode } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { X } from "lucide-react";
@@ -54,7 +58,7 @@ export function UnitDetailsSheet({
             "relative bg-white shadow-2xl border border-border/40 flex flex-col transition-all duration-300",
             isExpanded
               ? "h-full rounded-none"
-              : "p-5 rounded-[36px]",
+              : "p-4 sm:p-5 rounded-[36px]",
             className
           )}
         >
@@ -96,7 +100,7 @@ export function UnitDetailsSheet({
               </div>
 
               {/* Row 2: Features and Price */}
-              <div className="flex justify-between items-end gap-4">
+              <div className="flex justify-between items-end gap-2 sm:gap-4">
                 <div className="flex-1 min-w-0">
                   {features && (
                     <div className="flex flex-col gap-1.5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
@@ -106,7 +110,12 @@ export function UnitDetailsSheet({
                 </div>
                 <div className="text-right shrink-0">
                   <div className="text-2xl font-black text-foreground tracking-tighter">
-                    {typeof price === "number" ? `$${price.toFixed(2)}` : price}
+                    {typeof price ===
+                    "number"
+                      ? formatCurrency(
+                          price
+                        )
+                      : price}
                   </div>
                   {stockText && (
                     <div className="text-[10px] font-black text-primary/80 uppercase tracking-tighter">
