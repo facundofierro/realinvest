@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import {
+  useState,
+  useMemo,
+} from "react";
 import { useProjects } from "@/hooks/use-queries";
 import { Button } from "@repo/ui/components/ui/button";
 import {
@@ -53,7 +56,8 @@ type ProjectStatusUi =
   | "COMPLETADO";
 
 export default function InvestPage() {
-  const { data: fetchedProjects = [] } = useProjects();
+  const { data: fetchedProjects = [] } =
+    useProjects();
   const [
     selectedCategory,
     setSelectedCategory,
@@ -64,30 +68,34 @@ export default function InvestPage() {
       id: "all",
       label: "Todos",
       icon: Building2,
-      color: "bg-primary text-primary-foreground",
+      color:
+        "bg-primary text-primary-foreground",
     },
     {
       id: "PRE-VENTA",
       label: "Lanzamientos",
       icon: Clock,
-      color: "bg-blue-500/10 text-blue-600",
+      color:
+        "bg-blue-500/10 text-blue-600",
     },
     {
       id: "EN CONSTRUCCION",
       label: "En obra",
       icon: Hammer,
-      color: "bg-amber-500/10 text-amber-600",
+      color:
+        "bg-amber-500/10 text-amber-600",
     },
     {
       id: "COMPLETADO",
       label: "Completados",
       icon: Key,
-      color: "bg-purple-500/10 text-purple-600",
+      color:
+        "bg-purple-500/10 text-purple-600",
     },
   ];
 
   const projects = useMemo(() => {
-    return fetchedProjects.map(p => ({
+    return fetchedProjects.map((p) => ({
       id: p.id,
       title: p.title,
       location: p.location,
@@ -100,22 +108,27 @@ export default function InvestPage() {
       roi: `${p.roiPct}%`,
       progress: p.progressPct,
       precioRange: p.priceRangeUsd,
-      rentaFija: p.fixedRentPct ? `${p.fixedRentPct}%` : undefined,
-      tokensTotal: p.tokensTotal ? `$${p.tokensTotal.toLocaleString()}` : undefined,
+      rentaFija: p.fixedRentPct
+        ? `${p.fixedRentPct}%`
+        : undefined,
+      tokensTotal: p.tokensTotal
+        ? `$${p.tokensTotal.toLocaleString()}`
+        : undefined,
       launchDate: p.launchDate,
-      nextLaunchDate: p.nextLaunchDate
+      nextLaunchDate: p.nextLaunchDate,
     }));
   }, [fetchedProjects]);
 
-  const filteredProjects = useMemo(() => {
-    return selectedCategory === "all"
-      ? projects
-      : projects.filter(
-          (p) =>
-            p.status ===
-            selectedCategory
-        );
-  }, [selectedCategory, projects]);
+  const filteredProjects =
+    useMemo(() => {
+      return selectedCategory === "all"
+        ? projects
+        : projects.filter(
+            (p) =>
+              p.status ===
+              selectedCategory
+          );
+    }, [selectedCategory, projects]);
 
   return (
     <div className="overflow-x-hidden p-4 pb-32 mx-auto space-y-6 max-w-2xl duration-500 animate-in fade-in">
@@ -159,7 +172,7 @@ export default function InvestPage() {
               )
             }
             className={cn(
-              "flex items-center gap-3 px-4 py-4 rounded-2xl text-[13px] font-black transition-all border shadow-sm relative overflow-hidden group",
+              "flex items-center w-full min-w-0 gap-2 px-3 py-3 rounded-2xl text-[12px] font-black transition-all border shadow-sm relative overflow-hidden group sm:gap-3 sm:px-4 sm:py-4 sm:text-[13px]",
               selectedCategory ===
                 cat.id
                 ? "bg-primary text-white border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10"
@@ -168,14 +181,14 @@ export default function InvestPage() {
           >
             <cat.icon
               className={cn(
-                "h-5 w-5 shrink-0 transition-transform group-hover:scale-110",
+                "h-4 w-4 shrink-0 transition-transform group-hover:scale-110 sm:h-5 sm:w-5",
                 selectedCategory ===
                   cat.id
                   ? "text-white"
                   : "text-primary/60"
               )}
             />
-            <span className="truncate">
+            <span className="min-w-0 leading-tight line-clamp-2 sm:line-clamp-1">
               {cat.label}
             </span>
           </button>
@@ -197,7 +210,7 @@ export default function InvestPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 min-[500px]:grid-cols-2 gap-4">
           {filteredProjects.map(
             (project) => (
               <Link
