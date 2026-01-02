@@ -614,14 +614,17 @@ export default function ExchangeDetailPage({
   const {
     data: token,
     isLoading: isTokenLoading,
+    error: tokenError,
   } = useMarketToken(symbol);
   const {
     data: orderBook,
     isLoading: isOrderBookLoading,
+    error: orderBookError,
   } = useMarketOrderBook(symbol);
   const {
     data: series,
     isLoading: isSeriesLoading,
+    error: seriesError,
   } = useMarketSeries(
     symbol,
     timeframe,
@@ -649,10 +652,17 @@ export default function ExchangeDetailPage({
     isOrderBookLoading ||
     isSeriesLoading ||
     isPositionsLoading;
-  const error =
-    !token && !isTokenLoading
-      ? "Token not found"
-      : null;
+  const error = (() => {
+    if (tokenError instanceof Error)
+      return tokenError.message;
+    if (orderBookError instanceof Error)
+      return orderBookError.message;
+    if (seriesError instanceof Error)
+      return seriesError.message;
+    if (!token && !isTokenLoading)
+      return "Token not found";
+    return null;
+  })();
 
   const [
     isTradeDialogOpen,
