@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -26,12 +25,8 @@ import {
   StarOff,
 } from "lucide-react";
 import type {
-  Holding,
   MarketOrderBook,
-  MarketSeries,
   MarketToken,
-  Position,
-  WalletBalance,
 } from "@/types/wallet";
 import {
   useMarketToken,
@@ -121,7 +116,10 @@ function LineChart({
   isUp: boolean;
   currentPrice: number;
 }) {
-  if (!series || series.length === 0) return <div className="h-[200px] w-full" />;
+  if (!series || series.length === 0)
+    return (
+      <div className="h-[200px] w-full" />
+    );
 
   const min = Math.min(...series);
   const max = Math.max(...series);
@@ -302,7 +300,10 @@ function CandlesChart({
   isUp: boolean;
   currentPrice: number;
 }) {
-  if (!series || series.length === 0) return <div className="h-[200px] w-full" />;
+  if (!series || series.length === 0)
+    return (
+      <div className="h-[200px] w-full" />
+    );
   const min = Math.min(...series);
   const max = Math.max(...series);
   const w = 320;
@@ -328,9 +329,19 @@ function CandlesChart({
     );
     const fallback = series[0]!;
     const open = chunk[0] ?? fallback;
-    const close = (chunk.length > 0 ? chunk[chunk.length-1] : series[series.length-1]) ?? fallback;
-    const high = chunk.length > 0 ? Math.max(...chunk) : fallback;
-    const low = chunk.length > 0 ? Math.min(...chunk) : fallback;
+    const close =
+      (chunk.length > 0
+        ? chunk[chunk.length - 1]
+        : series[series.length - 1]) ??
+      fallback;
+    const high =
+      chunk.length > 0
+        ? Math.max(...chunk)
+        : fallback;
+    const low =
+      chunk.length > 0
+        ? Math.min(...chunk)
+        : fallback;
     return { open, close, high, low };
   });
 
@@ -596,20 +607,52 @@ export default function ExchangeDetailPage({
 
   // Loading and error states
   // Timeframe state hoisted for query usage
-  const [timeframe, setTimeframe] = useState<Timeframe>("24h");
+  const [timeframe, setTimeframe] =
+    useState<Timeframe>("24h");
 
   // Queries
-  const { data: token, isLoading: isTokenLoading } = useMarketToken(symbol);
-  const { data: orderBook, isLoading: isOrderBookLoading } = useMarketOrderBook(symbol);
-  const { data: series, isLoading: isSeriesLoading } = useMarketSeries(symbol, timeframe, 100);
-  const { data: allPositions = [], isLoading: isPositionsLoading } = useWalletPositions();
-  const { data: balances = [] } = useWalletBalances();
-  const { data: holdings = [] } = useWalletHoldings();
+  const {
+    data: token,
+    isLoading: isTokenLoading,
+  } = useMarketToken(symbol);
+  const {
+    data: orderBook,
+    isLoading: isOrderBookLoading,
+  } = useMarketOrderBook(symbol);
+  const {
+    data: series,
+    isLoading: isSeriesLoading,
+  } = useMarketSeries(
+    symbol,
+    timeframe,
+    100
+  );
+  const {
+    data: allPositions = [],
+    isLoading: isPositionsLoading,
+  } = useWalletPositions();
+  const { data: balances = [] } =
+    useWalletBalances();
+  const { data: holdings = [] } =
+    useWalletHoldings();
 
-  const positions = useMemo(() => allPositions.filter(p => p.tokenSymbol === symbol), [allPositions, symbol]);
+  const positions = useMemo(
+    () =>
+      allPositions.filter(
+        (p) => p.tokenSymbol === symbol
+      ),
+    [allPositions, symbol]
+  );
 
-  const isLoading = isTokenLoading || isOrderBookLoading || isSeriesLoading || isPositionsLoading;
-  const error = !token && !isTokenLoading ? "Token not found" : null;
+  const isLoading =
+    isTokenLoading ||
+    isOrderBookLoading ||
+    isSeriesLoading ||
+    isPositionsLoading;
+  const error =
+    !token && !isTokenLoading
+      ? "Token not found"
+      : null;
 
   const [
     isTradeDialogOpen,
@@ -628,60 +671,39 @@ export default function ExchangeDetailPage({
     setLimitPriceInput,
   ] = useState<string>("");
 
-
   const [view, setView] =
     useState<ChartView>("linea");
 
   // Favorite state
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  // Update favorite state when token is loaded
-  useEffect(() => {
-    if (token) {
-      setIsFavorite(token.isFavorite);
-    }
-  }, [token]);
+  const [
+    favoriteOverride,
+    setFavoriteOverride,
+  ] = useState<boolean | null>(null);
+  const isFavorite =
+    favoriteOverride === null
+      ? (token?.isFavorite ?? false)
+      : favoriteOverride;
 
   // Handle favorite toggle
   const handleFavorite = async () => {
     if (!token) return;
-    setIsFavorite(!isFavorite);
+    setFavoriteOverride((prev) => {
+      if (!token) return prev;
+      if (prev === null)
+        return !token.isFavorite;
+      return !prev;
+    });
     // TODO: Call API to toggle favorite on server
-    console.log("Toggle favorite for token:", token.id);
+    console.log(
+      "Toggle favorite for token:",
+      token.id
+    );
   };
 
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <div className="w-8 h-8 mx-auto mb-4 rounded-full border-4 border-primary/20 animate-spin border-t-primary" />
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (error || !token || !orderBook || !series) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <p className="text-lg font-semibold text-destructive mb-2">
-            {error || "Token not found"}
-          </p>
-          <Button onClick={() => router.back()}>Go Back</Button>
-        </div>
-      </div>
-    );
-  }
-
   const price = token?.priceUsd ?? 0;
-  const change = token ? getChangePct(
-    token,
-    timeframe
-  ) : 0;
+  const change = token
+    ? getChangePct(token, timeframe)
+    : 0;
   const isUp = change >= 0;
 
   const computedSeries = useMemo(() => {
@@ -743,19 +765,33 @@ export default function ExchangeDetailPage({
     );
   }, [positions, symbol]);
 
-  const displaySellPrice = useMemo(() => {
-    if (orderBook?.bids && orderBook.bids.length > 0) {
-      return orderBook.bids[orderBook.bids.length - 1]!.price;
-    }
-    return token?.sellPriceUsd ?? price;
-  }, [orderBook, token, price]);
+  const displaySellPrice =
+    useMemo(() => {
+      if (
+        orderBook?.bids &&
+        orderBook.bids.length > 0
+      ) {
+        return orderBook.bids[
+          orderBook.bids.length - 1
+        ]!.price;
+      }
+      return (
+        token?.sellPriceUsd ?? price
+      );
+    }, [orderBook, token, price]);
 
-  const displayBuyPrice = useMemo(() => {
-    if (orderBook?.asks && orderBook.asks.length > 0) {
-      return orderBook.asks[0]!.price;
-    }
-    return token?.buyPriceUsd ?? price;
-  }, [orderBook, token, price]);
+  const displayBuyPrice =
+    useMemo(() => {
+      if (
+        orderBook?.asks &&
+        orderBook.asks.length > 0
+      ) {
+        return orderBook.asks[0]!.price;
+      }
+      return (
+        token?.buyPriceUsd ?? price
+      );
+    }, [orderBook, token, price]);
 
   const marketTradePrice =
     tradeType === "BUY"
@@ -776,8 +812,8 @@ export default function ExchangeDetailPage({
 
       const levels =
         tradeType === "BUY"
-          ? orderBook.asks
-          : orderBook.bids;
+          ? (orderBook?.asks ?? [])
+          : (orderBook?.bids ?? []);
 
       let remaining = qty;
       let filled = 0;
@@ -818,11 +854,47 @@ export default function ExchangeDetailPage({
       };
     }, [
       amount,
-      orderBook.asks,
-      orderBook.bids,
+      orderBook,
       orderType,
       tradeType,
     ]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="w-8 h-8 mx-auto mb-4 rounded-full border-4 border-primary/20 animate-spin border-t-primary" />
+          <p className="text-sm text-muted-foreground">
+            Loading...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (
+    error ||
+    !token ||
+    !orderBook ||
+    !series
+  ) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <p className="text-lg font-semibold text-destructive mb-2">
+            {error || "Token not found"}
+          </p>
+          <Button
+            onClick={() =>
+              router.back()
+            }
+          >
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const handleMax = () => {
     if (tradeType === "SELL") {
@@ -843,7 +915,7 @@ export default function ExchangeDetailPage({
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] -mb-24 pb-24 bg-linear-to-b from-gray-900 via-slate-900 to-black duration-500 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
+    <div className="flex flex-col h-full bg-linear-to-b from-gray-900 via-slate-900 to-black duration-500 animate-in fade-in slide-in-from-bottom-4 overflow-hidden">
       <header className="overflow-hidden sticky top-0 z-50 px-4 pt-4 pb-3 text-white bg-transparent from-gray-900 rounded-none border-none shadow-xl shrink-0">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none" />
         <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl pointer-events-none bg-white/10" />

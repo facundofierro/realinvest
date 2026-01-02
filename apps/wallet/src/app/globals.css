@@ -137,6 +137,11 @@
   ::file-selector-button {
     border-color: var(--color-border, currentColor);
   }
+  html,
+  body {
+    height: 100%;
+    overflow-x: hidden;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);

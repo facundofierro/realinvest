@@ -1,24 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 export function useIsDesktop() {
-  const [isDesktop, setIsDesktop] = useState(false);
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-    const checkIsDesktop = () => {
-      setIsDesktop(window.innerWidth > window.innerHeight);
-    };
-
-    checkIsDesktop();
-    window.addEventListener("resize", checkIsDesktop);
-    return () => window.removeEventListener("resize", checkIsDesktop);
-  }, []);
-
-  // Return false during SSR or before mount to match server state (mobile by default)
-  if (!hasMounted) return false;
-
-  return isDesktop;
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      window.addEventListener("resize", onStoreChange);
+      return () =>
+        window.removeEventListener(
+          "resize",
+          onStoreChange
+        );
+    },
+    () => window.innerWidth > window.innerHeight,
+    () => false
+  );
 }

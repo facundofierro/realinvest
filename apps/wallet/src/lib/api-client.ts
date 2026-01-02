@@ -15,6 +15,7 @@ import type {
   ProjectStage,
   ProjectPurchaseOption,
 } from "@/types/wallet";
+import type { DashboardProject } from "@/lib/api/dashboard-projects";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -140,7 +141,9 @@ export async function getProjectPurchaseOptions(projectId: string): Promise<Proj
 }
 
 // Dashboard API
-export async function getDashboardProjects(): Promise<any[]> {
+export async function getDashboardProjects(): Promise<
+  DashboardProject[]
+> {
   const res = await fetch(`${API_BASE}/api/dashboard/projects`);
   if (!res.ok) throw new Error("Failed to fetch dashboard projects");
   const data = await res.json();

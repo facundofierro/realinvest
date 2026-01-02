@@ -47,6 +47,11 @@ interface Project {
   nextLaunchDate?: string;
 }
 
+type ProjectStatusUi =
+  | "PRE-VENTA"
+  | "EN CONSTRUCCION"
+  | "COMPLETADO";
+
 export default function InvestPage() {
   const { data: fetchedProjects = [] } = useProjects();
   const [
@@ -87,7 +92,11 @@ export default function InvestPage() {
       title: p.title,
       location: p.location,
       image: p.image,
-      status: p.status === "PRE_SALE" ? "PRE-VENTA" : p.status === "IN_CONSTRUCTION" ? "EN CONSTRUCCION" : "COMPLETADO" as any,
+      status: (p.status === "PRE_SALE"
+        ? "PRE-VENTA"
+        : p.status === "IN_CONSTRUCTION"
+          ? "EN CONSTRUCCION"
+          : "COMPLETADO") as ProjectStatusUi,
       roi: `${p.roiPct}%`,
       progress: p.progressPct,
       precioRange: p.priceRangeUsd,

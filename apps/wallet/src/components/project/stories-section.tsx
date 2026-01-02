@@ -38,7 +38,6 @@ export function ProjectStories({
 }: {
   stories: Story[];
 }) {
-  if (!stories || stories.length === 0) return null;
   const [activeIndex, setActiveIndex] =
     useState<number | null>(null);
   const [progress, setProgress] =
@@ -128,6 +127,8 @@ export function ProjectStories({
         handleKeyDown
       );
   }, []);
+
+  if (stories.length === 0) return null;
 
   return (
     <>
