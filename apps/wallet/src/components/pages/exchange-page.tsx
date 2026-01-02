@@ -20,7 +20,6 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Badge } from "@repo/ui/components/ui/badge";
-import { Card } from "@repo/ui/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -470,10 +469,10 @@ function ExchangePageInner({
               <ArrowLeft className="w-6 h-6" />
             </Button>
             <div className="flex-1 pr-10 text-center">
-              <h1 className="text-3xl font-black tracking-tight leading-none text-white uppercase">
+              <h1 className="text-[clamp(24px,7vw,32px)] font-black tracking-tight leading-none text-white uppercase">
                 Exchange
               </h1>
-              <p className="mt-1 font-serif text-sm italic font-medium text-white/70">
+              <p className="mt-1 font-serif text-[clamp(12px,3.4vw,14px)] italic font-medium text-white/70">
                 Mercado de Tokens
               </p>
             </div>
@@ -817,7 +816,7 @@ function ExchangePageInner({
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
-            className="w-full"
+            className="flex flex-col flex-1 min-h-0 w-full"
           >
             <div className="px-4 py-4 border-b border-border/50 bg-muted/10 shrink-0">
               <TabsList className="flex items-center gap-1.5 w-full h-auto bg-transparent p-0 border-none">
@@ -1003,13 +1002,13 @@ function ExchangePageInner({
                 value="positions"
                 className="p-4 mt-0 space-y-4"
               >
-                <Card className="p-5 rounded-[32px] border-none shadow-sm bg-white">
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                <header className="-mx-4 px-5 py-4 bg-white border-y border-border/40">
+                  <div className="flex justify-between items-end gap-4">
+                    <div className="min-w-0">
+                      <div className="text-[clamp(9px,2.6vw,10px)] text-muted-foreground font-black uppercase tracking-widest">
                         Total
                       </div>
-                      <div className="text-3xl font-black tracking-tight text-[#3B2146]">
+                      <div className="text-[clamp(24px,7vw,32px)] font-black tracking-tight text-[#3B2146] truncate">
                         $
                         {formatUsd(
                           summary.totalValueUsd
@@ -1019,7 +1018,7 @@ function ExchangePageInner({
                     <div className="text-right">
                       <div
                         className={cn(
-                          "text-[11px] font-black uppercase",
+                          "text-[clamp(10px,2.8vw,11px)] font-black uppercase whitespace-nowrap",
                           summary.totalGainUsd >=
                             0
                             ? "text-brand-green"
@@ -1048,7 +1047,7 @@ function ExchangePageInner({
                       </div>
                     </div>
                   </div>
-                </Card>
+                </header>
 
                 <div className="grid gap-4">
                   {activePositions.length >
@@ -1112,50 +1111,46 @@ function ExchangePageInner({
                                   }
                                 </div>
                                 <div className="min-w-0">
-                                  <div className="flex gap-2 items-center">
-                                    <span className="font-black text-[14px] uppercase text-[#3B2146] truncate">
+                                  <div className="flex gap-2 items-center min-w-0">
+                                    <span className="font-black text-[clamp(12px,3.8vw,14px)] uppercase text-[#3B2146] truncate min-w-0">
                                       {
                                         pos.tokenSymbol
                                       }
                                     </span>
-                                    <Badge className="text-[8px] h-4 px-2 bg-primary/10 text-primary border-none rounded-full font-black">
+                                  </div>
+                                  <div className="flex items-center justify-between gap-2 mt-1">
+                                    <div className="text-[clamp(9px,2.6vw,10px)] text-muted-foreground font-black uppercase tracking-widest truncate">
                                       {
-                                        pos.status
-                                      }
-                                    </Badge>
-                                  </div>
-                                  <div className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mt-1">
-                                    {
-                                      pos.filledAmount
-                                    }{" "}
-                                    /{" "}
-                                    {
-                                      pos.totalAmount
-                                    }{" "}
-                                    TOKENS
-                                  </div>
-                                  <div className="flex gap-2 items-center mt-1">
-                                    <Badge className="text-[8px] h-4 px-1 bg-primary/10 text-primary border-none rounded-full font-black">
+                                        pos.filledAmount
+                                      }{" "}
+                                      /{" "}
+                                      {
+                                        pos.totalAmount
+                                      }{" "}
+                                      tokens
+                                    </div>
+                                    <Badge className="text-[8px] h-4 px-1 bg-primary/10 text-primary border-none rounded-full font-black shrink-0">
                                       {Math.round(
                                         progress
                                       )}
                                       %
                                     </Badge>
-                                    <span className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
-                                      {
-                                        pos.side
-                                      }
-                                    </span>
+                                  </div>
+                                  <div className="mt-1 text-[clamp(9px,2.6vw,10px)] text-muted-foreground font-black uppercase tracking-widest">
+                                    {pos.side ===
+                                    "BUY"
+                                      ? "Orden de compra"
+                                      : "Orden de venta"}
                                   </div>
                                 </div>
                               </div>
 
-                              <div className="text-right shrink-0">
-                                <div className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
+                              <div className="text-right min-w-0">
+                                <div className="text-[clamp(8px,2.4vw,9px)] text-muted-foreground font-bold uppercase tracking-widest opacity-60">
                                   Valor
                                   Actual
                                 </div>
-                                <div className="text-[17px] font-black text-[#3B2146] leading-tight">
+                                <div className="text-[clamp(14px,4.6vw,17px)] font-black text-[#3B2146] leading-tight">
                                   $
                                   {formatUsd(
                                     marketValueUsd
@@ -1163,7 +1158,7 @@ function ExchangePageInner({
                                 </div>
                                 <div
                                   className={cn(
-                                    "text-[10px] font-black uppercase mt-1",
+                                    "text-[clamp(9px,2.6vw,10px)] font-black uppercase mt-1",
                                     gainUsd >=
                                       0
                                       ? "text-brand-green"
