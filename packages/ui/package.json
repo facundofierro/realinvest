@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     "./components/ui/*": "./src/components/ui/*.tsx",
+    "./components/brand/*": "./src/components/brand/*.tsx",
     "./lib/*": "./src/lib/*.ts",
     "./globals.css": "./src/globals.css"
   },
