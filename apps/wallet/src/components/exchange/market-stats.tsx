@@ -3,18 +3,18 @@
 import { Card } from "@repo/ui/components/ui/card";
 import { cn } from "@repo/ui/lib/utils";
 import { formatCurrency } from "@/lib/format";
-import type { MarketToken } from "@/types/wallet";
+import type { MarketToken, Timeframe } from "@/types/wallet";
 
 interface MarketStatsProps {
   userHolding: number;
   userBalance: number;
   openOrders: number;
-  timeframe: string;
-  onTimeframeChange: (tf: any) => void;
+  timeframe: Timeframe;
+  onTimeframeChange: (tf: Timeframe) => void;
   token: MarketToken;
   getChangePct: (
     token: MarketToken,
-    timeframe: any
+    timeframe: Timeframe
   ) => number;
   formatPct: (value: number) => string;
 }

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useSyncExternalStore } from "react";
 import { useIsFetching } from "@tanstack/react-query";
 import { VestRealState } from "@repo/ui/components/brand/vest-real-state";
 
@@ -13,14 +10,12 @@ export function SplashScreen({
   children: React.ReactNode;
 }) {
   const isFetching = useIsFetching();
-  const [isMounted, setIsMounted] =
-    useState(false);
+  const isMounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  // Show splash during initial hydration or while active fetching is happening
   const isLoading =
     !isMounted || isFetching > 0;
 
