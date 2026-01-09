@@ -161,7 +161,7 @@ export function BottomNav() {
 
         <div
           className="absolute left-1/2 z-20 pl-2 -translate-x-1/2"
-          style={{ top: "-1.3 rem" }}
+          style={{ top: "-1.3rem" }}
         >
           <Link
             href="/"

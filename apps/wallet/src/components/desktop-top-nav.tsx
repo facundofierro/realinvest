@@ -7,7 +7,6 @@ import {
   ArrowLeftRight,
   MessageSquare,
   Wallet,
-  User,
   Blocks,
 } from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
@@ -15,11 +14,6 @@ import { formatCurrency } from "@/lib/format";
 import { useWalletBalances } from "@/hooks/use-queries";
 import { VestRealState } from "@repo/ui/components/brand/vest-real-state";
 import { Button } from "@repo/ui/components/ui/button";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@repo/ui/components/ui/avatar";
 
 export function DesktopTopNav() {
   const pathname = usePathname();
@@ -58,6 +52,7 @@ export function DesktopTopNav() {
         <Link href="/">
           <VestRealState
             theme="light"
+            withColors={true}
             className="origin-left scale-[0.65] border-none shadow-none p-0"
           />
         </Link>
@@ -117,16 +112,16 @@ export function DesktopTopNav() {
           </span>
         </div>
 
-        <div className="flex gap-2 items-center pl-2 ml-2 border-l">
-          <span className="text-sm font-medium">
-            Usuario
-          </span>
-          <Avatar className="w-8 h-8">
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>
-              CN
-            </AvatarFallback>
-          </Avatar>
+        <div className="flex items-center pl-2 ml-2 border-l">
+          <Button
+            variant="ghost"
+            className="text-sm font-semibold text-[#5B1187] hover:text-[#5B1187] hover:bg-[#5B1187]/5"
+            asChild
+          >
+            <Link href="/login">
+              Iniciar Sesión
+            </Link>
+          </Button>
         </div>
       </div>
     </header>
