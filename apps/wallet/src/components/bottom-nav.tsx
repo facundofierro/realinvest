@@ -70,16 +70,69 @@ export function BottomNav() {
   ];
 
   return (
-    <nav
+    <div
       className={cn(
-        "fixed bottom-0 left-0 right-0 border-t bg-background/80 backdrop-blur-lg pb-safe z-50 transition-transform duration-300",
+        "fixed bottom-0 left-1/2 z-50 w-full max-w-md transition-transform duration-300 -translate-x-1/2 pb-safe",
         isHidden
           ? "translate-y-full"
           : "translate-y-0"
       )}
     >
-      <div className="flex items-center justify-around h-16 max-w-md mx-auto px-2 relative">
-        <div className="flex items-center justify-around w-full mr-12">
+      <div className="absolute inset-0 -top-4 pointer-events-none">
+        <svg
+          viewBox="0 -20 375 120"
+          className="overflow-visible w-full h-full"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <filter
+              id="purple-glow"
+              x="-20%"
+              y="-20%"
+              width="140%"
+              height="140%"
+            >
+              <feGaussianBlur
+                stdDeviation="2"
+                result="blur"
+              />
+              <feFlood
+                floodColor="#5B1187"
+                floodOpacity="0.4"
+                result="color"
+              />
+              <feComposite
+                in="color"
+                in2="blur"
+                operator="in"
+                result="glow"
+              />
+              <feMerge>
+                <feMergeNode in="glow" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          {/* Main Background with Bell Curve and Rounded Top Corners */}
+          <path
+            d="M0,100 L0,35 Q0,20 15,20 L80,20 Q115,20 130,10 Q162.5,-15 195,10 Q210,20 245,20 L360,20 Q375,20 375,35 L375,100 Z"
+            fill="rgba(255, 255, 255, 0.95)"
+          />
+          {/* Purple Border Line (Top and Sides only) */}
+          <path
+            d="M0,100 L0,35 Q0,20 15,20 L80,20 Q115,20 130,10 Q162.5,-15 195,10 Q210,20 245,20 L360,20 Q375,20 375,35 L375,100"
+            fill="none"
+            stroke="#5B1187"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            filter="url(#purple-glow)"
+          />
+        </svg>
+      </div>
+
+      <nav className="flex relative justify-around items-center px-2 pt-3 h-16">
+        <div className="flex z-10 justify-around items-center mr-12 w-full">
           {leftNavItems.map((item) => {
             const active = isActive(
               item.href
@@ -91,13 +144,13 @@ export function BottomNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
+                  "flex flex-col justify-center items-center space-y-1 w-full h-full transition-colors",
                   active
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="w-5 h-5" />
                 <span className="text-[10px] font-medium">
                   {item.label}
                 </span>
@@ -106,19 +159,23 @@ export function BottomNav() {
           })}
         </div>
 
-        <div className="absolute left-1/2 -translate-x-1/2 -top-6">
+        <div
+          className="absolute left-1/2 z-20 pl-2 -translate-x-1/2"
+          style={{ top: "-2.5rem" }}
+        >
           <Link
             href="/"
-            className="flex items-center justify-center w-16 h-16 rounded-full bg-[#5B1187] shadow-lg transition-transform hover:scale-105 active:scale-95 overflow-hidden"
+            className="flex justify-center items-center w-40 h-32 transition-transform hover:scale-105 active:scale-95"
           >
             <VestLogo
-              className="w-12 h-12"
+              className="w-48 h-48"
               showSubtitle={false}
+              showBackground={false}
             />
           </Link>
         </div>
 
-        <div className="flex items-center justify-around w-full ml-12">
+        <div className="flex z-10 justify-around items-center ml-12 w-full">
           {rightNavItems.map((item) => {
             const active = isActive(
               item.href
@@ -130,13 +187,13 @@ export function BottomNav() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
+                  "flex flex-col justify-center items-center space-y-1 w-full h-full transition-colors",
                   active
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="w-5 h-5" />
                 <span className="text-[10px] font-medium">
                   {item.label}
                 </span>
@@ -144,7 +201,7 @@ export function BottomNav() {
             );
           })}
         </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 }

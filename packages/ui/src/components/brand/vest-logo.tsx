@@ -6,12 +6,14 @@ export type VestLogoProps =
   React.SVGProps<SVGSVGElement> & {
     showSubtitle?: boolean;
     showBackground?: boolean;
+    forceWhite?: boolean;
   };
 
 export function VestLogo({
   className,
   showSubtitle = true,
   showBackground = true,
+  forceWhite = false,
   ...props
 }: VestLogoProps) {
   return (
@@ -52,36 +54,57 @@ export function VestLogo({
         />
       )}
 
-      {/* V Shape Group */}
-      <g filter="url(#v-shadow)">
-        {/* Left stroke (Lighter Pink) */}
+      {/* V Shape Group - Centered when no background */}
+      <g
+        filter="url(#v-shadow)"
+        transform={
+          !showBackground &&
+          !showSubtitle
+            ? "translate(-20, 15)"
+            : ""
+        }
+      >
+        {/* Left stroke */}
         <path
           d="M45 60 L70 60 L82 125 L57 125 Z"
-          fill="#E879F9"
+          fill={
+            showBackground || forceWhite
+              ? "white"
+              : "#E879F9"
+          }
+          fillOpacity={
+            showBackground || forceWhite
+              ? 0.9
+              : 1
+          }
         />
-        {/* Right stroke (Darker Purple) */}
+        {/* Right stroke */}
         <path
           d="M80 60 L105 60 L93 125 L68 125 Z"
-          fill="#A21CAF"
+          fill={
+            showBackground || forceWhite
+              ? "white"
+              : "#A21CAF"
+          }
         />
-      </g>
 
-      {/* Text "est" */}
-      <text
-        x="108"
-        y="115"
-        fill={
-          showBackground
-            ? "white"
-            : "#5B1187"
-        }
-        fontSize="55"
-        fontWeight="bold"
-        fontFamily="Arial, sans-serif"
-        textAnchor="start"
-      >
-        est
-      </text>
+        {/* Text "est" moved inside group to move together */}
+        <text
+          x="108"
+          y="115"
+          fill={
+            showBackground || forceWhite
+              ? "white"
+              : "#5B1187"
+          }
+          fontSize="55"
+          fontWeight="bold"
+          fontFamily="Arial, sans-serif"
+          textAnchor="start"
+        >
+          est
+        </text>
+      </g>
 
       {/* Text "REAL STATE" */}
       {showSubtitle && (
@@ -89,7 +112,7 @@ export function VestLogo({
           x="100"
           y="155"
           fill={
-            showBackground
+            showBackground || forceWhite
               ? "white"
               : "#5B1187"
           }
