@@ -109,9 +109,12 @@ export function BottomNav() {
         <div className="absolute left-1/2 -translate-x-1/2 -top-6">
           <Link
             href="/"
-            className="flex items-center justify-center w-16 h-16 rounded-full bg-background border shadow-lg transition-transform hover:scale-105 active:scale-95 overflow-hidden"
+            className="flex items-center justify-center w-16 h-16 rounded-full bg-[#5B1187] shadow-lg transition-transform hover:scale-105 active:scale-95 overflow-hidden"
           >
-            <VestLogo className="w-12 h-12" />
+            <VestLogo
+              className="w-12 h-12"
+              showSubtitle={false}
+            />
           </Link>
         </div>
 

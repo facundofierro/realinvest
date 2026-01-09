@@ -3,10 +3,15 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 
 export type VestLogoProps =
-  React.SVGProps<SVGSVGElement>;
+  React.SVGProps<SVGSVGElement> & {
+    showSubtitle?: boolean;
+    showBackground?: boolean;
+  };
 
 export function VestLogo({
   className,
+  showSubtitle = true,
+  showBackground = true,
   ...props
 }: VestLogoProps) {
   return (
@@ -38,12 +43,14 @@ export function VestLogo({
       </defs>
 
       {/* Background Circle */}
-      <circle
-        cx="100"
-        cy="100"
-        r="100"
-        fill="#5B1187"
-      />
+      {showBackground && (
+        <circle
+          cx="100"
+          cy="100"
+          r="100"
+          fill="#5B1187"
+        />
+      )}
 
       {/* V Shape Group */}
       <g filter="url(#v-shadow)">
@@ -63,7 +70,11 @@ export function VestLogo({
       <text
         x="108"
         y="115"
-        fill="white"
+        fill={
+          showBackground
+            ? "white"
+            : "#5B1187"
+        }
         fontSize="55"
         fontWeight="bold"
         fontFamily="Arial, sans-serif"
@@ -73,19 +84,25 @@ export function VestLogo({
       </text>
 
       {/* Text "REAL STATE" */}
-      <text
-        x="100"
-        y="155"
-        fill="white"
-        fontSize="13"
-        fontWeight="600"
-        fontFamily="Arial, sans-serif"
-        textAnchor="middle"
-        letterSpacing="3"
-        className="uppercase"
-      >
-        Real State
-      </text>
+      {showSubtitle && (
+        <text
+          x="100"
+          y="155"
+          fill={
+            showBackground
+              ? "white"
+              : "#5B1187"
+          }
+          fontSize="13"
+          fontWeight="600"
+          fontFamily="Arial, sans-serif"
+          textAnchor="middle"
+          letterSpacing="3"
+          className="uppercase"
+        >
+          Real State
+        </text>
+      )}
     </svg>
   );
 }
