@@ -131,7 +131,7 @@ export default function InvestPage() {
     }, [selectedCategory, projects]);
 
   return (
-    <div className="overflow-x-hidden p-4 pb-32 mx-auto space-y-6 max-w-2xl duration-500 animate-in fade-in">
+    <div className="overflow-x-hidden p-4 pb-32 mx-auto space-y-6 max-w-7xl duration-500 animate-in fade-in">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -210,7 +210,7 @@ export default function InvestPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 min-[500px]:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredProjects.map(
             (project) => (
               <Link
