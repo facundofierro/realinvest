@@ -161,14 +161,14 @@ export function BottomNav() {
 
         <div
           className="absolute left-1/2 z-20 pl-2 -translate-x-1/2"
-          style={{ top: "-2.5rem" }}
+          style={{ top: "-1.3 rem" }}
         >
           <Link
             href="/"
-            className="flex justify-center items-center w-40 h-32 transition-transform hover:scale-105 active:scale-95"
+            className="flex justify-center items-center w-32 h-24 transition-transform hover:scale-105 active:scale-95"
           >
             <VestLogo
-              className="w-48 h-48"
+              className="w-36 h-36"
               showSubtitle={false}
               showBackground={false}
             />
