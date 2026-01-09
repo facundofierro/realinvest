@@ -2,7 +2,7 @@
 
 import { useIsDesktop } from "@/hooks/use-is-desktop";
 import { BottomNav } from "@/components/bottom-nav";
-import { DesktopSidebar } from "@/components/desktop-sidebar";
+import { DesktopTopNav } from "@/components/desktop-top-nav";
 import { cn } from "@repo/ui/lib/utils";
 
 export function DashboardLayoutClient({
@@ -15,13 +15,13 @@ export function DashboardLayoutClient({
   return (
     <div className="flex h-dvh overflow-hidden bg-muted/5 transition-all duration-300">
       {isDesktop ? (
-        <DesktopSidebar />
+        <DesktopTopNav />
       ) : null}
 
       <div
         className={cn(
           "flex-1 min-w-0 flex flex-col transition-all duration-300",
-          isDesktop ? "pl-64" : null
+          isDesktop ? "pt-16" : null
         )}
       >
         <main

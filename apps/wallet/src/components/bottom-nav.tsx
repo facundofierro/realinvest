@@ -1,130 +1,66 @@
 "use client";
 
-import {
-  useState,
-  useEffect,
-} from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Home,
-  PieChart,
+  Building2,
   ArrowLeftRight,
   MessageSquare,
-  Plus,
+  Wallet,
 } from "lucide-react";
-import { Button } from "@repo/ui/components/ui/button";
 import { cn } from "@repo/ui/lib/utils";
 
 export function BottomNav() {
   const pathname = usePathname();
-  const [isHidden, setIsHidden] =
-    useState(false);
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
-    const handleStoryActive = (
-      e: Event
-    ) => {
-      setIsHidden(
-        (e as CustomEvent).detail
-      );
+    const handleStoryActive = (e: Event) => {
+      setIsHidden((e as CustomEvent).detail);
     };
 
-    window.addEventListener(
-      "story-active",
-      handleStoryActive
-    );
-    return () =>
-      window.removeEventListener(
-        "story-active",
-        handleStoryActive
-      );
+    window.addEventListener("story-active", handleStoryActive);
+    return () => window.removeEventListener("story-active", handleStoryActive);
   }, []);
 
-  const isActive = (path: string) =>
-    pathname === path;
+  const isActive = (path: string) => pathname === path;
+
+  const navItems = [
+    { href: "/invest", label: "Proyectos", icon: Building2 },
+    { href: "/exchange", label: "Exchange", icon: ArrowLeftRight },
+    { href: "/chat", label: "Chat", icon: MessageSquare },
+    { href: "/assets", label: "Wallet", icon: Wallet },
+  ];
 
   return (
     <nav
       className={cn(
         "fixed bottom-0 left-0 right-0 border-t bg-background/80 backdrop-blur-lg pb-safe z-50 transition-transform duration-300",
-        isHidden
-          ? "translate-y-full"
-          : "translate-y-0"
+        isHidden ? "translate-y-full" : "translate-y-0"
       )}
     >
       <div className="flex items-center justify-around h-16 max-w-md mx-auto px-2">
-        <Link
-          href="/"
-          className={cn(
-            "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-            isActive("/")
-              ? "text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <Home className="h-5 w-5" />
-          <span className="text-[10px] font-medium">
-            Inicio
-          </span>
-        </Link>
+        {navItems.map((item) => {
+          const active = isActive(item.href);
+          const Icon = item.icon;
 
-        <Link
-          href="/assets"
-          className={cn(
-            "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-            isActive("/assets")
-              ? "text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <PieChart className="h-5 w-5" />
-          <span className="text-[10px] font-medium">
-            Portafolio
-          </span>
-        </Link>
-
-        <div className="relative -top-6">
-          <Button
-            size="icon"
-            className="h-14 w-14 rounded-full shadow-xl shadow-primary/30 border-4 border-background hover:scale-105 transition-transform"
-            asChild
-          >
-            <Link href="/invest">
-              <Plus className="h-7 w-7" />
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
+                active
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <Icon className="h-5 w-5" />
+              <span className="text-[10px] font-medium">{item.label}</span>
             </Link>
-          </Button>
-        </div>
-
-        <Link
-          href="/exchange"
-          className={cn(
-            "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-            isActive("/exchange")
-              ? "text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <ArrowLeftRight className="h-5 w-5" />
-          <span className="text-[10px] font-medium">
-            Exchange
-          </span>
-        </Link>
-
-        <Link
-          href="/chat"
-          className={cn(
-            "flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors",
-            isActive("/chat")
-              ? "text-primary"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <MessageSquare className="h-5 w-5" />
-          <span className="text-[10px] font-medium">
-            Chat
-          </span>
-        </Link>
+          );
+        })}
       </div>
     </nav>
   );
