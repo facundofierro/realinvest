@@ -5,14 +5,12 @@ import { cn } from "../../lib/utils";
 export type VestLogoProps =
   React.SVGProps<SVGSVGElement> & {
     showSubtitle?: boolean;
-    showBackground?: boolean;
     forceWhite?: boolean;
   };
 
 export function VestLogo({
   className,
   showSubtitle = true,
-  showBackground = true,
   forceWhite = false,
   ...props
 }: VestLogoProps) {
@@ -44,21 +42,10 @@ export function VestLogo({
         </filter>
       </defs>
 
-      {/* Background Circle */}
-      {showBackground && (
-        <circle
-          cx="100"
-          cy="100"
-          r="100"
-          fill="#5B1187"
-        />
-      )}
-
-      {/* V Shape Group - Centered when no background */}
+      {/* V Shape Group - Centered when no subtitle */}
       <g
         filter="url(#v-shadow)"
         transform={
-          !showBackground &&
           !showSubtitle
             ? "translate(-20, 15)"
             : ""
@@ -68,21 +55,19 @@ export function VestLogo({
         <path
           d="M45 60 L70 60 L82 125 L57 125 Z"
           fill={
-            showBackground || forceWhite
+            forceWhite
               ? "white"
               : "#E879F9"
           }
           fillOpacity={
-            showBackground || forceWhite
-              ? 0.9
-              : 1
+            forceWhite ? 0.9 : 1
           }
         />
         {/* Right stroke */}
         <path
           d="M80 60 L105 60 L93 125 L68 125 Z"
           fill={
-            showBackground || forceWhite
+            forceWhite
               ? "white"
               : "#A21CAF"
           }
@@ -93,7 +78,7 @@ export function VestLogo({
           x="108"
           y="115"
           fill={
-            showBackground || forceWhite
+            forceWhite
               ? "white"
               : "#5B1187"
           }
@@ -109,10 +94,10 @@ export function VestLogo({
       {/* Text "REAL STATE" */}
       {showSubtitle && (
         <text
-          x="100"
+          x="121"
           y="155"
           fill={
-            showBackground || forceWhite
+            forceWhite
               ? "white"
               : "#5B1187"
           }

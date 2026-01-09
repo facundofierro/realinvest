@@ -170,7 +170,6 @@ export function BottomNav() {
             <VestLogo
               className="w-36 h-36"
               showSubtitle={false}
-              showBackground={false}
             />
           </Link>
         </div>

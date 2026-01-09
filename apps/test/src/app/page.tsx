@@ -9,31 +9,18 @@ export default function Home() {
     title: string;
     props: Pick<
       VestLogoProps,
-      | "showBackground"
-      | "showSubtitle"
-      | "forceWhite"
+      "showSubtitle" | "forceWhite"
     >;
     previewClassName?: string;
   }> = [
     {
-      title: "Default",
-      props: {},
-      previewClassName: "bg-white",
-    },
-    {
-      title: "No subtitle",
-      props: { showSubtitle: false },
-      previewClassName: "bg-white",
-    },
-    {
       title: "No background",
-      props: { showBackground: false },
+      props: { showSubtitle: true },
       previewClassName: "bg-white",
     },
     {
       title: "Mark only",
       props: {
-        showBackground: false,
         showSubtitle: false,
       },
       previewClassName: "bg-white",
@@ -41,7 +28,6 @@ export default function Home() {
     {
       title: "No background (white)",
       props: {
-        showBackground: false,
         forceWhite: true,
       },
       previewClassName: "bg-black",
@@ -49,7 +35,6 @@ export default function Home() {
     {
       title: "Mark only (white)",
       props: {
-        showBackground: false,
         showSubtitle: false,
         forceWhite: true,
       },
@@ -60,13 +45,8 @@ export default function Home() {
   const vestRealStateThemes = [
     "dark",
     "light",
-    "green",
-    "pink",
     "brand",
     "ghost-dark",
-    "ghost-light",
-    "ghost-green",
-    "ghost-pink",
     "ghost-brand",
   ] as const;
 
@@ -151,20 +131,10 @@ export default function Home() {
             )}
             <div className="p-5 bg-white rounded-2xl border shadow-sm border-zinc-200">
               <div className="text-sm font-medium">
-                withColors
-              </div>
-              <div className="mt-3">
-                <VestRealState
-                  withColors
-                />
-              </div>
-            </div>
-            <div className="p-5 bg-white rounded-2xl border shadow-sm border-zinc-200">
-              <div className="text-sm font-medium">
                 Loader (wallet splash)
               </div>
-              <div className="mt-3 overflow-hidden rounded-xl bg-black">
-                <div className="flex items-center justify-center h-40">
+              <div className="overflow-hidden mt-3 bg-black rounded-xl">
+                <div className="flex justify-center items-center h-40">
                   <div className="animate-pulse">
                     <VestRealState theme="dark" />
                   </div>
