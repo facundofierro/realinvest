@@ -53,7 +53,7 @@ export function DesktopTopNav() {
           <VestRealState
             theme="light"
             withColors={true}
-            className="origin-left scale-[0.65] border-none shadow-none p-0"
+            className="origin-left scale-[0.78] border-none shadow-none p-0"
           />
         </Link>
 
