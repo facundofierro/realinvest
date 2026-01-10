@@ -20,12 +20,41 @@ import type { DashboardProject } from "@/lib/api/dashboard-projects";
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "";
 
+function getApiUrl(
+  path: string
+): string {
+  const normalizedPath =
+    path.startsWith("/")
+      ? path
+      : `/${path}`;
+
+  if (!API_BASE) return normalizedPath;
+
+  const base = API_BASE.trim();
+  const withoutTrailingSlashes =
+    base.endsWith("/")
+      ? base.replace(/\/+$/, "")
+      : base;
+
+  try {
+    const url = new URL(
+      withoutTrailingSlashes
+    );
+    return new URL(
+      normalizedPath,
+      url.origin
+    ).toString();
+  } catch {
+    return `${withoutTrailingSlashes}${normalizedPath}`;
+  }
+}
+
 // Market API
 export async function getMarketTokens(): Promise<
   MarketToken[]
 > {
   const res = await fetch(
-    `${API_BASE}/api/market/tokens`
+    getApiUrl("/api/market/tokens")
   );
   if (!res.ok)
     throw new Error(
@@ -53,7 +82,9 @@ export async function getMarketSeries(
   points: number
 ): Promise<MarketSeries> {
   const res = await fetch(
-    `${API_BASE}/api/market/series?symbol=${encodeURIComponent(symbol)}&timeframe=${encodeURIComponent(timeframe)}&points=${points}`
+    getApiUrl(
+      `/api/market/series?symbol=${encodeURIComponent(symbol)}&timeframe=${encodeURIComponent(timeframe)}&points=${points}`
+    )
   );
   if (!res.ok)
     throw new Error(
@@ -66,7 +97,9 @@ export async function getMarketOrderBook(
   symbol: string
 ): Promise<MarketOrderBook> {
   const res = await fetch(
-    `${API_BASE}/api/market/orderbook?symbol=${encodeURIComponent(symbol)}`
+    getApiUrl(
+      `/api/market/orderbook?symbol=${encodeURIComponent(symbol)}`
+    )
   );
   if (!res.ok)
     throw new Error(
@@ -92,7 +125,7 @@ export async function getWalletBalances(): Promise<
   WalletBalance[]
 > {
   const res = await fetch(
-    `${API_BASE}/api/wallet/balances`
+    getApiUrl("/api/wallet/balances")
   );
   if (!res.ok)
     throw new Error(
@@ -106,7 +139,7 @@ export async function getWalletHoldings(): Promise<
   Holding[]
 > {
   const res = await fetch(
-    `${API_BASE}/api/wallet/holdings`
+    getApiUrl("/api/wallet/holdings")
   );
   if (!res.ok)
     throw new Error(
@@ -120,7 +153,7 @@ export async function getWalletPositions(): Promise<
   Position[]
 > {
   const res = await fetch(
-    `${API_BASE}/api/wallet/positions`
+    getApiUrl("/api/wallet/positions")
   );
   if (!res.ok)
     throw new Error(
@@ -138,7 +171,7 @@ export async function createPosition(position: {
   orderPriceUsd?: number;
 }): Promise<Position> {
   const res = await fetch(
-    `${API_BASE}/api/wallet/positions`,
+    getApiUrl("/api/wallet/positions"),
     {
       method: "POST",
       headers: {
@@ -160,7 +193,7 @@ export async function closePosition(
   positionId: string
 ): Promise<void> {
   const res = await fetch(
-    `${API_BASE}/api/wallet/positions`,
+    getApiUrl("/api/wallet/positions"),
     {
       method: "POST",
       headers: {
@@ -183,7 +216,7 @@ export async function getProjects(): Promise<
   Project[]
 > {
   const res = await fetch(
-    `${API_BASE}/api/projects`
+    getApiUrl("/api/projects")
   );
   if (!res.ok)
     throw new Error(
@@ -197,7 +230,7 @@ export async function getProjectById(
   id: string
 ): Promise<Project | null> {
   const res = await fetch(
-    `${API_BASE}/api/projects/${id}`
+    getApiUrl(`/api/projects/${id}`)
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -208,7 +241,9 @@ export async function getProjectUnits(
   projectId: string
 ): Promise<ProjectUnit[]> {
   const res = await fetch(
-    `${API_BASE}/api/projects/${projectId}/units`
+    getApiUrl(
+      `/api/projects/${projectId}/units`
+    )
   );
   if (!res.ok)
     throw new Error(
@@ -222,7 +257,9 @@ export async function getProjectStories(
   projectId: string
 ): Promise<ProjectStory[]> {
   const res = await fetch(
-    `${API_BASE}/api/projects/${projectId}/stories`
+    getApiUrl(
+      `/api/projects/${projectId}/stories`
+    )
   );
   if (!res.ok)
     throw new Error(
@@ -236,7 +273,9 @@ export async function getProjectStages(
   projectId: string
 ): Promise<ProjectStage[]> {
   const res = await fetch(
-    `${API_BASE}/api/projects/${projectId}/stages`
+    getApiUrl(
+      `/api/projects/${projectId}/stages`
+    )
   );
   if (!res.ok)
     throw new Error(
@@ -250,7 +289,9 @@ export async function getProjectPurchaseOptions(
   projectId: string
 ): Promise<ProjectPurchaseOption[]> {
   const res = await fetch(
-    `${API_BASE}/api/projects/${projectId}/purchase-options`
+    getApiUrl(
+      `/api/projects/${projectId}/purchase-options`
+    )
   );
   if (!res.ok)
     throw new Error(
@@ -265,7 +306,7 @@ export async function getDashboardProjects(): Promise<
   DashboardProject[]
 > {
   const res = await fetch(
-    `${API_BASE}/api/dashboard/projects`
+    getApiUrl("/api/dashboard/projects")
   );
   if (!res.ok)
     throw new Error(
@@ -280,7 +321,7 @@ export async function getTransactions(): Promise<
   Transaction[]
 > {
   const res = await fetch(
-    `${API_BASE}/api/transactions`
+    getApiUrl("/api/transactions")
   );
   if (!res.ok)
     throw new Error(

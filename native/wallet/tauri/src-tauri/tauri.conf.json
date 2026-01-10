@@ -5,7 +5,7 @@
   "identifier": "com.realinvest.wallet",
   "build": {
     "frontendDist": "../../nextjs/out",
-    "devUrl": "http://localhost:3000",
+    "devUrl": "http://localhost:8001",
     "beforeDevCommand": "pnpm --filter wallet-native dev",
     "beforeBuildCommand": "pnpm --filter wallet-native build"
   },
