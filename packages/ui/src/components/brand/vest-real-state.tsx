@@ -6,7 +6,7 @@ import {
 import { cn } from "../../lib/utils";
 
 const vestRealStateVariants = cva(
-  "flex flex-col items-center justify-center p-4 rounded-md w-fit transition-colors",
+  "grid grid-cols-1 justify-items-center p-4 rounded-md w-fit transition-colors",
   {
     variants: {
       theme: {
@@ -14,7 +14,7 @@ const vestRealStateVariants = cva(
         light:
           "bg-white text-black border border-input shadow-sm",
         brand:
-          "bg-white text-[#5B1187] border border-[#5B1187]/20 shadow-sm",
+          "bg-white text-[#5B1187] border border-[#5B1187]/20 shadow-sm rounded-4xl p-3",
         "ghost-dark":
           "bg-transparent text-black hover:bg-black/5",
         "ghost-brand":
@@ -81,7 +81,7 @@ const VestRealState = React.forwardRef<
             "Vest"
           )}
         </span>
-        <div className="text-[0.6rem] font-medium tracking-[0.2em] uppercase opacity-90 w-full text-center translate-x-[0.12em]">
+        <div className="text-[0.6rem] font-medium tracking-[0.2em] uppercase opacity-90 justify-self-stretch text-left pl-3">
           Real State
         </div>
       </div>

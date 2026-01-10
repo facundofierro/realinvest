@@ -47,13 +47,13 @@ export function VestLogo({
         filter="url(#v-shadow)"
         transform={
           !showSubtitle
-            ? "translate(-20, 15)"
+            ? "translate(-10, 15)"
             : ""
         }
       >
         {/* Left stroke */}
         <path
-          d="M45 60 L70 60 L82 125 L57 125 Z"
+          d="M51 75 L62 75 L79 116 L68 116 Z"
           fill={
             forceWhite
               ? "white"
@@ -65,7 +65,7 @@ export function VestLogo({
         />
         {/* Right stroke */}
         <path
-          d="M80 60 L105 60 L93 125 L68 125 Z"
+          d="M87 75 L98 75 L79 116 L68 116 Z"
           fill={
             forceWhite
               ? "white"
@@ -75,7 +75,7 @@ export function VestLogo({
 
         {/* Text "est" moved inside group to move together */}
         <text
-          x="108"
+          x="96"
           y="115"
           fill={
             forceWhite
@@ -95,7 +95,7 @@ export function VestLogo({
       {showSubtitle && (
         <text
           x="121"
-          y="155"
+          y="148"
           fill={
             forceWhite
               ? "white"
