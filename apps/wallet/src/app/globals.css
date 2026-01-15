@@ -82,44 +82,22 @@
 }
 
 @theme inline {
-  --color-background: hsl(
-    var(--background)
-  );
-  --color-foreground: hsl(
-    var(--foreground)
-  );
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(
-    var(--card-foreground)
-  );
+  --color-card-foreground: hsl(var(--card-foreground));
   --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(
-    var(--popover-foreground)
-  );
+  --color-popover-foreground: hsl(var(--popover-foreground));
   --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(
-    var(--primary-foreground)
-  );
-  --color-secondary: hsl(
-    var(--secondary)
-  );
-  --color-secondary-foreground: hsl(
-    var(--secondary-foreground)
-  );
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(
-    var(--muted-foreground)
-  );
+  --color-muted-foreground: hsl(var(--muted-foreground));
   --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(
-    var(--accent-foreground)
-  );
-  --color-destructive: hsl(
-    var(--destructive)
-  );
-  --color-destructive-foreground: hsl(
-    var(--destructive-foreground)
-  );
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -128,16 +106,10 @@
   --color-chart-3: hsl(var(--chart-3));
   --color-chart-4: hsl(var(--chart-4));
   --color-chart-5: hsl(var(--chart-5));
-  --radius-sm: calc(
-    var(--radius) - 4px
-  );
-  --radius-md: calc(
-    var(--radius) - 2px
-  );
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(
-    var(--radius) + 4px
-  );
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 @layer utilities {
@@ -167,15 +139,13 @@
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out
-    forwards;
+  animation: fadeInUp 0.6s ease-out forwards;
 }
 
 @keyframes fadeInOut {
   0% {
     opacity: 0;
-    transform: translateY(8px)
-      scale(0.98);
+    transform: translateY(8px) scale(0.98);
   }
   15% {
     opacity: 1;
@@ -187,12 +157,23 @@
   }
   100% {
     opacity: 0;
-    transform: translateY(-6px)
-      scale(0.98);
+    transform: translateY(-6px) scale(0.98);
   }
 }
 
 .animate-fade-in-out {
-  animation: fadeInOut 2.2s ease-in-out
-    forwards;
+  animation: fadeInOut 2.2s ease-in-out forwards;
+}
+
+@keyframes kenBurns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.15) translate(-2%, -2%);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenBurns 20s ease-out infinite alternate;
 }

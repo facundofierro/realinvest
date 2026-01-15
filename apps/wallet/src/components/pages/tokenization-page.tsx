@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  useRef,
-} from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Badge } from "@repo/ui/components/ui/badge";
 import {
@@ -15,6 +11,7 @@ import {
   Handshake,
 } from "lucide-react";
 import Image from "next/image";
+import ScrollVideoSection from "../scroll-video-section";
 
 const stepsData = [
   {
@@ -46,139 +43,83 @@ const stepsData = [
 const heroLabels = [
   {
     text: "Creación de fideicomiso",
-    position:
-      "top-8 left-2 sm:left-6 md:top-10",
+    position: "top-8 left-2 sm:left-6 md:top-10",
   },
   {
     text: "Regulado por la CNV",
-    position:
-      "top-20 right-2 sm:right-8 md:top-24",
+    position: "top-20 right-2 sm:right-8 md:top-24",
   },
   {
     text: "Tokenización de la propiedad",
-    position:
-      "bottom-20 left-2 sm:left-10 md:bottom-28",
+    position: "bottom-20 left-2 sm:left-10 md:bottom-28",
   },
   {
     text: "Compra de tokens en lanzamiento",
-    position:
-      "bottom-8 right-2 sm:right-6 md:bottom-12",
+    position: "bottom-8 right-2 sm:right-6 md:bottom-12",
   },
   {
     text: "Mercado secundario",
-    position:
-      "top-1/2 -translate-y-1/2 left-1 sm:left-6",
+    position: "top-1/2 -translate-y-1/2 left-1 sm:left-6",
   },
 ];
 
 export default function TokenizationPage() {
-  const [activeStep, setActiveStep] =
-    useState(1);
-  const [
-    activeHeroLabel,
-    setActiveHeroLabel,
-  ] = useState(0);
-  const sectionRef =
-    useRef<HTMLElement>(null);
-  const videoSectionRef =
-    useRef<HTMLElement>(null);
-  const video1Ref =
-    useRef<HTMLVideoElement>(null);
-  const video2Ref =
-    useRef<HTMLVideoElement>(null);
-  const [
-    videoProgress,
-    setVideoProgress,
-  ] = useState(0);
-  const [
-    videoVisibility,
-    setVideoVisibility,
-  ] = useState(0);
+  const [activeStep, setActiveStep] = useState(1);
+  const [activeHeroLabel, setActiveHeroLabel] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const videoSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const sectionEl =
-      sectionRef.current;
+    const sectionEl = sectionRef.current;
     if (!sectionEl) return;
 
     const findScrollParent = () => {
-      const isScrollable = (
-        el: HTMLElement
-      ) => {
-        const style =
-          window.getComputedStyle(el);
-        const overflowY =
-          style.overflowY;
+      const isScrollable = (el: HTMLElement) => {
+        const style = window.getComputedStyle(el);
+        const overflowY = style.overflowY;
         return (
-          (overflowY === "auto" ||
-            overflowY === "scroll") &&
-          el.scrollHeight >
-            el.clientHeight
+          (overflowY === "auto" || overflowY === "scroll") &&
+          el.scrollHeight > el.clientHeight
         );
       };
 
-      let el: HTMLElement | null =
-        sectionEl.parentElement;
-      while (
-        el &&
-        el !== document.body
-      ) {
+      let el: HTMLElement | null = sectionEl.parentElement;
+      while (el && el !== document.body) {
         if (isScrollable(el)) return el;
         el = el.parentElement;
       }
       return null;
     };
 
-    const scrollParent =
-      findScrollParent();
+    const scrollParent = findScrollParent();
 
     const getProgress = () => {
-      const rect =
-        sectionEl.getBoundingClientRect();
+      const rect = sectionEl.getBoundingClientRect();
 
       if (!scrollParent) {
-        const windowHeight =
-          window.innerHeight;
+        const windowHeight = window.innerHeight;
         const scrollY = window.scrollY;
-        const sectionTop =
-          scrollY + rect.top;
-        const totalScrollableDistance =
-          Math.max(
-            rect.height - windowHeight,
-            1
-          );
+        const sectionTop = scrollY + rect.top;
+        const totalScrollableDistance = Math.max(rect.height - windowHeight, 1);
         return Math.min(
-          Math.max(
-            (scrollY - sectionTop) /
-              totalScrollableDistance,
-            0
-          ),
-          1
+          Math.max((scrollY - sectionTop) / totalScrollableDistance, 0),
+          1,
         );
       }
 
-      const containerRect =
-        scrollParent.getBoundingClientRect();
-      const containerHeight =
-        scrollParent.clientHeight;
-      const scrollTop =
-        scrollParent.scrollTop;
+      const containerRect = scrollParent.getBoundingClientRect();
+      const containerHeight = scrollParent.clientHeight;
+      const scrollTop = scrollParent.scrollTop;
 
-      const sectionTop =
-        scrollTop +
-        (rect.top - containerRect.top);
-      const totalScrollableDistance =
-        Math.max(
-          rect.height - containerHeight,
-          1
-        );
+      const sectionTop = scrollTop + (rect.top - containerRect.top);
+      const totalScrollableDistance = Math.max(
+        rect.height - containerHeight,
+        1,
+      );
 
       return Math.min(
-        Math.max(
-          (scrollTop - sectionTop) /
-            totalScrollableDistance,
-          0
-        ),
-        1
+        Math.max((scrollTop - sectionTop) / totalScrollableDistance, 0),
+        1,
       );
     };
 
@@ -186,401 +127,94 @@ export default function TokenizationPage() {
       const progress = getProgress();
       const step = Math.min(
         stepsData.length,
-        Math.max(
-          Math.floor(
-            progress * stepsData.length
-          ) + 1,
-          1
-        )
+        Math.max(Math.floor(progress * stepsData.length) + 1, 1),
       );
       setActiveStep(step);
     };
 
     handleScroll();
     if (scrollParent) {
-      scrollParent.addEventListener(
-        "scroll",
-        handleScroll,
-        { passive: true }
-      );
+      scrollParent.addEventListener("scroll", handleScroll, { passive: true });
     } else {
-      window.addEventListener(
-        "scroll",
-        handleScroll,
-        {
-          passive: true,
-        }
-      );
+      window.addEventListener("scroll", handleScroll, {
+        passive: true,
+      });
     }
-    window.addEventListener(
-      "resize",
-      handleScroll
-    );
+    window.addEventListener("resize", handleScroll);
     return () => {
       if (scrollParent) {
-        scrollParent.removeEventListener(
-          "scroll",
-          handleScroll
-        );
+        scrollParent.removeEventListener("scroll", handleScroll);
       } else {
-        window.removeEventListener(
-          "scroll",
-          handleScroll
-        );
+        window.removeEventListener("scroll", handleScroll);
       }
-      window.removeEventListener(
-        "resize",
-        handleScroll
-      );
+      window.removeEventListener("resize", handleScroll);
     };
   }, []);
 
   useEffect(() => {
-    const interval = window.setInterval(
-      () => {
-        setActiveHeroLabel((prev) => {
-          if (heroLabels.length <= 1)
-            return prev;
-          let next = prev;
-          while (next === prev) {
-            next = Math.floor(
-              Math.random() *
-                heroLabels.length
-            );
-          }
-          return next;
-        });
-      },
-      2200
-    );
-    return () =>
-      window.clearInterval(interval);
+    const interval = window.setInterval(() => {
+      setActiveHeroLabel((prev) => {
+        if (heroLabels.length <= 1) return prev;
+        let next = prev;
+        while (next === prev) {
+          next = Math.floor(Math.random() * heroLabels.length);
+        }
+        return next;
+      });
+    }, 2200);
+    return () => window.clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    const sectionEl =
-      videoSectionRef.current;
+    const sectionEl = videoSectionRef.current;
     if (!sectionEl) return;
 
-    const clamp01 = (v: number) =>
-      Math.min(1, Math.max(0, v));
+    const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
     const findScrollParent = () => {
-      const isScrollable = (
-        el: HTMLElement
-      ) => {
-        const style =
-          window.getComputedStyle(el);
-        const overflowY =
-          style.overflowY;
+      const isScrollable = (el: HTMLElement) => {
+        const style = window.getComputedStyle(el);
+        const overflowY = style.overflowY;
         return (
-          (overflowY === "auto" ||
-            overflowY === "scroll") &&
-          el.scrollHeight >
-            el.clientHeight
+          (overflowY === "auto" || overflowY === "scroll") &&
+          el.scrollHeight > el.clientHeight
         );
       };
 
-      let el: HTMLElement | null =
-        sectionEl.parentElement;
-      while (
-        el &&
-        el !== document.body
-      ) {
+      let el: HTMLElement | null = sectionEl.parentElement;
+      while (el && el !== document.body) {
         if (isScrollable(el)) return el;
         el = el.parentElement;
       }
       return null;
     };
 
-    const scrollParent =
-      findScrollParent();
+    const scrollParent = findScrollParent();
 
     const getProgress = () => {
-      const rect =
-        sectionEl.getBoundingClientRect();
+      const rect = sectionEl.getBoundingClientRect();
 
       if (!scrollParent) {
-        const windowHeight =
-          window.innerHeight;
+        const windowHeight = window.innerHeight;
         const scrollY = window.scrollY;
-        const sectionTop =
-          scrollY + rect.top;
-        const totalScrollableDistance =
-          Math.max(
-            rect.height - windowHeight,
-            1
-          );
-        return clamp01(
-          (scrollY - sectionTop) /
-            totalScrollableDistance
-        );
+        const sectionTop = scrollY + rect.top;
+        const totalScrollableDistance = Math.max(rect.height - windowHeight, 1);
+        return clamp01((scrollY - sectionTop) / totalScrollableDistance);
       }
 
-      const containerRect =
-        scrollParent.getBoundingClientRect();
-      const containerHeight =
-        scrollParent.clientHeight;
-      const scrollTop =
-        scrollParent.scrollTop;
+      const containerRect = scrollParent.getBoundingClientRect();
+      const containerHeight = scrollParent.clientHeight;
+      const scrollTop = scrollParent.scrollTop;
 
-      const sectionTop =
-        scrollTop +
-        (rect.top - containerRect.top);
-      const totalScrollableDistance =
-        Math.max(
-          rect.height - containerHeight,
-          1
-        );
+      const sectionTop = scrollTop + (rect.top - containerRect.top);
+      const totalScrollableDistance = Math.max(
+        rect.height - containerHeight,
+        1,
+      );
 
-      return clamp01(
-        (scrollTop - sectionTop) /
-          totalScrollableDistance
-      );
-    };
-
-    const getVisibility = () => {
-      const rect =
-        sectionEl.getBoundingClientRect();
-      const viewportTop = scrollParent
-        ? scrollParent.getBoundingClientRect()
-            .top
-        : 0;
-      const viewportBottom =
-        scrollParent
-          ? scrollParent.getBoundingClientRect()
-              .bottom
-          : window.innerHeight;
-      const viewportHeight =
-        scrollParent
-          ? scrollParent.clientHeight
-          : window.innerHeight;
-      const visiblePx =
-        Math.min(
-          rect.bottom,
-          viewportBottom
-        ) -
-        Math.max(rect.top, viewportTop);
-      return clamp01(
-        visiblePx / viewportHeight
-      );
-    };
-
-    const handleScroll = () => {
-      setVideoProgress(getProgress());
-      setVideoVisibility(
-        getVisibility()
-      );
-    };
-
-    handleScroll();
-    if (scrollParent) {
-      scrollParent.addEventListener(
-        "scroll",
-        handleScroll,
-        { passive: true }
-      );
-    } else {
-      window.addEventListener(
-        "scroll",
-        handleScroll,
-        { passive: true }
-      );
-    }
-    window.addEventListener(
-      "resize",
-      handleScroll
-    );
-    return () => {
-      if (scrollParent) {
-        scrollParent.removeEventListener(
-          "scroll",
-          handleScroll
-        );
-      } else {
-        window.removeEventListener(
-          "scroll",
-          handleScroll
-        );
-      }
-      window.removeEventListener(
-        "resize",
-        handleScroll
-      );
+      return clamp01((scrollTop - sectionTop) / totalScrollableDistance);
     };
   }, []);
-
-  useEffect(() => {
-    const clamp01 = (v: number) =>
-      Math.min(1, Math.max(0, v));
-
-    const v1 = {
-      start: 0.18,
-      end: 0.55,
-    };
-    const v2 = {
-      start: 0.68,
-      end: 0.92,
-    };
-
-    const overallFade = (() => {
-      const edge = 0.18;
-      return clamp01(
-        videoVisibility / edge
-      );
-    })();
-
-    const shouldPlay =
-      overallFade > 0.05;
-
-    const syncVideo = (
-      video: HTMLVideoElement | null,
-      segment: {
-        start: number;
-        end: number;
-      } | null
-    ) => {
-      if (!video) return;
-      if (!shouldPlay) {
-        video.pause();
-        return;
-      }
-
-      const volume = clamp01(
-        overallFade
-      );
-      if (!video.muted) {
-        video.volume = volume;
-      }
-
-      if (!segment) {
-        video.pause();
-        return;
-      }
-
-      const segmentProgress = clamp01(
-        (videoProgress -
-          segment.start) /
-          (segment.end - segment.start)
-      );
-      if (
-        Number.isFinite(
-          video.duration
-        ) &&
-        video.duration > 0
-      ) {
-        const targetTime =
-          video.duration *
-          segmentProgress;
-        if (
-          Number.isFinite(targetTime) &&
-          Math.abs(
-            video.currentTime -
-              targetTime
-          ) > 0.12
-        ) {
-          video.currentTime =
-            targetTime;
-        }
-      }
-
-      if (video.paused) {
-        const playPromise =
-          video.play();
-        if (playPromise) {
-          playPromise.catch(() => {
-            video.muted = true;
-            video
-              .play()
-              .catch(() => {});
-          });
-        }
-      }
-    };
-
-    const isIn = (
-      p: number,
-      s: { start: number; end: number }
-    ) => p >= s.start && p <= s.end;
-
-    syncVideo(
-      video1Ref.current,
-      isIn(videoProgress, v1)
-        ? v1
-        : null
-    );
-    syncVideo(
-      video2Ref.current,
-      isIn(videoProgress, v2)
-        ? v2
-        : null
-    );
-  }, [videoProgress, videoVisibility]);
-
-  const clamp01 = (v: number) =>
-    Math.min(1, Math.max(0, v));
-  const fadeInOut = (
-    p: number,
-    start: number,
-    end: number,
-    edge: number
-  ) => {
-    if (
-      p <= start - edge ||
-      p >= end + edge
-    )
-      return 0;
-    if (p < start)
-      return clamp01(
-        (p - (start - edge)) / edge
-      );
-    if (p > end)
-      return clamp01(
-        (end + edge - p) / edge
-      );
-    return 1;
-  };
-  const fadeIn = (
-    p: number,
-    start: number,
-    edge: number
-  ) => clamp01((p - start) / edge);
-  const fadeOut = (
-    p: number,
-    end: number,
-    edge: number
-  ) => clamp01((end - p) / edge);
-
-  const overallFade = clamp01(
-    videoVisibility / 0.18
-  );
-  const title1Opacity =
-    fadeOut(videoProgress, 0.18, 0.07) *
-    overallFade;
-  const video1Opacity =
-    fadeInOut(
-      videoProgress,
-      0.18,
-      0.55,
-      0.06
-    ) * overallFade;
-  const title2Opacity =
-    fadeInOut(
-      videoProgress,
-      0.55,
-      0.68,
-      0.06
-    ) * overallFade;
-  const video2Opacity =
-    fadeInOut(
-      videoProgress,
-      0.68,
-      0.92,
-      0.06
-    ) * overallFade;
-  const title3Opacity =
-    fadeIn(videoProgress, 0.92, 0.06) *
-    overallFade;
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-3.5rem)]">
@@ -605,22 +239,16 @@ export default function TokenizationPage() {
             <div className="flex flex-col items-center text-center lg:items-start lg:text-left lg:-translate-y-6 lg:-translate-x-2">
               <h1 className="font-extrabold tracking-tight text-[#3B2146] leading-[1.06] animate-fade-in-up">
                 <span className="block text-[clamp(20px,2.4vw,32px)] text-[#2a1632] lg:whitespace-nowrap">
-                  Multiplica las fuentes
-                  de financiamiento
+                  Multiplica las fuentes de financiamiento
                 </span>
                 <span className="block mt-3 text-[clamp(26px,3.4vw,44px)] text-transparent bg-clip-text bg-gradient-to-r from-[#5B1187] via-purple-600 to-fuchsia-500 lg:whitespace-nowrap">
-                  Capital inmobiliario
-                  al alcance de todos
+                  Capital inmobiliario al alcance de todos
                 </span>
               </h1>
 
               <p className="mt-6 max-w-xl text-[clamp(15px,1.9vw,18px)] leading-relaxed text-muted-foreground animate-fade-in-up">
-                Transformamos el
-                desarrollo inmobiliario
-                conectándote con miles
-                de inversores.
-                Financiamiento ágil,
-                transparente y 100%
+                Transformamos el desarrollo inmobiliario conectándote con miles
+                de inversores. Financiamiento ágil, transparente y 100%
                 regulado.
               </p>
 
@@ -629,8 +257,7 @@ export default function TokenizationPage() {
                   size="lg"
                   className="bg-[#5B1187] hover:bg-[#4a0d6e] h-12 sm:h-14 px-7 sm:px-8 text-base sm:text-lg shadow-lg hover:shadow-purple-500/25 group transition-all duration-300 hover:scale-[1.02]"
                 >
-                  Aplicar como
-                  Desarrollador
+                  Aplicar como Desarrollador
                   <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                 </Button>
                 <Button
@@ -661,11 +288,7 @@ export default function TokenizationPage() {
                 <div className="inline-flex gap-2 items-center px-4 py-2 rounded-full border ring-1 shadow-lg backdrop-blur-xl bg-white/35 border-white/60 ring-white/40 shadow-black/5">
                   <span className="w-2 h-2 rounded-full bg-[#5B1187]" />
                   <span className="text-sm font-semibold text-[#3B2146]">
-                    {
-                      heroLabels[
-                        activeHeroLabel
-                      ]?.text
-                    }
+                    {heroLabels[activeHeroLabel]?.text}
                   </span>
                 </div>
               </div>
@@ -677,120 +300,71 @@ export default function TokenizationPage() {
       <section className="py-10 bg-white border-purple-100 border-y sm:py-14">
         <div className="px-4 mx-auto w-full max-w-6xl md:px-6">
           <div className="grid gap-6">
-            <div className="overflow-hidden relative rounded-[2rem] border border-purple-100 bg-gradient-to-br from-white via-purple-50/60 to-indigo-50/60 shadow-sm">
-              <div className="grid gap-10 p-7 sm:p-10 lg:grid-cols-2 lg:gap-12 lg:items-center">
-                <div>
-                  <Badge className="bg-white/70 text-[#3B2146] hover:bg-white/70 border-purple-200 px-4 py-1.5 text-sm font-medium rounded-full">
-                    Múltiples formas de
-                    financiamiento
-                  </Badge>
-                  <h2 className="mt-4 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#3B2146]">
-                    Estructura de
-                    capital flexible
-                    para tu proyecto
-                  </h2>
-                  <p className="mt-4 text-base leading-relaxed sm:text-lg text-muted-foreground">
-                    Combiná distintas
-                    alternativas para
-                    optimizar la
-                    preventa, reducir
-                    riesgos y atraer más
-                    inversores.
-                  </p>
+            <div className="overflow-hidden relative rounded-[3rem] bg-linear-to-br from-white to-[#EFF4FF] shadow-sm group">
+              {/* Background Glow Effect */}
+              <div className="absolute top-0 right-0 w-[60%] h-[80%] rounded-full bg-blue-50/50 blur-3xl pointer-events-none" />
 
-                  <div className="grid gap-4 mt-7 sm:grid-cols-2">
-                    <div className="p-5 rounded-2xl border backdrop-blur-sm border-white/70 bg-white/70">
-                      <div className="flex gap-3 items-start">
-                        <div className="flex justify-center items-center w-10 h-10 rounded-xl bg-purple-100 text-[#5B1187] shrink-0">
-                          <Building2 className="w-5 h-5" />
+              <div className="grid gap-8 p-8 md:p-12 lg:grid-cols-2 lg:gap-16 items-center relative z-10">
+                <div className="flex flex-col h-full justify-center">
+                  <div>
+                    <Badge className="bg-white text-[#5B1187] hover:bg-white border-purple-100 px-4 py-1.5 text-sm font-bold rounded-full shadow-sm mb-6 w-fit">
+                      Múltiples formas de financiamiento
+                    </Badge>
+                    <h2 className="text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold tracking-tight text-[#3B2146] leading-[1.15]">
+                      Estructura de capital flexible para tu proyecto
+                    </h2>
+                    <p className="mt-6 text-lg leading-relaxed text-muted-foreground/90 font-medium">
+                      Combiná distintas alternativas para optimizar la preventa,
+                      reducir riesgos y atraer más inversores.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-4 mt-10 md:grid-cols-2">
+                    <div className="p-5 rounded-3xl bg-white border border-purple-50 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex gap-4 items-center mb-3">
+                        <div className="flex justify-center items-center w-12 h-12 rounded-2xl bg-purple-50 text-[#5B1187] shrink-0">
+                          <Building2 className="w-6 h-6" />
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-base font-bold text-[#3B2146]">
-                            Equity
-                            Tokens
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Venta de
-                            participaciones
-                            del activo
-                          </p>
-                        </div>
+                        <p className="text-lg font-bold text-[#3B2146]">
+                          Equity Tokens
+                        </p>
                       </div>
-                      <ul className="mt-4 space-y-3">
-                        <li className="flex gap-3 items-start">
-                          <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">
-                            Inversores
-                            compran m²
-                            reales del
-                            proyecto.
+                      <ul className="space-y-2.5">
+                        <li className="flex gap-2.5 items-start">
+                          <ShieldCheck className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                          <span className="text-sm font-medium text-muted-foreground">
+                            Inversores compran m² reales.
                           </span>
                         </li>
-                        <li className="flex gap-3 items-start">
-                          <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">
-                            Obtenés
-                            capital sin
-                            generar
-                            deuda.
-                          </span>
-                        </li>
-                        <li className="flex gap-3 items-start">
-                          <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">
-                            Ideal para
-                            preventa y
-                            capitalización
-                            inicial.
+                        <li className="flex gap-2.5 items-start">
+                          <ShieldCheck className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                          <span className="text-sm font-medium text-muted-foreground">
+                            Sin generar deuda.
                           </span>
                         </li>
                       </ul>
                     </div>
 
-                    <div className="p-5 rounded-2xl border backdrop-blur-sm border-white/70 bg-white/70">
-                      <div className="flex gap-3 items-start">
-                        <div className="flex justify-center items-center w-10 h-10 text-blue-700 bg-blue-100 rounded-xl shrink-0">
-                          <TrendingUp className="w-5 h-5" />
+                    <div className="p-5 rounded-3xl bg-white border border-blue-50 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex gap-4 items-center mb-3">
+                        <div className="flex justify-center items-center w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 shrink-0">
+                          <TrendingUp className="w-6 h-6" />
                         </div>
-                        <div className="min-w-0">
-                          <p className="text-base font-bold text-[#3B2146]">
-                            Deuda /
-                            Renta Fija
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Crédito con
-                            tasa fija
-                            para
-                            inversores
-                          </p>
-                        </div>
+                        <p className="text-lg font-bold text-[#3B2146]">
+                          Deuda / Renta
+                        </p>
                       </div>
-                      <ul className="mt-4 space-y-3">
-                        <li className="flex gap-3 items-start">
-                          <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">
-                            Instrumentos
-                            similares a
-                            bonos
-                            corporativos.
+                      <ul className="space-y-2.5">
+                        <li className="flex gap-2.5 items-start">
+                          <ShieldCheck className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                          <span className="text-sm font-medium text-muted-foreground">
+                            Crédito con tasa fija.
                           </span>
                         </li>
-                        <li className="flex gap-3 items-start">
-                          <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">
-                            Pagás un
-                            interés fijo
-                            a los
-                            inversores.
-                          </span>
-                        </li>
-                        <li className="flex gap-3 items-start">
-                          <ShieldCheck className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">
-                            Mantenés la
-                            titularidad
-                            completa del
-                            activo.
+                        <li className="flex gap-2.5 items-start">
+                          <ShieldCheck className="w-5 h-5 text-green-500 shrink-0 mt-0.5" />
+                          <span className="text-sm font-medium text-muted-foreground">
+                            Sin ceder titularidad.
                           </span>
                         </li>
                       </ul>
@@ -798,50 +372,65 @@ export default function TokenizationPage() {
                   </div>
                 </div>
 
-                <div className="relative mx-auto w-full max-w-[560px] lg:max-w-none">
-                  <div className="w-full rounded-[1.75rem] border border-white/70 bg-white/40 backdrop-blur-sm aspect-[16/10]" />
+                <div className="relative h-full min-h-[300px] lg:min-h-[500px] flex items-center justify-center lg:justify-end">
+                  <div className="relative w-full aspect-square max-w-[500px]">
+                    <Image
+                      src="/landing/capital-icon.png"
+                      alt="Estructura de Capital"
+                      fill
+                      className="object-contain drop-shadow-2xl animate-float"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              <div className="overflow-hidden relative p-7 rounded-[2rem] border border-purple-100 bg-gradient-to-br from-white to-purple-50/60 shadow-sm sm:p-9">
-                <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200 px-4 py-1.5 text-sm font-medium rounded-full">
-                  Regulado por la CNV
-                </Badge>
-                <h3 className="mt-4 text-xl sm:text-2xl font-extrabold tracking-tight text-[#3B2146]">
-                  Seguridad jurídica
-                  para el proyecto
-                </h3>
-                <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                  Operamos bajo el marco
-                  regulatorio de la
-                  Comisión Nacional de
-                  Valores, garantizando
-                  seguridad jurídica
-                  para todas las partes.
-                </p>
-                <div className="mt-6 w-full rounded-2xl border border-white/70 bg-white/50 backdrop-blur-sm aspect-[16/10]" />
+              <div className="overflow-hidden relative p-8 rounded-[2.5rem] bg-linear-to-b from-[#FFFDF2] to-[#FFF5D6] transition-all duration-300 hover:shadow-lg group">
+                <div className="relative z-10 max-w-[55%]">
+                  <Badge className="bg-white/80 text-[#3B2146] hover:bg-white border-purple-100 px-4 py-1.5 text-sm font-bold rounded-full backdrop-blur-sm shadow-sm">
+                    Regulado por la CNV
+                  </Badge>
+                  <h3 className="mt-6 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#3B2146] leading-tight">
+                    Seguridad jurídica para el proyecto
+                  </h3>
+                  <p className="mt-4 text-base leading-relaxed text-muted-foreground/90 font-medium">
+                    Operamos bajo el marco regulatorio de la Comisión Nacional
+                    de Valores, garantizando seguridad jurídica para todas las
+                    partes.
+                  </p>
+                </div>
+                <div className="absolute -bottom-6 -right-6 w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] transition-transform duration-500 group-hover:scale-105">
+                  <Image
+                    src="/cnv-logo.png"
+                    alt="CNV Logo"
+                    fill
+                    className="object-contain opacity-90 drop-shadow-xl"
+                  />
+                </div>
               </div>
 
-              <div className="overflow-hidden relative p-7 rounded-[2rem] border border-purple-100 bg-gradient-to-br from-white to-indigo-50/60 shadow-sm sm:p-9">
-                <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200 px-4 py-1.5 text-sm font-medium rounded-full">
-                  Liquidez secundaria
-                </Badge>
-                <h3 className="mt-4 text-xl sm:text-2xl font-extrabold tracking-tight text-[#3B2146]">
-                  Mercado para tus
-                  inversores
-                </h3>
-                <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-                  Tus inversores pueden
-                  operar en nuestro
-                  mercado secundario,
-                  brindando una ventaja
-                  competitiva de
-                  liquidez a tu
-                  proyecto.
-                </p>
-                <div className="mt-6 w-full rounded-2xl border border-white/70 bg-white/50 backdrop-blur-sm aspect-[16/10]" />
+              <div className="overflow-hidden relative p-8 rounded-[2.5rem] bg-white border border-gray-100 transition-all duration-300 hover:shadow-lg group">
+                <div className="relative z-10 max-w-[65%]">
+                  <Badge className="bg-blue-50 text-[#3B2146] hover:bg-white border-blue-100 px-4 py-1.5 text-sm font-bold rounded-full backdrop-blur-sm shadow-sm">
+                    Liquidez secundaria
+                  </Badge>
+                  <h3 className="mt-6 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#3B2146] leading-tight">
+                    Mercado para tus inversores
+                  </h3>
+                  <p className="mt-4 text-base leading-relaxed text-muted-foreground/90 font-medium">
+                    Tus inversores pueden operar en nuestro mercado secundario,
+                    brindando una ventaja competitiva de liquidez a tu proyecto.
+                  </p>
+                </div>
+                <div className="absolute bottom-0 right-0 w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] transition-transform duration-500 group-hover:scale-105">
+                  <Image
+                    src="/landing/market-icon.png"
+                    alt="Mercado Secundario"
+                    fill
+                    className="object-contain drop-shadow-2xl"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -849,10 +438,7 @@ export default function TokenizationPage() {
       </section>
 
       {/* Parallax Construction Section */}
-      <section
-        ref={sectionRef}
-        className="relative h-[400vh] bg-white"
-      >
+      <section ref={sectionRef} className="relative h-[400vh] bg-white">
         <div className="sticky top-0 w-full h-screen bg-white">
           <div className="flex flex-col justify-center px-4 mx-auto w-full max-w-6xl h-full md:px-6">
             <div className="mx-auto w-full max-w-6xl">
@@ -864,8 +450,7 @@ export default function TokenizationPage() {
                       : "blur-[2px] opacity-75"
                   }`}
                 >
-                  Proceso de
-                  Tokenización
+                  Proceso de Tokenización
                 </h2>
                 <p
                   className={`text-muted-foreground transition-[filter,opacity] duration-500 ${
@@ -874,8 +459,7 @@ export default function TokenizationPage() {
                       : "blur-[2px] opacity-75"
                   }`}
                 >
-                  Desliza para ver el
-                  paso a paso
+                  Desliza para ver el paso a paso
                 </p>
               </div>
 
@@ -913,7 +497,7 @@ export default function TokenizationPage() {
                     }`}
                   />
                   <Image
-                    src="/landing/building4.png"
+                    src="/landing/building4-tall.png"
                     alt="Proyecto Exitoso"
                     fill
                     className={`object-contain transition-all duration-700 ease-out ${
@@ -928,45 +512,25 @@ export default function TokenizationPage() {
                   <div className="p-8 bg-white rounded-3xl border border-purple-100 shadow-xl sm:p-10">
                     <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
                       <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#5B1187] text-white text-xl font-bold mb-5 shadow-lg shadow-purple-500/20">
-                        {
-                          stepsData[
-                            activeStep -
-                              1
-                          ].step
-                        }
+                        {stepsData[activeStep - 1].step}
                       </div>
                       <h3 className="text-2xl sm:text-3xl font-bold text-[#3B2146] mb-3">
-                        {
-                          stepsData[
-                            activeStep -
-                              1
-                          ].title
-                        }
+                        {stepsData[activeStep - 1].title}
                       </h3>
                       <p className="text-base leading-relaxed sm:text-lg text-slate-600">
-                        {
-                          stepsData[
-                            activeStep -
-                              1
-                          ].description
-                        }
+                        {stepsData[activeStep - 1].description}
                       </p>
                       <div className="flex gap-2 mt-7">
-                        {[
-                          1, 2, 3, 4,
-                        ].map(
-                          (step) => (
-                            <div
-                              key={step}
-                              className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
-                                activeStep ===
-                                step
-                                  ? "bg-[#5B1187] scale-110"
-                                  : "bg-purple-200"
-                              }`}
-                            />
-                          )
-                        )}
+                        {[1, 2, 3, 4].map((step) => (
+                          <div
+                            key={step}
+                            className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
+                              activeStep === step
+                                ? "bg-[#5B1187] scale-110"
+                                : "bg-purple-200"
+                            }`}
+                          />
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -977,135 +541,11 @@ export default function TokenizationPage() {
         </div>
       </section>
 
-      <section
-        ref={videoSectionRef}
-        className="relative bg-white h-[280vh]"
-      >
+      <section ref={videoSectionRef} className="relative bg-white h-[280vh]">
         <div className="flex sticky top-0 items-center w-full h-screen">
           <div className="px-4 mx-auto w-full max-w-6xl md:px-6">
             <div className="flex flex-col items-center mx-auto w-full max-w-5xl">
-              <div className="relative w-full aspect-[16/9] bg-white">
-                <video
-                  ref={video1Ref}
-                  className="object-cover absolute inset-0 w-full h-full"
-                  playsInline
-                  preload="metadata"
-                  src="/landing/v1.mp4"
-                  style={{
-                    opacity:
-                      video1Opacity,
-                  }}
-                />
-                <video
-                  ref={video2Ref}
-                  className="object-cover absolute inset-0 w-full h-full"
-                  playsInline
-                  preload="metadata"
-                  src="/landing/v2.mp4"
-                  style={{
-                    opacity:
-                      video2Opacity,
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t pointer-events-none from-white/70 via-white/10 to-white/50" />
-                <div className="flex absolute inset-0 justify-center items-center px-6 pointer-events-none sm:px-10">
-                  <div
-                    className="max-w-2xl text-center"
-                    style={{
-                      opacity:
-                        title1Opacity,
-                    }}
-                  >
-                    <p className="text-xs font-semibold tracking-wide text-[#5B1187] uppercase">
-                      Producto
-                    </p>
-                    <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#3B2146] sm:text-4xl">
-                      Descubrí la
-                      experiencia VEST
-                    </h2>
-                  </div>
-
-                  <div
-                    className="absolute max-w-2xl text-center"
-                    style={{
-                      opacity:
-                        title2Opacity,
-                    }}
-                  >
-                    <p className="text-xs font-semibold tracking-wide text-[#5B1187] uppercase">
-                      Flujo
-                    </p>
-                    <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#3B2146] sm:text-4xl">
-                      Gestión clara,
-                      simple y regulada
-                    </h2>
-                  </div>
-
-                  <div
-                    className="absolute max-w-2xl text-center"
-                    style={{
-                      opacity:
-                        title3Opacity,
-                    }}
-                  >
-                    <p className="text-xs font-semibold tracking-wide text-[#5B1187] uppercase">
-                      Escala
-                    </p>
-                    <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#3B2146] sm:text-4xl">
-                      Listo para captar
-                      más inversores
-                    </h2>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-2 justify-center mt-6">
-                <div
-                  className="h-1.5 w-8 rounded-full bg-purple-200"
-                  style={{
-                    opacity: clamp01(
-                      title1Opacity *
-                        1.2
-                    ),
-                  }}
-                />
-                <div
-                  className="h-1.5 w-8 rounded-full bg-purple-200"
-                  style={{
-                    opacity: clamp01(
-                      video1Opacity *
-                        1.2
-                    ),
-                  }}
-                />
-                <div
-                  className="h-1.5 w-8 rounded-full bg-purple-200"
-                  style={{
-                    opacity: clamp01(
-                      title2Opacity *
-                        1.2
-                    ),
-                  }}
-                />
-                <div
-                  className="h-1.5 w-8 rounded-full bg-purple-200"
-                  style={{
-                    opacity: clamp01(
-                      video2Opacity *
-                        1.2
-                    ),
-                  }}
-                />
-                <div
-                  className="h-1.5 w-8 rounded-full bg-purple-200"
-                  style={{
-                    opacity: clamp01(
-                      title3Opacity *
-                        1.2
-                    ),
-                  }}
-                />
-              </div>
+              <ScrollVideoSection videoSectionRef={videoSectionRef} />
             </div>
           </div>
         </div>
@@ -1122,12 +562,8 @@ export default function TokenizationPage() {
                 Smart Contracts
               </h3>
               <p className="leading-relaxed text-muted-foreground">
-                Automatizamos la
-                distribución de
-                rendimientos y la
-                gestión de la propiedad
-                mediante contratos
-                inteligentes auditados.
+                Automatizamos la distribución de rendimientos y la gestión de la
+                propiedad mediante contratos inteligentes auditados.
               </p>
             </div>
           </div>
@@ -1138,15 +574,11 @@ export default function TokenizationPage() {
       <section className="py-24 bg-[#3B2146] text-white">
         <div className="px-4 mx-auto w-full max-w-6xl text-center md:px-6">
           <h2 className="mb-6 text-2xl font-bold tracking-tight sm:text-3xl">
-            ¿Listo para tokenizar tu
-            desarrollo?
+            ¿Listo para tokenizar tu desarrollo?
           </h2>
           <p className="mx-auto mb-10 max-w-2xl text-lg text-purple-200">
-            Sumate a la revolución del
-            Real Estate. Completá el
-            formulario y nuestro equipo
-            de estructuración financiera
-            se pondrá en contacto.
+            Sumate a la revolución del Real Estate. Completá el formulario y
+            nuestro equipo de estructuración financiera se pondrá en contacto.
           </p>
           <Button
             size="lg"
