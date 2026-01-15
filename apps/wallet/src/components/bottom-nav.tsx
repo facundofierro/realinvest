@@ -115,12 +115,12 @@ export function BottomNav() {
           </defs>
           {/* Main Background with Bell Curve and Rounded Top Corners */}
           <path
-            d="M0,100 L0,35 Q0,20 15,20 L80,20 Q115,20 130,10 Q162.5,-15 195,10 Q210,20 245,20 L360,20 Q375,20 375,35 L375,100 Z"
+            d="M0,100 L0,35 Q0,20 15,20 L80,20 Q115,20 145,10 Q187.5,-15 230,10 Q260,20 295,20 L360,20 Q375,20 375,35 L375,100 Z"
             fill="rgba(255, 255, 255, 0.95)"
           />
           {/* Purple Border Line (Top and Sides only) */}
           <path
-            d="M0,100 L0,35 Q0,20 15,20 L80,20 Q115,20 130,10 Q162.5,-15 195,10 Q210,20 245,20 L360,20 Q375,20 375,35 L375,100"
+            d="M0,100 L0,35 Q0,20 15,20 L80,20 Q115,20 145,10 Q187.5,-15 230,10 Q260,20 295,20 L360,20 Q375,20 375,35 L375,100"
             fill="none"
             stroke="#5B1187"
             strokeWidth="1.5"

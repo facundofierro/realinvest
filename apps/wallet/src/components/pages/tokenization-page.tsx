@@ -1150,7 +1150,7 @@ export default function TokenizationPage() {
           </p>
           <Button
             size="lg"
-            className="bg-white text-[#5B1187] hover:bg-gray-100 font-semibold px-8 h-12 text-lg"
+            className="bg-white text-white hover:bg-gray-100 font-semibold px-8 h-12 text-lg"
           >
             Comenzar Solicitud
           </Button>
