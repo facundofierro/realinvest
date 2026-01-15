@@ -4,8 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { Button } from "@repo/ui/components/ui/button";
 import { Badge } from "@repo/ui/components/ui/badge";
 import {
-  Building2,
-  TrendingUp,
   ShieldCheck,
   ArrowRight,
   Handshake,
@@ -320,11 +318,8 @@ export default function TokenizationPage() {
                   </div>
 
                   <div className="grid gap-4 mt-10 md:grid-cols-2">
-                    <div className="p-5 rounded-3xl bg-white border border-purple-50 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="p-5 rounded-3xl bg-white/40 backdrop-blur-md border border-white/40 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex gap-4 items-center mb-3">
-                        <div className="flex justify-center items-center w-12 h-12 rounded-2xl bg-purple-50 text-[#5B1187] shrink-0">
-                          <Building2 className="w-6 h-6" />
-                        </div>
                         <p className="text-lg font-bold text-[#3B2146]">
                           Equity Tokens
                         </p>
@@ -345,11 +340,8 @@ export default function TokenizationPage() {
                       </ul>
                     </div>
 
-                    <div className="p-5 rounded-3xl bg-white border border-blue-50 shadow-sm hover:shadow-md transition-shadow">
+                    <div className="p-5 rounded-3xl bg-white/40 backdrop-blur-md border border-white/40 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex gap-4 items-center mb-3">
-                        <div className="flex justify-center items-center w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 shrink-0">
-                          <TrendingUp className="w-6 h-6" />
-                        </div>
                         <p className="text-lg font-bold text-[#3B2146]">
                           Deuda / Renta
                         </p>
@@ -410,9 +402,9 @@ export default function TokenizationPage() {
                 </div>
               </div>
 
-              <div className="overflow-hidden relative p-8 rounded-[2.5rem] bg-white border border-gray-100 transition-all duration-300 hover:shadow-lg group">
+              <div className="overflow-hidden relative p-8 rounded-[2.5rem] bg-linear-to-b from-[#F4FFF4] to-[#D5FAD5] transition-all duration-300 hover:shadow-lg group">
                 <div className="relative z-10 max-w-[65%]">
-                  <Badge className="bg-blue-50 text-[#3B2146] hover:bg-white border-blue-100 px-4 py-1.5 text-sm font-bold rounded-full backdrop-blur-sm shadow-sm">
+                  <Badge className="bg-white/80 text-[#3B2146] hover:bg-white border-green-100 px-4 py-1.5 text-sm font-bold rounded-full backdrop-blur-sm shadow-sm">
                     Liquidez secundaria
                   </Badge>
                   <h3 className="mt-6 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#3B2146] leading-tight">
