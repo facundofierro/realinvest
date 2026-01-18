@@ -1,20 +1,14 @@
 {
-  "name": "wallet",
+  "name": "admin",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 8000",
+    "dev": "next dev -p 8001",
     "build": "next build",
-    "start": "next start -p 8000",
+    "start": "next start -p 8001",
     "lint": "eslint"
   },
-  "main": "src/index.ts",
-  "types": "src/index.ts",
-  "exports": {
-    ".": "./src/index.ts"
-  },
   "dependencies": {
-    "@agelum/backend": "^0.1.0",
     "@repo/backend": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.16",

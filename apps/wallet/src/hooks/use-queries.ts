@@ -1,148 +1,98 @@
 "use client";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import * as api from "@/lib/api-client";
+import { useReactive } from "@agelum/backend/client";
+
+const DEFAULT_USER_ID = "default-user";
 
 // Market
 export function useMarketTokens() {
-  return useQuery({
-    queryKey: ["market", "tokens"],
-    queryFn: api.getMarketTokens,
-  });
+  return useReactive("market.tokens.getAll", {});
 }
 
 export function useMarketToken(symbol: string) {
-  return useQuery({
-    queryKey: ["market", "tokens", symbol],
-    queryFn: () => api.getMarketTokenBySymbol(symbol),
-    enabled: !!symbol,
-  });
+  const { data: tokens, ...rest } = useReactive("market.tokens.getAll", {});
+  const token = tokens?.find((t) => t.symbol === symbol);
+  return { data: token, ...rest };
 }
 
 export function useMarketOrderBook(symbol: string) {
-  return useQuery({
-    queryKey: ["market", "orderbook", symbol],
-    queryFn: () => api.getMarketOrderBook(symbol),
-    enabled: !!symbol,
-    refetchInterval: 5000,
-  });
+  return useReactive("market.orderbook.get", { symbol });
 }
 
-export function useMarketSeries(symbol: string, timeframe: string, points: number) {
-  return useQuery({
-    queryKey: ["market", "series", symbol, timeframe],
-    queryFn: () => api.getMarketSeries(symbol, timeframe, points),
-    enabled: !!symbol,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
+export function useMarketSeries(
+  symbol: string,
+  timeframe: "all" | "30d" | "7d" | "24h",
+  _points?: number
+) {
+  return useReactive("market.series.get", { symbol, timeframe });
 }
 
 // Wallet
 export function useWalletBalances() {
-  return useQuery({
-    queryKey: ["wallet", "balances"],
-    queryFn: api.getWalletBalances,
-  });
+  return useReactive("wallet.balances.get", { userId: DEFAULT_USER_ID });
 }
 
 export function useWalletHoldings() {
-  return useQuery({
-    queryKey: ["wallet", "holdings"],
-    queryFn: api.getWalletHoldings,
-  });
+  return useReactive("wallet.holdings.getAll", { userId: DEFAULT_USER_ID });
 }
 
 export function useWalletPositions() {
-  return useQuery({
-    queryKey: ["wallet", "positions"],
-    queryFn: api.getWalletPositions,
-    refetchInterval: 10000,
-  });
+  return useReactive("wallet.positions.getAll", { userId: DEFAULT_USER_ID });
 }
 
 export function useTransactions() {
-  return useQuery({
-    queryKey: ["wallet", "transactions"],
-    queryFn: api.getTransactions,
-  });
+  return useReactive("transactions.getAll", { userId: DEFAULT_USER_ID });
 }
 
 // Projects
 export function useProjects() {
-  return useQuery({
-    queryKey: ["projects"],
-    queryFn: api.getProjects,
-  });
+  return useReactive("projects.getAll", {});
 }
 
 export function useProject(id: string) {
-  return useQuery({
-    queryKey: ["projects", id],
-    queryFn: () => api.getProjectById(id),
-    enabled: !!id,
-  });
+  return useReactive("projects.getById", { id });
 }
 
 export function useProjectStories(projectId: string) {
-  return useQuery({
-    queryKey: ["projects", projectId, "stories"],
-    queryFn: () => api.getProjectStories(projectId),
-    enabled: !!projectId,
-  });
+  return useReactive("projects.stories.getAll", { projectId });
 }
 
 export function useProjectStages(projectId: string) {
-  return useQuery({
-    queryKey: ["projects", projectId, "stages"],
-    queryFn: () => api.getProjectStages(projectId),
-    enabled: !!projectId,
-  });
+  return useReactive("projects.stages.getAll", { projectId });
 }
 
 export function useProjectPurchaseOptions(projectId: string) {
-  return useQuery({
-    queryKey: ["projects", projectId, "purchase-options"],
-    queryFn: () => api.getProjectPurchaseOptions(projectId),
-    enabled: !!projectId,
-  });
+  return useReactive("projects.purchaseOptions.getAll", { projectId });
 }
 
 export function useProjectUnits(projectId: string) {
-  return useQuery({
-    queryKey: ["projects", projectId, "units"],
-    queryFn: () => api.getProjectUnits(projectId),
-    enabled: !!projectId,
-  });
+  return useReactive("projects.units.getAll", { projectId });
 }
 
 export function useDashboardProjects() {
-  return useQuery({
-    queryKey: ["dashboard", "projects"],
-    queryFn: api.getDashboardProjects,
-  });
+  return useReactive("projects.dashboard.getAll", {});
 }
 
-// Mutations
+// Mutations - these will auto-invalidate via SSE
+// For now, return empty mutation functions for compatibility
 export function useCreatePosition() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: api.createPosition,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wallet", "positions"] });
-      queryClient.invalidateQueries({ queryKey: ["wallet", "balances"] });
-      queryClient.invalidateQueries({ queryKey: ["wallet", "holdings"] });
+  return {
+    mutate: () => {
+      console.warn("useCreatePosition not yet implemented with tRPC mutations");
     },
-  });
+    mutateAsync: async () => {
+      console.warn("useCreatePosition not yet implemented with tRPC mutations");
+    },
+  };
 }
 
 export function useClosePosition() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: api.closePosition,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wallet", "positions"] });
-      queryClient.invalidateQueries({ queryKey: ["wallet", "balances"] });
-      queryClient.invalidateQueries({ queryKey: ["wallet", "holdings"] });
+  return {
+    mutate: () => {
+      console.warn("useClosePosition not yet implemented with tRPC mutations");
     },
-  });
+    mutateAsync: async () => {
+      console.warn("useClosePosition not yet implemented with tRPC mutations");
+    },
+  };
 }
