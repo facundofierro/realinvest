@@ -1,11 +1,11 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import * as schema from './schema'
-import { 
-  projects, 
-  projectUnits, 
-  projectStories, 
-  projectStages, 
+import {
+  projects,
+  projectUnits,
+  projectStories,
+  projectStages,
   projectPurchaseOptions,
   marketTokens,
   walletBalances,
@@ -126,7 +126,7 @@ async function seed() {
     // Seed orderbook levels
     console.log('Seeding orderbook levels...')
     const orderbookLevelsData: any[] = []
-    
+
     for (const [symbol, orderbook] of Object.entries(orderbookData) as [string, any][]) {
       // Find the token
       const token = tokensData.find((t: any) => t.symbol === symbol)

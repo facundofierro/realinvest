@@ -39,8 +39,8 @@ Updated the wallet app to use the new backend:
 
 - **tRPC API Route** (`apps/wallet/src/app/api/trpc/[trpc]/route.ts`)
   - Handles all tRPC requests
-  
-- **SSE Endpoints** 
+
+- **SSE Endpoints**
   - `/api/events` - Real-time event stream
   - `/api/events/ack` - Event acknowledgment
 

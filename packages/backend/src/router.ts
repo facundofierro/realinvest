@@ -4,6 +4,7 @@ import * as projects from './functions/projects'
 import * as market from './functions/market'
 import * as wallet from './functions/wallet'
 import * as transactions from './functions/transactions'
+import * as admin from './functions/admin'
 
 // Create the main tRPC router with all reactive functions
 export const appRouter = createReactiveRouter({ db })
@@ -27,6 +28,15 @@ export const appRouter = createReactiveRouter({ db })
   .addQuery(transactions.getAll)
   // Transactions mutations
   .addMutation(transactions.create)
+  // Admin queries
+  .addQuery(admin.getAdminDashboardStats)
+  .addQuery(admin.getPropertyStatistics)
+  .addQuery(admin.getAllTransactions)
+  // Admin mutations
+  .addMutation(admin.createProperty)
+  .addMutation(admin.updateProperty)
+  .addMutation(admin.createProjectUnit)
+  .addMutation(admin.updateProjectUnit)
   .build()
 
 // Export the router type for use in the frontend

@@ -47,11 +47,11 @@ export const getAllPositions = defineReactiveFunction({
     return db.db.query.positions.findMany({
       where: (positions, { eq, and }) => {
         const conditions = [eq(positions.userId, input.userId)]
-        
+
         if (input.status) {
           conditions.push(eq(positions.status, input.status))
         }
-        
+
         return and(...conditions)
       },
       orderBy: (positions, { desc }) => [desc(positions.createdAt)],

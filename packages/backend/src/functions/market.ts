@@ -13,15 +13,15 @@ export const getAllTokens = defineReactiveFunction({
     return db.db.query.marketTokens.findMany({
       where: (tokens, { eq, and }) => {
         const conditions = []
-        
+
         if (input.projectId) {
           conditions.push(eq(tokens.projectId, input.projectId))
         }
-        
+
         if (input.isFavorite !== undefined) {
           conditions.push(eq(tokens.isFavorite, input.isFavorite))
         }
-        
+
         return conditions.length > 0 ? and(...conditions) : undefined
       },
     })
@@ -107,11 +107,11 @@ export const getSeries = defineReactiveFunction({
     const seriesData = await db.db.query.marketSeries.findMany({
       where: (series, { eq, and, gte }) => {
         const conditions = [eq(series.tokenId, token.id)]
-        
+
         if (dateFilter) {
           conditions.push(gte(series.timestamp, dateFilter))
         }
-        
+
         return and(...conditions)
       },
       orderBy: (series, { asc }) => [asc(series.timestamp)],

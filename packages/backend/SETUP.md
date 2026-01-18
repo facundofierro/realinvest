@@ -61,13 +61,13 @@ This will populate your database with all the sample data from the JSON files.
 
 - **Open Drizzle Studio**: `pnpm db:studio`
   - Visual database browser at http://localhost:4983
-  
+
 - **Generate migrations**: `pnpm db:generate`
   - After modifying schema.ts
-  
+
 - **Run migrations**: `pnpm db:migrate`
   - Apply pending migrations
-  
+
 - **Push schema**: `pnpm db:push`
   - Quick schema sync for development (bypasses migrations)
 
@@ -152,9 +152,9 @@ import { useProjects } from '@/hooks/use-queries'
 
 function ProjectList() {
   const { data: projects, isLoading, isStale } = useProjects()
-  
+
   if (isLoading) return <div>Loading...</div>
-  
+
   return (
     <div>
       {isStale && <div>Syncing...</div>}

@@ -16,15 +16,15 @@ export const getAll = defineReactiveFunction({
     return db.db.query.transactions.findMany({
       where: (transactions, { eq, and }) => {
         const conditions = [eq(transactions.userId, input.userId)]
-        
+
         if (input.type) {
           conditions.push(eq(transactions.type, input.type))
         }
-        
+
         if (input.status) {
           conditions.push(eq(transactions.status, input.status))
         }
-        
+
         return and(...conditions)
       },
       orderBy: (transactions, { desc }) => [desc(transactions.createdAt)],

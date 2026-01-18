@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request) {
   try {
     const { eventId } = await request.json()
-    
+
     if (!eventId) {
       return NextResponse.json(
         { error: 'Event ID is required' },
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     acknowledgeEvent(eventId)
-    
+
     return NextResponse.json({ ok: true })
   } catch (error) {
     return NextResponse.json(
