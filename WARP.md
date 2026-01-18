@@ -56,7 +56,7 @@ pnpm cap run ios
 pnpm cap run android
 pnpm cap sync
 
-# Tauri desktop development  
+# Tauri desktop development
 cd native/wallet/tauri
 pnpm tauri dev
 pnpm tauri build
@@ -104,6 +104,6 @@ The wallet app uses a sophisticated mock data system:
 
 Global environment variables configured in `turbo.json`:
 - `HOST`: Development server host
-- `LOG_LEVEL`: Application logging level  
+- `LOG_LEVEL`: Application logging level
 - `PORT`: Development server port
 - `RIPIO_MOCK_DATA_DIR`: Override directory for mock data files
