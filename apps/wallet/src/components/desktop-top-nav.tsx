@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -14,9 +15,20 @@ import { formatCurrency } from "@/lib/format";
 import { useWalletBalances } from "@/hooks/use-queries";
 import { VestRealState } from "@repo/ui/components/brand/vest-real-state";
 import { Button } from "@repo/ui/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@repo/ui/components/ui/dialog";
 
 export function DesktopTopNav() {
   const pathname = usePathname();
+  const [launchDialogOpen, setLaunchDialogOpen] =
+    useState(false);
   const { data: balances = [] } =
     useWalletBalances();
 
@@ -33,11 +45,13 @@ export function DesktopTopNav() {
       href: "/invest",
       label: "Proyectos",
       icon: Building2,
+      blocked: true,
     },
     {
       href: "/exchange",
       label: "Exchange",
       icon: ArrowLeftRight,
+      blocked: true,
     },
     {
       href: "/tokenization",
@@ -62,17 +76,14 @@ export function DesktopTopNav() {
             const active = isActive(
               link.href
             );
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "relative flex items-center gap-2 h-full px-1 group transition-colors",
-                  active
-                    ? "text-[#5B1187]"
-                    : "text-muted-foreground hover:text-[#5B1187]"
-                )}
-              >
+            const linkClasses = cn(
+              "relative flex items-center gap-2 h-full px-1 group transition-colors",
+              active
+                ? "text-[#5B1187]"
+                : "text-muted-foreground hover:text-[#5B1187]"
+            );
+            const linkContent = (
+              <>
                 <link.icon className="w-4 h-4" />
                 <span className="text-sm font-semibold">
                   {link.label}
@@ -86,6 +97,32 @@ export function DesktopTopNav() {
                       : "opacity-0 scale-x-0 group-hover:opacity-50 group-hover:scale-x-100"
                   )}
                 />
+              </>
+            );
+
+            if (link.blocked) {
+              return (
+                <button
+                  key={link.href}
+                  type="button"
+                  className={linkClasses}
+                  onClick={() =>
+                    setLaunchDialogOpen(true)
+                  }
+                  aria-haspopup="dialog"
+                >
+                  {linkContent}
+                </button>
+              );
+            }
+
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={linkClasses}
+              >
+                {linkContent}
               </Link>
             );
           })}
@@ -124,6 +161,37 @@ export function DesktopTopNav() {
           </Button>
         </div>
       </div>
+
+      <Dialog
+        open={launchDialogOpen}
+        onOpenChange={setLaunchDialogOpen}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              Disponible en marzo de 2026
+            </DialogTitle>
+            <DialogDescription>
+              Exchange y Proyectos están en
+              camino. Regístrate para recibir
+              novedades y ser de los primeros en
+              acceder.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <DialogClose asChild>
+              <Button variant="ghost">
+                Cerrar
+              </Button>
+            </DialogClose>
+            <Button asChild>
+              <Link href="/register">
+                Registrarme
+              </Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   );
 }
