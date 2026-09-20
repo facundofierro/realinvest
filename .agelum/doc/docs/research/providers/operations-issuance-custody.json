@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "Operaciones 2: emisión, custodia y mercado primario", "quality_profile": "showcase" },
+  "components": [
+    { "id": "legal", "type": "external", "label": "SPV / expediente legal", "sublabel": "inmueble, derechos y acta", "pos": [40, 130], "size": [185, 70] },
+    { "id": "ops", "type": "frontend", "label": "Back office", "sublabel": "emisión y aprobaciones", "pos": [40, 360], "size": [185, 70] },
+    { "id": "api", "type": "backend", "label": "Backend", "sublabel": "orden, cap y conciliación", "pos": [320, 360], "size": [185, 70] },
+    { "id": "database", "type": "database", "label": "BD / ledger", "sublabel": "supply, órdenes y auditoría", "pos": [320, 560], "size": [185, 70] },
+    { "id": "payment", "type": "external", "label": "Banco / pagos", "sublabel": "cobro de suscripción", "pos": [610, 560], "size": [185, 70] },
+    { "id": "fireblocks", "type": "security", "label": "Fireblocks", "sublabel": "Vault, Policy Engine y MPC", "pos": [610, 360], "size": [195, 70] },
+    { "id": "hedera", "type": "cloud", "label": "Hedera HTS / ATS", "sublabel": "crear, emitir y transferir", "pos": [900, 360], "size": [195, 70] },
+    { "id": "investor", "type": "external", "label": "Inversor aprobado", "sublabel": "cuenta KYC habilitada", "pos": [900, 130], "size": [195, 70] }
+  ],
+  "boundaries": [
+    { "kind": "security-group", "label": "PSAV: órdenes, decisiones y ledger", "wraps": ["ops", "api", "database"], "pad": 30 },
+    { "kind": "region", "label": "Custodia, red y contrapartes", "wraps": ["fireblocks", "hedera", "payment", "investor", "legal"], "pad": 30 }
+  ],
+  "connections": [
+    { "id": "legal-ops", "from": "legal", "to": "ops", "label": "vehículo y reglas aprobadas", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelAt": [240, 220] },
+    { "id": "ops-api", "from": "ops", "to": "api", "label": "solicitud aprobada", "variant": "emphasis", "labelDy": -34 },
+    { "id": "api-db", "from": "api", "to": "database", "label": "orden y supply", "fromSide": "bottom", "toSide": "top", "labelAt": [515, 450] },
+    { "id": "api-fireblocks", "from": "api", "to": "fireblocks", "label": "Vault API: firmar operación", "variant": "emphasis", "labelDy": 58 },
+    { "id": "fireblocks-hedera", "from": "fireblocks", "to": "hedera", "label": "MPC: create / transfer / burn", "variant": "emphasis", "labelDy": -34 },
+    { "id": "payment-api", "from": "payment", "to": "api", "label": "pago confirmado", "variant": "dashed", "fromSide": "top", "toSide": "bottom", "labelDx": 108 },
+    { "id": "hedera-investor", "from": "hedera", "to": "investor", "label": "entrega primaria", "variant": "security", "fromSide": "top", "toSide": "bottom", "labelDx": 108 }
+  ],
+  "cards": [
+    { "dot": "violet", "title": "Crear el token", "items": ["Después de aprobar SPV, derechos, cap y llaves, el backend solicita la firma MPC.", "Hedera crea el token; el ledger guarda token ID, supply, acta y receipt."] },
+    { "dot": "cyan", "title": "Suscripción primaria", "items": ["Una orden reserva unidades, confirma el pago y entrega tokens desde el treasury al inversor elegible.", "Fireblocks no decide KYC ni la oferta; aplica políticas y firma la operación autorizada."] },
+    { "dot": "amber", "title": "Eventos de ciclo de vida", "items": ["Mint adicional, burn/rescate, freeze y pause requieren rol, clave y aprobación corporativa definida.", "Cada evento se confirma en red y se reconcilia con la BD antes de cerrar la orden."] }
+  ]
+}

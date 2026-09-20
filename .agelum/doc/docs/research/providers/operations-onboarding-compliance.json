@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "Operaciones 1: onboarding y cumplimiento", "quality_profile": "showcase" },
+  "components": [
+    { "id": "investor", "type": "external", "label": "Inversor", "sublabel": "persona física o jurídica", "pos": [40, 300], "size": [145, 68] },
+    { "id": "frontend", "type": "frontend", "label": "Portal", "sublabel": "alta, KYC y wallet", "pos": [250, 300], "size": [150, 68] },
+    { "id": "api", "type": "backend", "label": "Backend", "sublabel": "expediente y orquestación", "pos": [465, 300], "size": [170, 68] },
+    { "id": "kyc", "type": "external", "label": "KYC / KYT", "sublabel": "proveedor o proceso interno", "pos": [720, 120], "size": [185, 70] },
+    { "id": "compliance", "type": "security", "label": "Cumplimiento", "sublabel": "riesgo, EDD y decisión", "pos": [720, 300], "size": [185, 70] },
+    { "id": "database", "type": "database", "label": "BD de evidencia", "sublabel": "expediente y auditoría", "pos": [465, 500], "size": [170, 70] },
+    { "id": "hedera", "type": "cloud", "label": "Hedera", "sublabel": "asociar cuenta / estado KYC", "pos": [985, 300], "size": [185, 70] }
+  ],
+  "boundaries": [
+    { "kind": "security-group", "label": "PSAV: decisión y evidencia bajo control propio", "wraps": ["frontend", "api", "compliance", "database"], "pad": 32 },
+    { "kind": "region", "label": "Servicios externos", "wraps": ["kyc", "hedera"], "pad": 32 }
+  ],
+  "connections": [
+    { "id": "investor-portal", "from": "investor", "to": "frontend", "label": "HTTPS: datos y consentimiento", "variant": "emphasis", "labelAt": [218, 405] },
+    { "id": "portal-api", "from": "frontend", "to": "api", "label": "crear expediente", "variant": "emphasis", "labelDy": 58 },
+    { "id": "api-kyc", "from": "api", "to": "kyc", "label": "KYC/KYT API + webhook", "variant": "security", "fromSide": "top", "toSide": "left" },
+    { "id": "kyc-compliance", "from": "kyc", "to": "compliance", "label": "resultado técnico", "variant": "dashed", "fromSide": "bottom", "toSide": "top", "labelAt": [918, 210] },
+    { "id": "api-compliance", "from": "api", "to": "compliance", "label": "solicitar decisión", "variant": "security", "labelDy": -34 },
+    { "id": "api-database", "from": "api", "to": "database", "label": "guardar evidencia cifrada", "fromSide": "bottom", "toSide": "top", "labelAt": [660, 420] },
+    { "id": "compliance-hedera", "from": "compliance", "to": "hedera", "label": "approved: grant KYC", "variant": "security", "labelDy": 58 }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Alta y KYC", "items": ["El portal abre un expediente; la API registra consentimiento y el estado pending_kyc.", "El proveedor puede validar identidad, prueba de vida y listas; también puede hacerlo el equipo interno."] },
+    { "dot": "violet", "title": "Wallet y elegibilidad", "items": ["La wallet se vincula por firma de mensaje y se analiza su riesgo.", "Sólo una decisión vigente de cumplimiento permite asociar la cuenta y conceder KYC on-chain."] },
+    { "dot": "rose", "title": "Responsabilidad PSAV", "items": ["Tercerizar captura o screening no delega política, EDD, investigación ni ROS.", "PII y documentos permanecen fuera de Hedera y Fireblocks."] }
+  ]
+}

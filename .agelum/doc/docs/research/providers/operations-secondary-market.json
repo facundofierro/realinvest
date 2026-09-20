@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": { "title": "Operaciones 3: mercado secundario entre usuarios", "quality_profile": "showcase" },
+  "components": [
+    { "id": "seller", "type": "external", "label": "Vendedor", "sublabel": "titular KYC con tokens", "pos": [40, 260], "size": [165, 70] },
+    { "id": "buyer", "type": "external", "label": "Comprador", "sublabel": "inversor KYC aprobado", "pos": [40, 500], "size": [165, 70] },
+    { "id": "frontend", "type": "frontend", "label": "Portal de mercado", "sublabel": "orden, cotización y confirmación", "pos": [280, 380], "size": [185, 70] },
+    { "id": "api", "type": "backend", "label": "Motor de órdenes", "sublabel": "matching, escrow e idempotencia", "pos": [550, 380], "size": [190, 70] },
+    { "id": "compliance", "type": "security", "label": "Cumplimiento", "sublabel": "KYC/KYT, límites y bloqueo", "pos": [550, 140], "size": [190, 70] },
+    { "id": "ledger", "type": "database", "label": "Ledger / order book", "sublabel": "reservas, estados y auditoría", "pos": [550, 610], "size": [190, 70] },
+    { "id": "payment", "type": "external", "label": "Rail de pago", "sublabel": "fiat o activo de liquidación", "pos": [825, 610], "size": [190, 70] },
+    { "id": "fireblocks", "type": "security", "label": "Fireblocks", "sublabel": "escrow/treasury y aprobación MPC", "pos": [825, 380], "size": [190, 70] },
+    { "id": "hedera", "type": "cloud", "label": "Hedera", "sublabel": "transferencia permissioned", "pos": [1100, 380], "size": [185, 70] }
+  ],
+  "boundaries": [
+    { "kind": "security-group", "label": "PSAV: matching, compliance y libro interno", "wraps": ["frontend", "api", "compliance", "ledger"], "pad": 32 },
+    { "kind": "region", "label": "Contrapartes, pagos, custodia y red", "wraps": ["seller", "buyer", "payment", "fireblocks", "hedera"], "pad": 32 }
+  ],
+  "connections": [
+    { "id": "seller-portal", "from": "seller", "to": "frontend", "label": "orden de venta", "variant": "emphasis", "fromSide": "right", "toSide": "top", "labelDy": -34 },
+    { "id": "buyer-portal", "from": "buyer", "to": "frontend", "label": "orden de compra", "variant": "emphasis", "fromSide": "right", "toSide": "bottom", "labelDy": 58 },
+    { "id": "portal-api", "from": "frontend", "to": "api", "label": "orden firmada", "variant": "emphasis", "labelDy": -34 },
+    { "id": "api-compliance", "from": "api", "to": "compliance", "label": "validar ambos lados", "variant": "security", "fromSide": "top", "toSide": "bottom", "labelDx": 112 },
+    { "id": "api-ledger", "from": "api", "to": "ledger", "label": "reservar y hacer matching", "fromSide": "bottom", "toSide": "top", "labelAt": [755, 470] },
+    { "id": "payment-api", "from": "payment", "to": "api", "label": "fondos confirmados", "variant": "dashed", "fromSide": "top", "toSide": "bottom", "labelDx": 112 },
+    { "id": "api-fireblocks", "from": "api", "to": "fireblocks", "label": "transferencia autorizada", "variant": "emphasis", "labelDy": 58 },
+    { "id": "fireblocks-hedera", "from": "fireblocks", "to": "hedera", "label": "MPC firma y envía", "variant": "security", "labelDy": -34 }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Sí: la compraventa entre usuarios es posible", "items": ["No estaba detallada como mercado secundario: el cuadro anterior sólo cubría transferencia/retiro controlado.", "Aquí la plataforma recibe órdenes de compra y venta, no una transferencia libre entre wallets."] },
+    { "dot": "amber", "title": "Flujo de liquidación", "items": ["1) validar KYC/KYT, elegibilidad y restricciones de vendedor y comprador; 2) reservar tokens y fondos; 3) matching; 4) liquidar; 5) conciliar.", "La entrega del token se ejecuta sólo después de confirmar fondos y controles, con estados recuperables ante fallos."] },
+    { "dot": "rose", "title": "Límite regulatorio", "items": ["No habilitar mercado secundario abierto hasta definir con asesoría local si el token/oferta requiere régimen de valores, mercado, intermediación o divulgaciones adicionales.", "Restringir por defecto a wallets allowlisted; mantener freeze, límites, trazabilidad y revisión de alertas."] }
+  ]
+}
