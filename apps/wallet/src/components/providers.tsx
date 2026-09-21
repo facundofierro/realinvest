@@ -1,6 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import { TrpcReactiveProvider } from "@agelum/backend/client";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
@@ -50,14 +51,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const organizationId = "default-org";
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TrpcReactiveProvider
-        organizationId={organizationId}
-        relations={reactiveRelations}
-        trpcClient={trpcClient}
-      >
-        <SplashScreen>{children}</SplashScreen>
-      </TrpcReactiveProvider>
-    </QueryClientProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <TrpcReactiveProvider
+          organizationId={organizationId}
+          relations={reactiveRelations}
+          trpcClient={trpcClient}
+        >
+          <SplashScreen>{children}</SplashScreen>
+        </TrpcReactiveProvider>
+      </QueryClientProvider>
+    </SessionProvider>
   );
 }

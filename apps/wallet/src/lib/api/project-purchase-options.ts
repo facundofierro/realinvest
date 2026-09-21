@@ -1,4 +1,6 @@
-import { readSampleJson } from "@/lib/sample-data";
+import { purchaseOptions } from "@repo/db";
+import { sql } from "drizzle-orm";
+import { getDb } from "@/lib/db";
 
 export interface ProjectPurchaseOption {
   key: string;
@@ -21,7 +23,5 @@ export interface ProjectPurchaseOption {
 export async function getProjectPurchaseOptions(): Promise<
   ProjectPurchaseOption[]
 > {
-  return readSampleJson<
-    ProjectPurchaseOption[]
-  >("projectPurchaseOptions.json");
+  return getDb().select().from(purchaseOptions).orderBy(sql`rowid`);
 }

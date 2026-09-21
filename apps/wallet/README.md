@@ -31,7 +31,13 @@ pnpm dev --filter wallet
 pnpm dev
 ```
 
-The application will be available at `http://localhost:3000`.
+The application will be available at `http://localhost:8000`.
+
+### Google authentication setup
+
+Create a **Web application** OAuth client in [Google Cloud Console](https://console.cloud.google.com/apis/credentials). Add `http://localhost:8000/api/auth/callback/google` as an authorized redirect URI, plus the equivalent `/api/auth/callback/google` URL for production.
+
+Copy the root `.env.example` to `.env.local` and set `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, and a secure `AUTH_SECRET` (for example, `openssl rand -base64 32`). `DATABASE_URL` and, for remote libSQL databases, `DATABASE_AUTH_TOKEN` are also required.
 
 ## 📁 Project Structure
 
@@ -72,3 +78,4 @@ src/
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Package Manager**: [pnpm](https://pnpm.io/)
 - **Monorepo Tooling**: [Turborepo](https://turbo.build/)
+- **Authentication**: [Auth.js](https://authjs.dev/) with Google OAuth

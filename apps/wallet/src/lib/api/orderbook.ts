@@ -1,4 +1,8 @@
 import type { MarketOrderBook, OrderBookLevel } from "@/types/wallet";
+import { orderBookLevels } from "@repo/db";
+import { and, asc, desc, eq } from "drizzle-orm";
+import { getDb } from "@/lib/db";
+import { getMarketTokenBySymbol } from "./market";
 
 function makeDepth(currentPrice: number): {
   asks: OrderBookLevel[];
@@ -20,26 +24,28 @@ function makeDepth(currentPrice: number): {
 }
 
 export async function getMarketOrderBook(symbol: string): Promise<MarketOrderBook> {
-  const { readSampleJson } = await import("@/lib/sample-data");
-  const { getMarketTokenBySymbol } = await import("./market");
-  
   const token = await getMarketTokenBySymbol(symbol);
-  
   if (!token) {
     throw new Error("Token not found");
   }
 
-  // Try to get from fixture data first
-  const orderBooks = await readSampleJson<Record<string, MarketOrderBook>>("marketOrderBooks.json");
-  const fromFixture = orderBooks[symbol] ?? null;
+  const [asks, bids] = await Promise.all([
+    getDb().select({ price: orderBookLevels.price, amount: orderBookLevels.amount })
+      .from(orderBookLevels).where(and(eq(orderBookLevels.tokenId, token.id), eq(orderBookLevels.side, "ask")))
+      .orderBy(asc(orderBookLevels.price)),
+    getDb().select({ price: orderBookLevels.price, amount: orderBookLevels.amount })
+      .from(orderBookLevels).where(and(eq(orderBookLevels.tokenId, token.id), eq(orderBookLevels.side, "bid")))
+      .orderBy(desc(orderBookLevels.price)),
+  ]);
 
-  if (fromFixture) {
-    return fromFixture;
+  if (asks.length || bids.length) {
+    return {
+      asks,
+      bids,
+    };
   }
 
-  // Generate mock orderbook if no fixture data
-  const currentPrice = typeof token.priceUsd === "number" ? token.priceUsd : 0;
-  const { asks, bids } = makeDepth(currentPrice);
+  const { asks: generatedAsks, bids: generatedBids } = makeDepth(token.priceUsd);
 
-  return { asks, bids };
+  return { asks: generatedAsks, bids: generatedBids };
 }

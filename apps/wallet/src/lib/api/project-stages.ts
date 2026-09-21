@@ -1,4 +1,6 @@
-import { readSampleJson } from "@/lib/sample-data";
+import { stages } from "@repo/db";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/lib/db";
 
 export interface ProjectStage {
   id: number;
@@ -10,6 +12,7 @@ export interface ProjectStage {
   minPrice: number;
 }
 
-export async function getProjectStages(): Promise<ProjectStage[]> {
-  return readSampleJson<ProjectStage[]>("projectStages.json");
+export async function getProjectStages(projectId: string): Promise<ProjectStage[]> {
+  return getDb().select().from(stages)
+    .where(eq(stages.projectId, projectId)).orderBy(stages.id);
 }

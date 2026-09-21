@@ -20,6 +20,15 @@ import type { DashboardProject } from "@/lib/api/dashboard-projects";
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "";
 
+function fetch(...args: Parameters<typeof globalThis.fetch>) {
+  return globalThis.fetch(...args).then((response) => {
+    if (response.status === 401 && typeof window !== "undefined") {
+      window.location.assign("/login");
+    }
+    return response;
+  });
+}
+
 function getApiUrl(
   path: string
 ): string {

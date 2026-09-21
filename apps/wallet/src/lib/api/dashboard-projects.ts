@@ -1,4 +1,6 @@
-import { readSampleJson } from "@/lib/sample-data";
+import { projects } from "@repo/db";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/lib/db";
 
 export interface DashboardProject {
   id: string;
@@ -13,5 +15,17 @@ export interface DashboardProject {
 }
 
 export async function getDashboardProjects(): Promise<DashboardProject[]> {
-  return readSampleJson<DashboardProject[]>("dashboardProjects.json");
+  const rows = await getDb().select().from(projects)
+    .where(eq(projects.isFeatured, true)).orderBy(projects.id);
+  const statusByValue = {
+    PRE_SALE: "PRE-VENTA",
+    IN_CONSTRUCTION: "EN CONSTRUCCION",
+    COMPLETED: "COMPLETADO",
+  } as const;
+  return rows.map((project) => ({
+    id: project.id, title: project.title, location: project.location, image: project.image,
+    status: statusByValue[project.status], roi: project.roiPct,
+    progress: project.progressPct, priceRange: project.priceRangeUsd ?? "",
+    fixedRent: project.fixedRentPct ?? 0,
+  }));
 }

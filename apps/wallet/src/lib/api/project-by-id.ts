@@ -1,14 +1,16 @@
-import { readSampleJson } from "@/lib/sample-data";
+import { projects } from "@repo/db";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/lib/db";
 import type { Project } from "@/types/wallet";
+import { mapProject } from "./projects";
 
 export async function getProjectById(id: string): Promise<Project | null> {
-  const projects = await readSampleJson<Project[]>("projects.json");
-  const direct = projects.find((p) => p.id === id) ?? null;
-  if (direct) return direct;
-
-  const isNumericId = /^\d+$/.test(id);
-  if (!isNumericId) return null;
-
-  const index = Number(id) - 1;
-  return projects[index] ?? null;
+  const [project] = await getDb().select({
+    id: projects.id, title: projects.title, location: projects.location,
+    image: projects.image, status: projects.status, roiPct: projects.roiPct,
+    progressPct: projects.progressPct, priceRangeUsd: projects.priceRangeUsd,
+    fixedRentPct: projects.fixedRentPct, tokensTotal: projects.tokensTotal,
+    launchDate: projects.launchDate, nextLaunchDate: projects.nextLaunchDate,
+  }).from(projects).where(eq(projects.id, id)).limit(1);
+  return project ? mapProject(project) : null;
 }

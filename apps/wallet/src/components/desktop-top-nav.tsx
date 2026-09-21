@@ -24,11 +24,15 @@ import {
   DialogTitle,
   DialogClose,
 } from "@repo/ui/components/ui/dialog";
+import { signOut } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function DesktopTopNav() {
   const pathname = usePathname();
   const [launchDialogOpen, setLaunchDialogOpen] =
     useState(false);
+  const [accountDialogOpen, setAccountDialogOpen] = useState(false);
+  const { user } = useCurrentUser();
   const { data: balances = [] } =
     useWalletBalances();
 
@@ -152,12 +156,11 @@ export function DesktopTopNav() {
         <div className="flex items-center pl-2 ml-2 border-l">
           <Button
             variant="ghost"
-            className="text-sm font-semibold text-[#5B1187] hover:text-[#5B1187] hover:bg-[#5B1187]/5"
-            asChild
+            className="gap-2 text-sm font-semibold text-[#5B1187] hover:text-[#5B1187] hover:bg-[#5B1187]/5"
+            onClick={() => setAccountDialogOpen(true)}
           >
-            <Link href="/login">
-              Iniciar Sesión
-            </Link>
+            {user?.image ? <img alt="" className="h-6 w-6 rounded-full" src={user.image} /> : <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs">{user?.name?.[0] ?? "U"}</span>}
+            {user?.name ?? "Cuenta"}
           </Button>
         </div>
       </div>
@@ -185,10 +188,22 @@ export function DesktopTopNav() {
               </Button>
             </DialogClose>
             <Button asChild>
-              <Link href="/register">
-                Registrarme
+              <Link href="/login">
+                Iniciar sesión
               </Link>
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={accountDialogOpen} onOpenChange={setAccountDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Tu cuenta</DialogTitle>
+            <DialogDescription>{user?.email}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => signOut({ redirectTo: "/login" })}>Cerrar sesión</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

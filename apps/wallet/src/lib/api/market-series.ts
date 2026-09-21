@@ -1,7 +1,5 @@
-import type {
-  MarketToken,
-} from "@/types/wallet";
-import { readSampleJson } from "@/lib/sample-data";
+import type { MarketToken } from "@/types/wallet";
+import { getMarketTokenBySymbol } from "./market";
 
 type Timeframe = "all" | "30d" | "7d" | "24h";
 
@@ -57,8 +55,7 @@ export async function getMarketSeries(
   timeframe: Timeframe,
   points: number
 ): Promise<{ series: number[] }> {
-  const tokens = await readSampleJson<MarketToken[]>("marketTokens.json");
-  const token = tokens.find((t) => t.symbol === symbol) ?? null;
+  const token = await getMarketTokenBySymbol(symbol);
 
   if (!token) {
     throw new Error("Token not found");

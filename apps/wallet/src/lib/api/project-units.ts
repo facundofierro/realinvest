@@ -1,32 +1,23 @@
-import { readSampleJson } from "@/lib/sample-data";
+import { units } from "@repo/db";
+import { eq, sql } from "drizzle-orm";
+import { getDb } from "@/lib/db";
 import type { ProjectUnit } from "@/types/wallet";
 
 export async function getProjectUnits(
   projectId: string
 ): Promise<ProjectUnit[]> {
-  const units = await readSampleJson<
-    ProjectUnit[]
-  >("projectUnits.json");
-  const direct = units.filter(
-    (u) => u.projectId === projectId
-  );
-  if (direct.length > 0) return direct;
-
-  const isNumericId = /^\d+$/.test(
-    projectId
-  );
-  if (!isNumericId) return direct;
-
-  const projects = await readSampleJson<
-    { id: string }[]
-  >("projects.json");
-  const index = Number(projectId) - 1;
-  const resolvedProjectId =
-    projects[index]?.id;
-  if (!resolvedProjectId) return direct;
-
-  return units.filter(
-    (u) =>
-      u.projectId === resolvedProjectId
-  );
+  const rows = await getDb().select().from(units)
+    .where(eq(units.projectId, projectId)).orderBy(sql`rowid`);
+  return rows.map(({ areaM2, area, bedrooms, bathrooms, floorPlanImage, tokenSymbol,
+    tokenName, investmentType, statusRaw, queueOrder, orientation, totalTokens,
+    tokensSold, negotiatedAmount, ...unit }) => ({
+      ...unit,
+      areaM2: areaM2 ?? undefined, area: area ?? undefined,
+      bedrooms: bedrooms ?? undefined, bathrooms: bathrooms ?? undefined,
+      floorPlanImage: floorPlanImage ?? undefined, tokenSymbol: tokenSymbol ?? "",
+      tokenName: tokenName ?? undefined, investmentType: investmentType ?? undefined,
+      statusRaw: statusRaw ?? undefined, queueOrder: queueOrder ?? undefined,
+      orientation: orientation ?? undefined, totalTokens: totalTokens ?? undefined,
+      tokensSold: tokensSold ?? undefined, negotiatedAmount: negotiatedAmount ?? undefined,
+    }));
 }

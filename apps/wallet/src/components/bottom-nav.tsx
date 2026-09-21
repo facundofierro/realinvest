@@ -11,14 +11,21 @@ import {
   ArrowLeftRight,
   MessageSquare,
   Wallet,
+  User,
 } from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
 import { VestLogo } from "@repo/ui/components/brand/vest-logo";
+import { Button } from "@repo/ui/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@repo/ui/components/ui/dialog";
+import { signOut } from "next-auth/react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function BottomNav() {
   const pathname = usePathname();
   const [isHidden, setIsHidden] =
     useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const { user } = useCurrentUser();
 
   useEffect(() => {
     const handleStoryActive = (
@@ -66,6 +73,11 @@ export function BottomNav() {
       href: "/assets",
       label: "Wallet",
       icon: Wallet,
+    },
+    {
+      href: "#account",
+      label: "Cuenta",
+      icon: User,
     },
   ];
 
@@ -139,6 +151,20 @@ export function BottomNav() {
             );
             const Icon = item.icon;
 
+            if (item.href === "#account") {
+              return (
+                <button
+                  key={item.href}
+                  type="button"
+                  onClick={() => setAccountOpen(true)}
+                  className="flex flex-col justify-center items-center space-y-1 w-full h-full text-muted-foreground hover:text-foreground"
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[10px] font-medium">{item.label}</span>
+                </button>
+              );
+            }
+
             return (
               <Link
                 key={item.href}
@@ -201,6 +227,24 @@ export function BottomNav() {
           })}
         </div>
       </nav>
+
+      <Dialog open={accountOpen} onOpenChange={setAccountOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <div className="mb-2 flex items-center gap-3">
+              {user?.image ? <img alt="" className="h-10 w-10 rounded-full" src={user.image} /> : <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">{user?.name?.[0] ?? "U"}</span>}
+              <div>
+                <DialogTitle>{user?.name ?? "Cuenta"}</DialogTitle>
+                <DialogDescription>{user?.email}</DialogDescription>
+              </div>
+            </div>
+            <DialogDescription>Estado KYC: {user?.kycStatus ?? "none"}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => signOut({ redirectTo: "/login" })}>Cerrar sesión</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

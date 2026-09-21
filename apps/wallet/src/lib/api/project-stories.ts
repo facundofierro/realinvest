@@ -1,4 +1,5 @@
-import { readSampleJson } from "@/lib/sample-data";
+import { projectStories } from "@repo/db";
+import { getDb } from "@/lib/db";
 
 export interface ProjectStory {
   id: number;
@@ -8,5 +9,5 @@ export interface ProjectStory {
 }
 
 export async function getProjectStories(): Promise<ProjectStory[]> {
-  return readSampleJson<ProjectStory[]>("projectStories.json");
+  return getDb().select().from(projectStories).orderBy(projectStories.id);
 }
