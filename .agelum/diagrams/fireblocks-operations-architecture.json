@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Operaciones de custodia y tokenización inmobiliaria",
+    "quality_profile": "showcase",
+    "output": "fireblocks-operations-architecture.html"
+  },
+  "components": [
+    { "id": "investor", "type": "external", "label": "Inversor / operador", "sublabel": "Portal web y back office", "pos": [40, 310], "size": [150, 68] },
+    { "id": "frontend", "type": "frontend", "label": "Frontend", "sublabel": "KYC, ofertas y cartera", "pos": [255, 310], "size": [178, 68] },
+    { "id": "api", "type": "backend", "label": "Backend / API", "sublabel": "Orquestación, RBAC e idempotencia", "pos": [505, 310], "size": [184, 68], "tag": "decisión de negocio" },
+    { "id": "compliance", "type": "security", "label": "Motor de cumplimiento", "sublabel": "KYC, KYT, límites, casos y EDD", "pos": [505, 120], "size": [184, 72], "tag": "aprobación / bloqueo" },
+    { "id": "database", "type": "database", "label": "BD y ledger interno", "sublabel": "clientes, órdenes y saldos", "pos": [505, 510], "size": [184, 68], "tag": "fuente operativa" },
+    { "id": "kyc", "type": "external", "label": "Proveedor KYC / KYT", "sublabel": "identidad, listas y riesgo wallet", "pos": [770, 105], "size": [202, 82], "tag": "opcional tercerizado" },
+    { "id": "fireblocks", "type": "security", "label": "Fireblocks", "sublabel": "MPC, Vaults, Policy Engine y webhooks", "pos": [770, 295], "size": [202, 82], "tag": "custodia y firma" },
+    { "id": "hedera", "type": "cloud", "label": "Red Hedera", "sublabel": "HTS / ATS: token y controles", "pos": [1050, 295], "size": [204, 82], "tag": "liquidación on-chain" },
+    { "id": "payment", "type": "external", "label": "Banco / rail de pagos", "sublabel": "cobros, rescates y distribuciones", "pos": [770, 510], "size": [202, 68] },
+    { "id": "legal", "type": "external", "label": "SPV y expediente legal", "sublabel": "inmueble, derechos, actas, contratos", "pos": [1050, 510], "size": [204, 68] }
+  ],
+  "boundaries": [
+    { "kind": "security-group", "label": "Plataforma PSAV: datos y decisiones bajo nuestro control", "wraps": ["frontend", "api", "compliance", "database"], "pad": 35 },
+    { "kind": "region", "label": "Proveedores y redes externas", "wraps": ["kyc", "fireblocks", "hedera", "payment", "legal"], "pad": 35 }
+  ],
+  "connections": [
+    { "id": "investor-frontend", "from": "investor", "to": "frontend", "label": "HTTPS: KYC, órdenes y cartera", "variant": "emphasis", "labelDy": -34 },
+    { "id": "frontend-api", "from": "frontend", "to": "api", "label": "API autenticada", "variant": "emphasis", "labelDy": 58 },
+    { "id": "api-compliance", "from": "api", "to": "compliance", "label": "evaluar elegibilidad", "variant": "security", "fromSide": "top", "toSide": "bottom", "labelDx": 100 },
+    { "id": "compliance-kyc", "from": "compliance", "to": "kyc", "label": "KYC/KYT API + webhook", "variant": "security", "labelAt": [730, 215] },
+    { "id": "api-database", "from": "api", "to": "database", "label": "órdenes, ledger y auditoría", "fromSide": "bottom", "toSide": "top", "labelAt": [695, 480] },
+    { "id": "api-fireblocks", "from": "api", "to": "fireblocks", "label": "Vault API + webhook", "variant": "emphasis", "labelDy": -42 },
+    { "id": "fireblocks-hedera", "from": "fireblocks", "to": "hedera", "label": "MPC firma y envía", "variant": "emphasis", "labelAt": [1011, 250] },
+    { "id": "api-payment", "from": "api", "to": "payment", "label": "cobros y distribuciones", "fromSide": "bottom", "toSide": "top", "labelDx": 126 },
+    { "id": "legal-api", "from": "legal", "to": "api", "label": "SPV, oferta y reglas", "variant": "dashed", "fromSide": "left", "toSide": "bottom", "labelAt": [1026, 610] },
+    { "id": "legal-hedera", "from": "legal", "to": "hedera", "label": "acta: crear token y supply", "variant": "security", "fromSide": "top", "toSide": "bottom", "labelDx": 118 }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Operación normal", "items": ["El backend recibe una orden y consulta compliance.", "Sólo una orden aprobada llega a Fireblocks para firma y envío.", "El webhook y el receipt se concilian en el ledger antes de actualizar la cartera."] },
+    { "dot": "violet", "title": "Operaciones on-chain", "items": ["Hedera ejecuta creación, asociación, grant/revoke KYC, freeze, pause, transfer, mint o burn.", "Fireblocks resguarda llaves MPC y aplica políticas; nuestra plataforma conserva la intención, controles y evidencia."] },
+    { "dot": "rose", "title": "KYC y responsabilidad PSAV", "items": ["KYC/KYT puede ser interno, tercerizado o híbrido.", "Incluso con proveedor, el PSAV mantiene política, decisión, EDD, investigación, ROS y auditoría."] }
+  ]
+}
