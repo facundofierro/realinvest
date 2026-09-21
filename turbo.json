@@ -5,7 +5,14 @@
     "HOST",
     "LOG_LEVEL",
     "PORT",
-    "RIPIO_MOCK_DATA_DIR"
+    "RIPIO_MOCK_DATA_DIR",
+    "DATABASE_URL",
+    "DATABASE_AUTH_TOKEN",
+    "AUTH_SECRET",
+    "AUTH_GOOGLE_ID",
+    "AUTH_GOOGLE_SECRET",
+    "AUTH_URL",
+    "AUTH_TRUST_HOST"
   ],
   "tasks": {
     "build": {
@@ -22,6 +29,19 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "db:generate": {
+      "inputs": ["src/schema.ts", "drizzle.config.ts", "drizzle/**"],
+      "outputs": ["drizzle/**"]
+    },
+    "db:migrate": {
+      "cache": false,
+      "inputs": ["drizzle/**", "drizzle.config.ts", "src/schema.ts"]
+    },
+    "db:seed": {
+      "cache": false,
+      "dependsOn": ["db:migrate"],
+      "inputs": ["src/seed.ts", "../../apps/wallet/src/sample-data/**"]
     }
   }
 }
