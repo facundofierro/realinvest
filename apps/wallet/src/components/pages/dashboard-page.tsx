@@ -1,6 +1,7 @@
 "use client";
 
 import { formatCurrency } from "@/lib/format";
+import { computeHoldingsTotals } from "@/lib/portfolio";
 import {
   Avatar,
   AvatarFallback,
@@ -15,8 +16,8 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   Building2,
-  TrendingUp,
   Bell,
+  AlertTriangle,
 } from "lucide-react";
 import Link from "next/link";
 import { SimilarProjectsCarousel } from "@/components/project/stories-section";
@@ -27,6 +28,8 @@ import {
   useTransactions,
 } from "@/hooks/use-queries";
 import { useMemo } from "react";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { cn } from "@repo/ui/lib/utils";
 
 interface DashboardProject {
   id: string;
@@ -41,41 +44,47 @@ interface DashboardProject {
 }
 
 export default function DashboardPage() {
+  const { user } = useCurrentUser();
   const {
     data: projects = [],
     isLoading: isProjectsLoading,
+    isError: isProjectsError,
+    refetch: refetchProjects,
   } = useDashboardProjects();
   const {
     data: balances = [],
     isLoading: isBalancesLoading,
+    isError: isBalancesError,
+    refetch: refetchBalances,
   } = useWalletBalances();
   const {
     data: holdings = [],
     isLoading: isHoldingsLoading,
+    isError: isHoldingsError,
+    refetch: refetchHoldings,
   } = useWalletHoldings();
   const {
     data: transactions = [],
     isLoading: isTransactionsLoading,
+    isError: isTransactionsError,
+    refetch: refetchTransactions,
   } = useTransactions();
 
+  const portfolioTotals = useMemo(() => computeHoldingsTotals(holdings), [holdings]);
   const totalBalance = useMemo(() => {
     const cash =
       balances.find(
         (b) => b.currencyCode === "USDT"
       )?.available ?? 0;
-    const assets = holdings.reduce(
-      (acc, h) =>
-        acc +
-        h.tokens * h.marketPriceUsd,
-      0
-    );
-    return cash + assets;
-  }, [balances, holdings]);
+    return cash + portfolioTotals.totalValue;
+  }, [balances, portfolioTotals]);
 
   const isLoading =
     isProjectsLoading ||
     isBalancesLoading ||
-    isHoldingsLoading;
+    isHoldingsLoading ||
+    isTransactionsLoading;
+  const isError = isProjectsError || isBalancesError || isHoldingsError || isTransactionsError;
 
   if (isLoading) {
     return (
@@ -90,13 +99,30 @@ export default function DashboardPage() {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="flex justify-center items-center h-screen p-6">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-destructive/10 flex items-center justify-center">
+            <AlertTriangle className="h-8 w-8 text-destructive" />
+          </div>
+          <h3 className="font-black uppercase text-sm mb-2">No pudimos cargar tu inicio</h3>
+          <p className="text-sm text-muted-foreground mb-4">Revisá tu conexión e intentá de nuevo.</p>
+          <Button onClick={() => { void refetchProjects(); void refetchBalances(); void refetchHoldings(); void refetchTransactions(); }}>
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 space-y-6 duration-500 animate-in fade-in slide-in-from-bottom-4">
       {/* Header */}
       <header className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            Hola, Facundo
+            Hola, {user?.name?.split(" ")[0] || "Inversor"}
           </h1>
           <p className="text-sm text-muted-foreground">
             Bienvenido de nuevo
@@ -119,6 +145,8 @@ export default function DashboardPage() {
         </div>
       </header>
 
+      {user?.kycStatus !== "approved" && <Card className="border-primary/20 bg-primary/5"><CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">{user?.kycStatus === "pending" ? "Tu verificación está en revisión" : user?.kycStatus === "rejected" ? "Tu verificación necesita una nueva presentación" : "Completá tu verificación de identidad"}</p><p className="text-sm text-muted-foreground">Necesitamos esta información para habilitar todas las funciones.</p></div><Button asChild size="sm"><Link href="/kyc">{user?.kycStatus === "rejected" ? "Reintentar" : user?.kycStatus === "pending" ? "Ver estado" : "Verificarme"}</Link></Button></CardContent></Card>}
+
       {/* Balance Card */}
       <Card className="overflow-hidden relative text-white from-gray-900 rounded-3xl border-none shadow-xl bg-linear-to-br via-slate-900 to-violet-950">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
@@ -134,9 +162,8 @@ export default function DashboardPage() {
                 totalBalance
               )}
             </div>
-            <div className="flex items-center text-sm font-medium text-brand-green">
-              <TrendingUp className="mr-1 w-4 h-4" />
-              +12.5% este mes
+            <div className={cn("flex items-center text-sm font-medium", portfolioTotals.pnlPct >= 0 ? "text-brand-green" : "text-destructive")}>
+              {portfolioTotals.pnlPct >= 0 ? "+" : ""}{portfolioTotals.pnlPct.toFixed(1)}% P&amp;L no realizado
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4 pt-2">
@@ -189,7 +216,9 @@ export default function DashboardPage() {
           Actividad Reciente
         </h2>
         <div className="space-y-3">
-          {transactions
+          {transactions.length === 0 ? (
+            <p className="text-sm text-muted-foreground p-3">Todavía no tenés movimientos</p>
+          ) : transactions
             .slice(0, 3)
             .map((tx) => (
               <div

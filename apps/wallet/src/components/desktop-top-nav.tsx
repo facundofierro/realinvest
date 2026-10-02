@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogClose,
 } from "@repo/ui/components/ui/dialog";
-import { signOut } from "next-auth/react";
+import { useAppSession } from "@/lib/session";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function DesktopTopNav() {
@@ -33,6 +33,9 @@ export function DesktopTopNav() {
     useState(false);
   const [accountDialogOpen, setAccountDialogOpen] = useState(false);
   const { user } = useCurrentUser();
+  const { signOut } = useAppSession();
+  const kycStatus = user?.kycStatus ?? "none";
+  const kycAction = kycStatus === "none" ? "Completar verificación" : kycStatus === "pending" ? "Ver estado de verificación" : kycStatus === "rejected" ? "Reintentar verificación" : null;
   const { data: balances = [] } =
     useWalletBalances();
 
@@ -201,9 +204,11 @@ export function DesktopTopNav() {
           <DialogHeader>
             <DialogTitle>Tu cuenta</DialogTitle>
             <DialogDescription>{user?.email}</DialogDescription>
+            <DialogDescription>Estado KYC: {kycStatus}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={() => signOut({ redirectTo: "/login" })}>Cerrar sesión</Button>
+            {kycAction ? <Button asChild variant="outline"><Link href="/kyc" onClick={() => setAccountDialogOpen(false)}>{kycAction}</Link></Button> : <span className="text-sm text-green-600">Verificación aprobada.</span>}
+            <Button onClick={() => void signOut()}>Cerrar sesión</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@repo/ui/components/ui/button";
 import {
   Card,
@@ -9,19 +11,16 @@ import {
 } from "@repo/ui/components/ui/card";
 import Link from "next/link";
 import { Wallet } from "lucide-react";
-import { signIn } from "@/auth";
+import { useAppSession } from "@/lib/session";
 
 export default function LoginPage({
   callbackUrl,
   error,
 }: {
-  callbackUrl: string;
+  callbackUrl?: string;
   error?: string;
 }) {
-  async function continueWithGoogle() {
-    "use server";
-    await signIn("google", { redirectTo: callbackUrl });
-  }
+  const { signIn } = useAppSession();
 
   return (
     <div className="flex overflow-hidden relative justify-center items-center p-4 min-h-screen bg-muted/20">
@@ -50,7 +49,7 @@ export default function LoginPage({
               No pudimos iniciar sesión con Google. Intentá nuevamente.
             </p>
           )}
-          <form action={continueWithGoogle}>
+          <form onSubmit={(event) => { event.preventDefault(); void signIn(callbackUrl); }}>
             <Button className="w-full h-11" type="submit" variant="outline">
               <svg aria-hidden="true" className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M21.35 12.27c0-.79-.07-1.55-.2-2.27H12v4.3h5.23a4.47 4.47 0 0 1-1.94 2.94v2.79h3.14c1.84-1.69 2.92-4.18 2.92-7.76Z" />

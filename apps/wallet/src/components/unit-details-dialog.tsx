@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   formatCurrency,
   formatTokenAmount,
+  parseUsdString,
 } from "@/lib/format";
 import {
   MapPin,
@@ -50,16 +51,6 @@ export function UnitDetailsDialog({
   const [activeTab, setActiveTab] =
     useState("plano");
 
-  const parsePriceToNumber = (
-    price?: string
-  ): number => {
-    if (!price) return 0;
-    const n = Number(
-      price.replace(/[^\d.-]/g, "")
-    );
-    return Number.isFinite(n) ? n : 0;
-  };
-
   if (!data) return null;
 
   // Unified mapping
@@ -91,7 +82,7 @@ export function UnitDetailsDialog({
       total - sold
     );
     const unitPriceNum =
-      parsePriceToNumber(unit.price);
+      parseUsdString(unit.price);
 
     if (unit.isTokenized && total > 0) {
       displayPrice =
@@ -208,6 +199,7 @@ export function UnitDetailsDialog({
     {
       label: "INVERTIR",
       variant: "primary" as const,
+      disabled: isMarketToken ? false : (data as ProjectUnit).statusRaw !== "available",
       onClick: () => {
         if (onInvest) {
           onInvest(data);

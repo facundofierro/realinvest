@@ -1,8 +1,9 @@
 "use client";
 
-import { useProjectUnits } from "@/hooks/use-queries";
+import { useProjectUnits, useWalletBalances } from "@/hooks/use-queries";
 
 import { UnitDetailsDialog } from "../unit-details-dialog";
+import { InvestConfirmDialog } from "../invest-confirm-dialog";
 import { UnitDetailsActions } from "../unit-details-actions";
 import {
   useState,
@@ -52,6 +53,7 @@ export default function ProjectUnitsPage({
 }: ProjectUnitsPageProps) {
   const router = useRouter();
   const { data: fetchedUnits = [], isLoading: isFetching, error: queryError } = useProjectUnits(projectId);
+  const { data: walletBalances = [] } = useWalletBalances();
 
   const unitsState = units ?? fetchedUnits;
   const loading = !units && isFetching;
@@ -59,6 +61,8 @@ export default function ProjectUnitsPage({
 
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+  const [purchaseUnit, setPurchaseUnit] = useState<ProjectUnit | null>(null);
+  const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: "",
     phone: "",
@@ -592,11 +596,21 @@ export default function ProjectUnitsPage({
         onInvest={(unit) => {
           const u = unit as ProjectUnit;
           if (u.isTokenized && u.tokenSymbol) {
-            router.push(`/exchange/${u.tokenSymbol}`);
+            if (u.statusRaw !== "available") return;
+            setPurchaseUnit(u);
+            setIsPurchaseDialogOpen(true);
             return;
           }
           setIsContactDialogOpen(true);
         }}
+      />
+
+      <InvestConfirmDialog
+        isOpen={isPurchaseDialogOpen}
+        onClose={() => setIsPurchaseDialogOpen(false)}
+        unit={purchaseUnit}
+        projectId={projectId}
+        availableBalance={walletBalances.find((balance) => balance.currencyCode === "USDT")?.available ?? 0}
       />
 
       {/* Contact Dialog */}

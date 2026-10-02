@@ -15,7 +15,11 @@ import {
   useWalletBalances,
   useWalletPositions,
   useMarketTokens,
+  useCreatePosition,
 } from "@/hooks/use-queries";
+import { useKycGate } from "@/hooks/use-kyc-gate";
+import { computeHoldingsTotals } from "@/lib/portfolio";
+import { KycBlockedDialog } from "@/components/kyc/kyc-blocked-dialog";
 import { useIsDesktop } from "@/hooks/use-is-desktop";
 import { DesktopTokenTabs } from "../desktop-token-tabs";
 import { UnitDetailsDialog } from "../unit-details-dialog";
@@ -42,25 +46,30 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Building2,
-  TrendingUp,
   Wallet,
   X,
   PieChart,
+  AlertTriangle,
 } from "lucide-react";
 import { Badge } from "@repo/ui/components/ui/badge";
 import Link from "next/link";
 import { cn } from "@repo/ui/lib/utils";
 
 export default function AssetsPage() {
+  const { mutateAsync: createPosition } = useCreatePosition();
+  const gate = useKycGate();
   const router = useRouter();
-  const { data: holdings = [] } =
+  const { data: holdings = [], isLoading: isHoldingsLoading, isError: isHoldingsError, refetch: refetchHoldings } =
     useWalletHoldings();
-  const { data: balances = [] } =
+  const { data: balances = [], isLoading: isBalancesLoading, isError: isBalancesError, refetch: refetchBalances } =
     useWalletBalances();
-  const { data: positions = [] } =
+  const { data: positions = [], isLoading: isPositionsLoading, isError: isPositionsError, refetch: refetchPositions } =
     useWalletPositions();
-  const { data: marketTokens = [] } =
+  const { data: marketTokens = [], isLoading: isMarketTokensLoading, isError: isMarketTokensError, refetch: refetchMarketTokens } =
     useMarketTokens();
+
+  const isLoading = isHoldingsLoading || isBalancesLoading || isPositionsLoading || isMarketTokensLoading;
+  const isError = isHoldingsError || isBalancesError || isPositionsError || isMarketTokensError;
 
   const isDesktop = useIsDesktop();
 
@@ -79,6 +88,7 @@ export default function AssetsPage() {
       );
       return {
         ...holding,
+        marketToken: marketTokens.find((token) => token.id === holding.tokenId),
         tokenName: holding.tokenSymbol,
         projectName:
           holding.projectTitle,
@@ -101,7 +111,7 @@ export default function AssetsPage() {
         borderColor: "border-primary",
       };
     });
-  }, [holdings, positions]);
+  }, [holdings, positions, marketTokens]);
 
   const selectedToken = useMemo(() => {
     return (
@@ -111,12 +121,8 @@ export default function AssetsPage() {
     );
   }, [myTokens, selectedTokenId]);
 
-  const totalValue = useMemo(() => {
-    return myTokens.reduce(
-      (acc, t) => acc + t.value,
-      0
-    );
-  }, [myTokens]);
+  const portfolioTotals = useMemo(() => computeHoldingsTotals(holdings), [holdings]);
+  const totalValue = portfolioTotals.totalValue;
 
   const availableUsdt = useMemo(() => {
     return (
@@ -167,6 +173,34 @@ export default function AssetsPage() {
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <div className="w-8 h-8 mx-auto mb-4 rounded-full border-4 border-primary/20 animate-spin border-t-primary" />
+          <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex justify-center items-center h-screen p-6">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-destructive/10 flex items-center justify-center">
+            <AlertTriangle className="h-8 w-8 text-destructive" />
+          </div>
+          <h3 className="font-black uppercase text-sm mb-2">No pudimos cargar tus activos</h3>
+          <p className="text-sm text-muted-foreground mb-4">Revisá tu conexión e intentá de nuevo.</p>
+          <Button onClick={() => { void refetchHoldings(); void refetchBalances(); void refetchPositions(); void refetchMarketTokens(); }}>
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       {isDesktop ? (
@@ -183,11 +217,11 @@ export default function AssetsPage() {
                   )}
                 </div>
                 <div className="flex gap-2 items-center mt-1">
-                  <span className="text-brand-green text-[10px] font-black bg-brand-green/10 px-2 py-0.5 rounded-full">
-                    +12.5%
+                  <span className={cn("text-[10px] font-black px-2 py-0.5 rounded-full", portfolioTotals.pnlPct >= 0 ? "text-brand-green bg-brand-green/10" : "text-destructive bg-destructive/10")}>
+                    {portfolioTotals.pnlPct >= 0 ? "+" : ""}{portfolioTotals.pnlPct.toFixed(1)}%
                   </span>
                   <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
-                    Último mes
+                    P&amp;L no realizado
                   </span>
                 </div>
               </div>
@@ -244,7 +278,18 @@ export default function AssetsPage() {
                 </div>
               </Card>
 
-              {myTokens.map((asset) => (
+              {myTokens.length === 0 ? (
+                <Card className="border-dashed border-muted-foreground/20 bg-white/50 text-center shadow-none">
+                  <CardContent className="flex flex-col items-center p-6">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mb-4">
+                      <PieChart className="h-6 w-6 text-primary/40" />
+                    </div>
+                    <h3 className="text-sm font-black uppercase mb-2">Todavía no tenés tokens</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Explorá proyectos para empezar a invertir.</p>
+                    <Button asChild><Link href="/invest">Explorar proyectos</Link></Button>
+                  </CardContent>
+                </Card>
+              ) : myTokens.map((asset) => (
                 <div
                   key={asset.id}
                   onClick={() =>
@@ -290,40 +335,9 @@ export default function AssetsPage() {
           </div>
 
           <div className="flex-1 flex flex-col p-8 bg-muted/10 overflow-hidden">
-            {selectedToken ? (
+            {selectedToken?.marketToken ? (
               <div className="h-full animate-in fade-in slide-in-from-right-8 duration-500">
-                <DesktopTokenTabs
-                  token={{
-                    id: selectedToken.id,
-                    symbol:
-                      selectedToken.tokenName,
-                    projectTitle:
-                      selectedToken.projectName,
-                    priceUsd: Number(
-                      selectedToken.marketPrice
-                    ),
-                    tokensAvailable: 1250,
-                    marketCapUsd: 520000,
-                    projectId: "1",
-                    change24hPct: 0.5,
-                    change7dPct: 2.1,
-                    change30dPct: 5.4,
-                    changeAllPct: 12.4,
-                    isFavorite: true,
-                    roiPct: 12.4,
-                    unitId:
-                      selectedToken.unitId,
-                    sellPriceUsd:
-                      Number(
-                        selectedToken.marketPrice
-                      ),
-                    buyPriceUsd: Number(
-                      selectedToken.marketPrice
-                    ),
-                    liveSince:
-                      "6 meses",
-                  }}
-                />
+                <DesktopTokenTabs token={selectedToken.marketToken} />
               </div>
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-center max-w-sm mx-auto p-12 rounded-[40px] border-2 border-dashed border-muted-foreground/20 bg-white/50 backdrop-blur-sm">
@@ -363,12 +377,11 @@ export default function AssetsPage() {
                     )}
                   </div>
                   <div className="flex gap-2 items-center">
-                    <span className="inline-flex items-center text-brand-green text-sm font-medium bg-brand-green/10 px-2 py-0.5 rounded-full">
-                      <TrendingUp className="mr-1 w-3 h-3" />
-                      +12.5%
+                    <span className={cn("inline-flex items-center text-sm font-medium px-2 py-0.5 rounded-full", portfolioTotals.pnlPct >= 0 ? "text-brand-green bg-brand-green/10" : "text-destructive bg-destructive/10")}>
+                      {portfolioTotals.pnlPct >= 0 ? "+" : ""}{portfolioTotals.pnlPct.toFixed(1)}%
                     </span>
                     <span className="text-xs text-white/40">
-                      último mes
+                      P&amp;L no realizado
                     </span>
                   </div>
                 </div>
@@ -458,7 +471,18 @@ export default function AssetsPage() {
               </div>
 
               <div className="space-y-4">
-                {myTokens.map(
+                {myTokens.length === 0 ? (
+                  <Card className="border-dashed border-muted-foreground/20 bg-white/50 text-center shadow-none">
+                    <CardContent className="flex flex-col items-center p-6">
+                      <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center mb-4">
+                        <PieChart className="h-6 w-6 text-primary/40" />
+                      </div>
+                      <h3 className="text-sm font-black uppercase mb-2">Todavía no tenés tokens</h3>
+                      <p className="text-sm text-muted-foreground mb-4">Explorá proyectos para empezar a invertir.</p>
+                      <Button asChild><Link href="/invest">Explorar proyectos</Link></Button>
+                    </CardContent>
+                  </Card>
+                ) : myTokens.map(
                   (asset) => (
                     <Card
                       key={asset.id}
@@ -544,50 +568,12 @@ export default function AssetsPage() {
         onClose={() =>
           setSelectedTokenId(null)
         }
-        data={
-          selectedToken
-            ? {
-                symbol:
-                  selectedToken.tokenName,
-                projectTitle:
-                  selectedToken.projectName,
-                priceUsd: Number(
-                  selectedToken.marketPrice.replace(
-                    /,/g,
-                    ""
-                  )
-                ),
-                tokensAvailable: 1250,
-                marketCapUsd: 520000,
-                id: selectedToken.id,
-                projectId: "1",
-                change24hPct: 0.5,
-                change7dPct: 2.1,
-                change30dPct: 5.4,
-                changeAllPct: 12.4,
-                liveSince: "6 meses",
-                isFavorite: true,
-                roiPct: 12.4,
-                buyPriceUsd: Number(
-                  selectedToken.marketPrice.replace(
-                    /,/g,
-                    ""
-                  )
-                ),
-                sellPriceUsd: Number(
-                  selectedToken.marketPrice.replace(
-                    /,/g,
-                    ""
-                  )
-                ),
-              }
-            : null
-        }
-        onInvest={() => {
+        data={selectedToken?.marketToken ?? null}
+        onInvest={() => gate.guard(() => {
           setTradeType("BUY");
           setOrderType("MARKET");
           setIsTradeDialogOpen(true);
-        }}
+        })}
       />
 
       <Dialog
@@ -727,11 +713,7 @@ export default function AssetsPage() {
                 <Button
                   className="w-full h-12 mt-6 rounded-xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/25"
                   size="lg"
-                  onClick={() =>
-                    setIsTradeDialogOpen(
-                      false
-                    )
-                  }
+                  onClick={() => { if (selectedToken && Number(amount) > 0) void createPosition({ tokenSymbol: selectedToken.tokenName, side: tradeType, orderType, totalAmount: Number(amount), orderPriceUsd: orderType === "LIMIT" ? Number(limitPriceInput) : undefined }).then(() => setIsTradeDialogOpen(false)); }}
                 >
                   {tradeType === "BUY"
                     ? "CONFIRMAR COMPRA"
@@ -742,6 +724,7 @@ export default function AssetsPage() {
           </div>
         </DialogContent>
       </Dialog>
+      <KycBlockedDialog open={gate.blockedDialogOpen} onOpenChange={gate.setBlockedDialogOpen} status={gate.status} rejectionReason={gate.rejectionReason} />
     </div>
   );
 }

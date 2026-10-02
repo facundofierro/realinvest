@@ -17,7 +17,7 @@ import { cn } from "@repo/ui/lib/utils";
 import { VestLogo } from "@repo/ui/components/brand/vest-logo";
 import { Button } from "@repo/ui/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@repo/ui/components/ui/dialog";
-import { signOut } from "next-auth/react";
+import { useAppSession } from "@/lib/session";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function BottomNav() {
@@ -26,6 +26,9 @@ export function BottomNav() {
     useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const { user } = useCurrentUser();
+  const { signOut } = useAppSession();
+  const kycStatus = user?.kycStatus ?? "none";
+  const kycAction = kycStatus === "none" ? "Completar verificación" : kycStatus === "pending" ? "Ver estado de verificación" : kycStatus === "rejected" ? "Reintentar verificación" : null;
 
   useEffect(() => {
     const handleStoryActive = (
@@ -238,10 +241,11 @@ export function BottomNav() {
                 <DialogDescription>{user?.email}</DialogDescription>
               </div>
             </div>
-            <DialogDescription>Estado KYC: {user?.kycStatus ?? "none"}</DialogDescription>
+            <DialogDescription>Estado KYC: {kycStatus}</DialogDescription>
+            {kycAction ? <Button asChild variant="outline"><Link href="/kyc" onClick={() => setAccountOpen(false)}>{kycAction}</Link></Button> : <DialogDescription>Verificación aprobada.</DialogDescription>}
           </DialogHeader>
           <DialogFooter>
-            <Button onClick={() => signOut({ redirectTo: "/login" })}>Cerrar sesión</Button>
+            <Button onClick={() => void signOut()}>Cerrar sesión</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

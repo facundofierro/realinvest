@@ -6,7 +6,8 @@ export { getMarketOrderBook } from "./orderbook";
 // Wallet API functions
 export { getWalletBalances } from "./wallet";
 export { getWalletHoldings } from "./holdings";
-export { getWalletPositions, createPosition } from "./positions";
+export { getWalletPositions } from "./positions";
+export { createWithdrawal } from "./withdraw";
 
 // Projects API functions
 export { getProjects } from "./projects";
@@ -21,3 +22,6 @@ export { getDashboardProjects } from "./dashboard-projects";
 
 // Transactions API functions
 export { getTransactions } from "./transactions";
+
+// KYC API functions
+export { getKycApplication, submitKycApplication } from "./kyc";

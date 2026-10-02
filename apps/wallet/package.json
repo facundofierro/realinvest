@@ -16,11 +16,13 @@
   "dependencies": {
     "@aparajita/capacitor-secure-storage": "^6.0.1",
     "@auth/drizzle-adapter": "^1.11.1",
-    "@agelum/backend": "^0.1.0",
     "@capacitor/app": "^6.0.0",
     "@capacitor/browser": "^6.0.0",
-    "@repo/backend": "workspace:*",
+    "@hookform/resolvers": "^5.2.2",
     "@repo/db": "workspace:*",
+    "@repo/fireblocks-mock": "workspace:*",
+    "@repo/providers-custody": "workspace:*",
+    "@repo/providers-kyc": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.16",
     "@tauri-apps/api": "^2",
@@ -35,8 +37,10 @@
     "next-auth": "beta",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-hook-form": "^7.69.0",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

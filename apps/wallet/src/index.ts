@@ -12,6 +12,8 @@ export { default as DepositPage } from "./components/pages/deposit-page";
 export { default as WithdrawPage } from "./components/pages/withdraw-page";
 
 export { BottomNav } from "./components/bottom-nav";
+export { RequireSession } from "./components/require-session";
+export { AppSessionProvider, useAppSession } from "./lib/session";
 export { Providers } from "./components/providers";
 
 // Export types

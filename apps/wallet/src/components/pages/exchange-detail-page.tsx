@@ -32,7 +32,10 @@ import {
   useWalletBalances,
   useWalletHoldings,
   useWalletPositions,
+  useCreatePosition,
 } from "@/hooks/use-queries";
+import { useKycGate } from "@/hooks/use-kyc-gate";
+import { KycBlockedDialog } from "@/components/kyc/kyc-blocked-dialog";
 
 function formatPct(
   value: number
@@ -136,6 +139,8 @@ export default function ExchangeDetailPage({
     useWalletBalances();
   const { data: holdings = [] } =
     useWalletHoldings();
+  const { mutateAsync: createPosition } = useCreatePosition();
+  const gate = useKycGate();
 
   const positions = useMemo(
     () =>
@@ -507,13 +512,13 @@ export default function ExchangeDetailPage({
         <div className="flex gap-3 pt-3 pb-2 sm:pt-4 sm:pb-6 shrink-0">
           <Button
             variant="outline"
-            onClick={() => {
+            onClick={() => gate.guard(() => {
               setTradeType("SELL");
               setOrderType("MARKET");
               setIsTradeDialogOpen(
                 true
               );
-            }}
+            })}
             className="flex-1 h-16 sm:h-20 flex-col gap-0.5 text-[11px] sm:text-[12px] font-black tracking-widest uppercase rounded-[24px] border-brand-pink bg-gray-100 text-[#3B2146] shadow-sm hover:bg-gray-200 hover:text-[#3B2146] active:scale-95 transition-all"
           >
             <span>VENDER</span>
@@ -525,13 +530,13 @@ export default function ExchangeDetailPage({
           </Button>
           <Button
             variant="outline"
-            onClick={() => {
+            onClick={() => gate.guard(() => {
               setTradeType("BUY");
               setOrderType("MARKET");
               setIsTradeDialogOpen(
                 true
               );
-            }}
+            })}
             className="flex-1 h-16 sm:h-20 flex-col gap-0.5 text-[11px] sm:text-[12px] font-black tracking-widest uppercase rounded-[24px] border-brand-green bg-gray-100 text-[#3B2146] shadow-sm hover:bg-gray-200 hover:text-[#3B2146] active:scale-95 transition-all"
           >
             <span>COMPRAR</span>
@@ -570,15 +575,9 @@ export default function ExchangeDetailPage({
           marketSimulation
         }
         onMax={handleMax}
-        onConfirm={() => {
-          console.log("Confirm trade", {
-            tradeType,
-            orderType,
-            amount,
-          });
-          setIsTradeDialogOpen(false);
-        }}
+        onConfirm={() => { if (token && Number(amount) > 0) void createPosition({ tokenSymbol: token.symbol, side: tradeType, orderType, totalAmount: Number(amount), orderPriceUsd: orderType === "LIMIT" ? Number(limitPriceInput) : undefined }).then(() => setIsTradeDialogOpen(false)); }}
       />
+      <KycBlockedDialog open={gate.blockedDialogOpen} onOpenChange={gate.setBlockedDialogOpen} status={gate.status} rejectionReason={gate.rejectionReason} />
     </div>
   );
 }
