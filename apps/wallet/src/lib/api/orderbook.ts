@@ -1,51 +1,24 @@
-import type { MarketOrderBook, OrderBookLevel } from "@/types/wallet";
-import { orderBookLevels } from "@repo/db";
-import { and, asc, desc, eq } from "drizzle-orm";
+import type { MarketOrderBook } from "@/types/wallet";
+import { positions } from "@repo/db";
+import { and, asc, desc, eq, or, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db";
+import { ensureMarketMakerLiquidity } from "./market-maker";
 import { getMarketTokenBySymbol } from "./market";
-
-function makeDepth(currentPrice: number): {
-  asks: OrderBookLevel[];
-  bids: OrderBookLevel[];
-} {
-  const asks = Array.from({ length: 6 })
-    .map((_, i) => ({
-      price: currentPrice * (1 + (i + 1) * 0.005),
-      amount: Math.floor((Math.sin(i * 123.45) * 0.5 + 0.5) * 500) + 50,
-    }))
-    .reverse();
-
-  const bids = Array.from({ length: 6 }).map((_, i) => ({
-    price: currentPrice * (1 - (i + 1) * 0.005),
-    amount: Math.floor((Math.cos(i * 123.45) * 0.5 + 0.5) * 500) + 50,
-  }));
-
-  return { asks, bids };
-}
 
 export async function getMarketOrderBook(symbol: string): Promise<MarketOrderBook> {
   const token = await getMarketTokenBySymbol(symbol);
-  if (!token) {
-    throw new Error("Token not found");
-  }
+  if (!token) throw new Error("Token not found");
+  await ensureMarketMakerLiquidity(token.id, token.priceUsd);
 
+  const remaining = sql<number>`SUM(${positions.totalAmount} - ${positions.filledAmount})`.as("amount");
+  const openStatus = or(eq(positions.status, "OPEN"), eq(positions.status, "PARTIALLY_FILLED"));
   const [asks, bids] = await Promise.all([
-    getDb().select({ price: orderBookLevels.price, amount: orderBookLevels.amount })
-      .from(orderBookLevels).where(and(eq(orderBookLevels.tokenId, token.id), eq(orderBookLevels.side, "ask")))
-      .orderBy(asc(orderBookLevels.price)),
-    getDb().select({ price: orderBookLevels.price, amount: orderBookLevels.amount })
-      .from(orderBookLevels).where(and(eq(orderBookLevels.tokenId, token.id), eq(orderBookLevels.side, "bid")))
-      .orderBy(desc(orderBookLevels.price)),
+    getDb().select({ price: positions.orderPriceUsd, amount: remaining }).from(positions)
+      .where(and(eq(positions.tokenId, token.id), eq(positions.side, "SELL"), openStatus))
+      .groupBy(positions.orderPriceUsd).orderBy(asc(positions.orderPriceUsd)),
+    getDb().select({ price: positions.orderPriceUsd, amount: remaining }).from(positions)
+      .where(and(eq(positions.tokenId, token.id), eq(positions.side, "BUY"), openStatus))
+      .groupBy(positions.orderPriceUsd).orderBy(desc(positions.orderPriceUsd)),
   ]);
-
-  if (asks.length || bids.length) {
-    return {
-      asks,
-      bids,
-    };
-  }
-
-  const { asks: generatedAsks, bids: generatedBids } = makeDepth(token.priceUsd);
-
-  return { asks: generatedAsks, bids: generatedBids };
+  return { asks, bids };
 }

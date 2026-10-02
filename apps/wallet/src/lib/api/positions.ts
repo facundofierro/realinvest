@@ -19,8 +19,3 @@ export async function getWalletPositions(): Promise<Position[]> {
     openedMarketPriceUsd: row.openedMarketPriceUsd ?? undefined,
   }));
 }
-
-export async function createPosition(positionId: string): Promise<{ ok: boolean; positionId: string }> {
-  // In a real app, this would create a position in the database
-  return { ok: true, positionId };
-}
