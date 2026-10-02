@@ -6,6 +6,13 @@ import { expect, type Page } from "@playwright/test";
  */
 const IGNORED_CONSOLE: RegExp[] = [];
 
+/**
+ * Failed resource URLs to ignore (matched against the console message location).
+ * - Seeded project images ("/projects/*.png") live in apps/wallet/public; the
+ *   admin renders the same DB rows but does not serve those files (known gap).
+ */
+const IGNORED_RESOURCES: RegExp[] = [/:47311\/projects\/[^/]+\.(png|jpe?g|webp)$/];
+
 const ERROR_TEXT = "Application error: a client-side exception has occurred";
 
 function isExternal(page: Page, url: string) {
@@ -24,6 +31,7 @@ export function trackErrors(page: Page) {
     const text = msg.text();
     // Third-party assets (e.g. decorative SVGs) failing is not an app error.
     if (text.startsWith("Failed to load resource") && isExternal(page, msg.location().url)) return;
+    if (text.startsWith("Failed to load resource") && IGNORED_RESOURCES.some((re) => re.test(msg.location().url))) return;
     if (IGNORED_CONSOLE.some((re) => re.test(text))) return;
     errors.push(`console.error: ${text}`);
   });
