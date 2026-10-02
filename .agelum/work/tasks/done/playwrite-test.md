@@ -1,7 +1,10 @@
 ---
 created: 2026-09-25T15:28:07.661Z
+plan: .agelum/work/plans/2026-10-02-playwrite-test-1790962327523.md
+status: done
+summary: .agelum/work/summaries/2026-10-02-playwrite-test-1790962446260.md
 type: task
-workflowStatus: doing
+workflowStatus: done
 ---
 
 # playwright test

@@ -1,5 +1,8 @@
 ---
-workflowStatus: pending
+plan: '.agelum/work/plans/2026-10-02-17 Responsive audit: screen-by-screen pass (8)-1790959753877.md'
+status: done
+summary: '.agelum/work/summaries/2026-10-02-17 Responsive audit: screen-by-screen pass (8)-1790960080594.md'
+workflowStatus: done
 ---
 
 ---

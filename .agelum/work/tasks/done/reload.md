@@ -1,7 +1,10 @@
 ---
 created: 2026-10-02T13:54:29.664Z
-workflowStatus: fixes
+plan: .agelum/work/plans/2026-10-02-reload-1790950371001.md
+status: done
+summary: .agelum/work/summaries/2026-10-02-reload-1790950642945.md
 type: task
+workflowStatus: done
 ---
 
 # reload
