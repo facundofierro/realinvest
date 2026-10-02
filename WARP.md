@@ -93,7 +93,6 @@ pnpm generate:component
 The wallet app uses a sophisticated mock data system:
 - Sample JSON files in `src/sample-data/` directory contain fixtures for market data, transactions, user balances, etc.
 - API routes automatically fall back to generating mock data when sample data isn't available
-- Environment variable `RIPIO_MOCK_DATA_DIR` can override data directory location
 
 ### Native App Build Process
 1. **Next.js Build**: Native NextJS app builds static export to `out/` directory
@@ -106,4 +105,3 @@ Global environment variables configured in `turbo.json`:
 - `HOST`: Development server host
 - `LOG_LEVEL`: Application logging level
 - `PORT`: Development server port
-- `RIPIO_MOCK_DATA_DIR`: Override directory for mock data files
