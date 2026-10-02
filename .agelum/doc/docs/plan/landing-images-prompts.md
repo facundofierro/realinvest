@@ -24,7 +24,12 @@ Generated 2026-10-02 for `apps/landing` (task `.agelum/work/tasks/fixes/landing-
 
 Iterations: `trust-loop` v1 had a mirrored floor reflection and bunched objects → v2 forces even spacing + no reflection. `opengraph` v1 had a muddy fog patch → v2 asks for a clean sky gradient. All others accepted on the first pass.
 
-Not generated (still SVG): hero phone, buyer-portal phone and investor app mock. The plan called for real wallet screenshots, but every wallet screen shows tokens, ROI/TIR, "renta fija" or P&L, which breaks the landing copy rules, and there is no buyer-portal screen. Pending a user decision.
+Not generated: the three phone slots use real `apps/wallet` screenshots of the seeded `demo-user` (390×844 @2x, Next dev badge hidden; the user confirmed all data is demo data, so nothing else is hidden), shown in a CSS phone frame (`components/phone-screenshot.tsx`):
+- `screenshot-hero.webp`: `/` home, cropped to the top 780×1300 to keep the hero phone's 0.6 aspect.
+- `screenshot-portal.webp`: `/project/torre-libertador-8000` (photos, launch, construction phases).
+- `screenshot-investor.webp`: `/invest` (opportunities list).
+
+Capture script: `.imagegen/shots.mjs` (copy into `apps/e2e` and run `node .shots.mjs <outdir> <paths...>`; needs the wallet dev server on :47310 and `apps/e2e/.auth/wallet.json`).
 
 ## Prompts
 

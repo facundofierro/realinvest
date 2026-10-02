@@ -4,7 +4,7 @@ plan: .agelum/work/plans/2026-10-02-landing-page-images-1790974316519.md
 status: done
 summary: .agelum/work/summaries/2026-10-02-landing-page-images-1790975016552.md
 type: task
-workflowStatus: doing
+workflowStatus: done
 ---
 
 # landing page images
