@@ -43,7 +43,7 @@ All screens exist as UI mock-ups in `apps/wallet`:
 
 ### 2.4 Provider Integrations (None)
 
-- No crypto custody provider integration. A `dev:ripio-mock` script exists in the root `package.json` referencing a `@repo/ripio-mock` package, but the package **does not exist yet**; the script is a leftover from an earlier idea and will be replaced by a Fireblocks-oriented mock (see §3.2).
+- No crypto custody provider integration is implemented yet. Fireblocks is the chosen direction for the future custody mock (see §3.2).
 - No KYC provider (real or simulated).
 
 ### 2.5 Research (Complete for First Market: Paraguay)
@@ -68,7 +68,7 @@ The research folder (`doc/docs/research/`) contains the regulatory and technical
 
 ### 3.2 Simulated Providers
 
-- **Provider decision: Fireblocks.** For the Paraguay deployment the custody provider is **Fireblocks** (the model already validated locally by X4T — local PSAV license + foreign custody technology — per `paraguay-psav-registro-y-wallets.md`). Ripio is **discarded** as a provider option; the existing `dev:ripio-mock` script and `RIPIO_MOCK_DATA_DIR` references in the root `package.json`/`turbo.json` are leftovers and must be removed or renamed.
+- **Provider decision: Fireblocks.** For the Paraguay deployment the custody provider is **Fireblocks** (the model already validated locally by X4T — local PSAV license + foreign custody technology — per `paraguay-psav-registro-y-wallets.md`). Ripio is **discarded** as a provider option; its stale mock script and environment configuration have been removed.
 - **[ ] Simulated crypto custody provider — Fireblocks mock** (e.g. `@repo/fireblocks-mock` package):
   - Simulated API mirroring Fireblocks concepts (vault accounts, wallets, balances, transfers, deposit addresses) based on the operations research in `research/providers/fireblocks-operations-architecture` and `research/providers/operations-issuance-custody`.
   - Covers wallets, balances, deposits/withdrawals, and stablecoin (USDT) on/off-ramp flows.

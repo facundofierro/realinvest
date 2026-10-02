@@ -1,31 +1,32 @@
 ---
 created: 2026-09-21T12:30:00.000Z
 epic: alpha-version
-priority: '05'
-storyPoints: 3
-title: Session handling for native wrappers (Capacitor/Tauri)
+plan: .agelum/work/plans/2026-09-22-12 Remove Ripio leftovers (1)-1790074452617.md
+priority: 12
+status: done
+storyPoints: 1
+summary: .agelum/work/summaries/2026-09-22-12 Remove Ripio leftovers (1)-1790118658176.md
+title: Remove Ripio leftovers
 type: task
-workflowStatus: pending
+workflowStatus: done
 ---
 
-# Session handling for native wrappers (Capacitor/Tauri)
+# Remove Ripio leftovers
 
 **Project context:** RealInvest is a real-estate tokenization platform. The wallet app (`apps/wallet`, Next.js 16, React 19, TanStack Query, Tailwind 4, shared UI in `packages/ui`) is currently a UI mock-up: it reads sample JSON from `apps/wallet/src/sample-data/` through API routes, has no auth, no persistence and no providers. The "alpha version" goal is a fully functional alpha: Drizzle ORM + SQLite persistence, Google OAuth, simulated KYC provider, simulated Fireblocks custody provider (Fireblocks is the chosen custody provider; Ripio is discarded), an end-to-end investment loop, responsive polish, and package boundaries (`packages/domain`, `packages/providers-custody`, `packages/providers-kyc`, `packages/db`) so future forked deployments can plug different real providers. Tenancy is resolved per deployment (no runtime multi-tenancy). Real blockchain issuance, real Fireblocks integration and native store releases are out of scope. Reference docs: `.agelum/doc/docs/plan/status-2026-sep.md`, `docs/plan/wallet-multiplatform.md`, `.agelum/doc/docs/research/providers/` (Fireblocks/operations research).
 
 ## Task
 
-Make the authentication session strategy work in the native wrappers (Capacitor and Tauri static export builds) following `docs/plan/wallet-multiplatform.md` and `docs/plan/wallet-multiplatform-implementation.md`. Web behavior must remain unchanged. Define how OAuth redirect / token exchange happens in a webview (system browser + deep link, or token-based session) and how the session is stored securely. A working design plus implemented web-side hooks/abstraction is required; actual store releases are out of scope. Depends on the Google OAuth task.
+Fireblocks is the chosen custody provider and Ripio is discarded. Remove the leftover `dev:ripio-mock` script from the root `package.json` (referencing a non-existent `@repo/ripio-mock` package) and the `RIPIO_MOCK_DATA_DIR` env var from `turbo.json` globalEnv, and update docs that mention them (WARP.md, plan docs where appropriate). If a replacement dev script for the Fireblocks mock is needed, add `dev:fireblocks-mock` only once that package exists.
 
 ## Related Source Code
-- [ ] docs/plan/wallet-multiplatform.md:1
-- [ ] docs/plan/wallet-multiplatform-implementation.md:1
-- [ ] native/wallet/capacitor/capacitor.config.ts:1
-- [ ] native/wallet/nextjs/next.config.ts:1
-- [ ] native/wallet/tauri/src-tauri:1
-- [ ] apps/wallet/src/components/providers.tsx:1
+- [ ] package.json:7
+- [ ] turbo.json:8
+- [ ] WARP.md:96
+- [ ] WARP.md:109
+- [ ] .agelum/doc/docs/plan/status-2026-sep.md:46
 
 ## Acceptance Criteria
-- [ ] Documented session/OAuth flow for Capacitor and Tauri
-- [ ] A session abstraction lets the app run on web and native webviews without changing screens
-- [ ] Web flow is unaffected
-- [ ] Known limitations are listed in the doc
+- [ ] No `ripio`/`RIPIO` references remain in code, scripts or env config (historical notes in research docs may stay)
+- [ ] `pnpm build` and `pnpm dev` still work
+- [ ] WARP.md environment section updated

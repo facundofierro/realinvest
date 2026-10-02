@@ -1,11 +1,14 @@
 ---
 created: 2026-09-21T12:30:00.000Z
 epic: alpha-version
+plan: .agelum/work/plans/2026-09-22-07 KYC onboarding UI flow (5)-1790058532031.md
 priority: '07'
+status: done
 storyPoints: 5
+summary: .agelum/work/summaries/2026-09-22-07 KYC onboarding UI flow (5)-1790059520658.md
 title: KYC onboarding UI flow
 type: task
-workflowStatus: pending
+workflowStatus: done
 ---
 
 # KYC onboarding UI flow

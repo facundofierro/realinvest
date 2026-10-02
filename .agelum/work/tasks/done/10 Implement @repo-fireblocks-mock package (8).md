@@ -1,11 +1,14 @@
 ---
 created: 2026-09-21T12:30:00.000Z
 epic: alpha-version
+plan: .agelum/work/plans/2026-09-22-10 Implement @repo-fireblocks-mock package (8)-1790074366566.md
 priority: 10
+status: done
 storyPoints: 8
+summary: .agelum/work/summaries/2026-09-22-10 Implement @repo-fireblocks-mock package (8)-1790118630850.md
 title: Implement @repo/fireblocks-mock package
 type: task
-workflowStatus: pending
+workflowStatus: done
 ---
 
 # Implement @repo/fireblocks-mock package

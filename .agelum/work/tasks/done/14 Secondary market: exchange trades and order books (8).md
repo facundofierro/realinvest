@@ -1,5 +1,8 @@
 ---
-workflowStatus: pending
+plan: '.agelum/work/plans/2026-09-23-14 Secondary market: exchange trades and order books (8)-1790162455842.md'
+status: done
+summary: '.agelum/work/summaries/2026-09-23-14 Secondary market: exchange trades and order books (8)-1790165522543.md'
+workflowStatus: done
 ---
 
 ---

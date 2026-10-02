@@ -1,11 +1,14 @@
 ---
 created: 2026-09-21T12:30:00.000Z
 epic: alpha-version
+plan: .agelum/work/plans/2026-09-22-08 KYC gating of invest, deposit and withdraw (3)-1790061902790.md
 priority: '08'
+status: done
 storyPoints: 3
+summary: .agelum/work/summaries/2026-09-22-08 KYC gating of invest, deposit and withdraw (3)-1790062980464.md
 title: KYC gating of invest, deposit and withdraw
 type: task
-workflowStatus: pending
+workflowStatus: done
 ---
 
 # KYC gating of invest, deposit and withdraw

@@ -1,11 +1,14 @@
 ---
 created: 2026-09-21T12:30:00.000Z
 epic: alpha-version
+plan: .agelum/work/plans/2026-09-22-06 Define KYC provider port and packages-providers-kyc (3)-1790057544926.md
 priority: '06'
+status: done
 storyPoints: 3
+summary: .agelum/work/summaries/2026-09-22-06 Define KYC provider port and packages-providers-kyc (3)-1790058137590.md
 title: Define KYC provider port and packages/providers-kyc
 type: task
-workflowStatus: pending
+workflowStatus: done
 ---
 
 # Define KYC provider port and packages/providers-kyc

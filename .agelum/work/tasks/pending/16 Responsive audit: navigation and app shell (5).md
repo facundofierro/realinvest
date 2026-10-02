@@ -1,4 +1,6 @@
 ---
+plan: '.agelum/work/plans/2026-09-23-16 Responsive audit: navigation and app shell (5)-1790177874928.md'
+status: planned
 workflowStatus: pending
 ---
 

@@ -1,11 +1,14 @@
 ---
 created: 2026-09-21T12:30:00.000Z
 epic: alpha-version
+plan: .agelum/work/plans/2026-09-22-09 Define custody provider port (packages-providers-custody) (3)-1790058851766.md
 priority: '09'
+status: done
 storyPoints: 3
+summary: .agelum/work/summaries/2026-09-22-09 Define custody provider port (packages-providers-custody) (3)-1790059829610.md
 title: Define custody provider port (packages/providers-custody)
 type: task
-workflowStatus: pending
+workflowStatus: done
 ---
 
 # Define custody provider port (packages/providers-custody)

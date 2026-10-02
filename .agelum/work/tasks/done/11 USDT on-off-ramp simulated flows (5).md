@@ -1,11 +1,14 @@
 ---
 created: 2026-09-21T12:30:00.000Z
 epic: alpha-version
+plan: .agelum/work/plans/2026-09-22-11 USDT on-off-ramp simulated flows (5)-1790074427264.md
 priority: 11
+status: done
 storyPoints: 5
+summary: .agelum/work/summaries/2026-09-23-11 USDT on-off-ramp simulated flows (5)-1790154954488.md
 title: USDT on/off-ramp simulated flows
 type: task
-workflowStatus: pending
+workflowStatus: done
 ---
 
 # USDT on/off-ramp simulated flows

@@ -1,11 +1,14 @@
 ---
 created: 2026-09-21T12:30:00.000Z
 epic: alpha-version
+plan: .agelum/work/plans/2026-09-23-15 Assets-portfolio screen wired to real data (3)-1790165567997.md
 priority: 15
+status: done
 storyPoints: 3
+summary: .agelum/work/summaries/2026-09-23-15 Assets-portfolio screen wired to real data (3)-1790167315661.md
 title: Assets/portfolio screen wired to real data
 type: task
-workflowStatus: pending
+workflowStatus: done
 ---
 
 # Assets/portfolio screen wired to real data

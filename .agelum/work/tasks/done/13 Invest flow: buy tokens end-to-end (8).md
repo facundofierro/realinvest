@@ -1,5 +1,8 @@
 ---
-workflowStatus: pending
+plan: '.agelum/work/plans/2026-09-23-13 Invest flow: buy tokens end-to-end (8)-1790156862704.md'
+status: done
+summary: '.agelum/work/summaries/2026-09-23-13 Invest flow: buy tokens end-to-end (8)-1790161401765.md'
+workflowStatus: done
 ---
 
 ---
