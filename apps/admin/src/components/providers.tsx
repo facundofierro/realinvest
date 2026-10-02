@@ -2,25 +2,8 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import { TrpcReactiveProvider } from "@agelum/backend/client";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "@repo/backend";
-
-// Reactive relations configuration
-const reactiveRelations = {
-  project: ['project_unit', 'project_story', 'project_stage', 'project_purchase_option', 'market_token'],
-  project_unit: ['project', 'market_token'],
-  project_story: ['project'],
-  project_stage: ['project'],
-  project_purchase_option: ['project'],
-  market_token: ['project', 'project_unit', 'holding', 'position', 'orderbook_level', 'market_series'],
-  holding: ['market_token'],
-  position: ['market_token', 'transaction'],
-  transaction: ['position', 'wallet_balance'],
-  wallet_balance: ['transaction'],
-  orderbook_level: ['market_token'],
-  market_series: ['market_token'],
-};
+import { httpBatchLink } from "@trpc/client";
+import { trpc } from "@/lib/trpc";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -32,31 +15,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
             refetchOnWindowFocus: false,
           },
         },
-      })
+      }),
   );
 
   const [trpcClient] = useState(() =>
-    createTRPCClient<AppRouter>({
-      links: [
-        httpBatchLink({
-          url: "/api/trpc",
-        }),
-      ],
-    })
+    trpc.createClient({ links: [httpBatchLink({ url: "/api/trpc" })] }),
   );
 
-  // Default organization ID - in production, this would come from auth/session
-  const organizationId = "admin-org";
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <TrpcReactiveProvider
-        organizationId={organizationId}
-        relations={reactiveRelations}
-        trpcClient={trpcClient}
-      >
-        {children}
-      </TrpcReactiveProvider>
-    </QueryClientProvider>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </trpc.Provider>
   );
 }

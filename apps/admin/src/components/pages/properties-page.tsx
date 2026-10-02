@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { formatCurrency } from "@/lib/format";
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@repo/ui/components/ui/card";
 import { Button } from "@repo/ui/components/ui/button";
 import { Badge } from "@repo/ui/components/ui/badge";
 import { Skeleton } from "@repo/ui/components/ui/skeleton";
@@ -107,9 +112,7 @@ export function PropertiesPage() {
 
         <Card>
           <CardHeader className="flex flex-row justify-between items-center pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">
-              En Pre-venta
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">En Pre-venta</CardTitle>
             <Building2 className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -187,15 +190,15 @@ export function PropertiesPage() {
                           project.status === "COMPLETED"
                             ? "default"
                             : project.status === "IN_CONSTRUCTION"
-                            ? "secondary"
-                            : "outline"
+                              ? "secondary"
+                              : "outline"
                         }
                       >
                         {project.status === "PRE_SALE"
                           ? "Pre-venta"
                           : project.status === "IN_CONSTRUCTION"
-                          ? "Construcción"
-                          : "Completado"}
+                            ? "Construcción"
+                            : "Completado"}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -234,9 +237,7 @@ export function PropertiesPage() {
           ) : (
             <div className="flex flex-col justify-center items-center py-12 text-center">
               <Building2 className="mb-4 w-12 h-12 text-muted-foreground" />
-              <h3 className="mb-2 text-lg font-semibold">
-                No hay propiedades
-              </h3>
+              <h3 className="mb-2 text-lg font-semibold">No hay propiedades</h3>
               <p className="mb-4 text-sm text-muted-foreground">
                 Comienza agregando tu primera propiedad
               </p>
@@ -271,8 +272,13 @@ function PropertyFormDialog({
     tokensTotal: project?.tokensTotal || 0,
   });
 
-  const createMutation = trpc.admin.properties.create.useMutation();
-  const updateMutation = trpc.admin.properties.update.useMutation();
+  const utils = trpc.useUtils();
+  const createMutation = trpc.admin.properties.create.useMutation({
+    onSuccess: () => utils.projects.getAll.invalidate(),
+  });
+  const updateMutation = trpc.admin.properties.update.useMutation({
+    onSuccess: () => utils.projects.getAll.invalidate(),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -458,8 +464,8 @@ function PropertyFormDialog({
             {createMutation.isPending || updateMutation.isPending
               ? "Guardando..."
               : project
-              ? "Actualizar"
-              : "Crear"}
+                ? "Actualizar"
+                : "Crear"}
           </Button>
         </DialogFooter>
       </form>

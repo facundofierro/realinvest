@@ -1,6 +1,7 @@
 "use client";
 
 import { trpc } from "@/lib/trpc";
+import type { TransactionStatus, TransactionType } from "@repo/db";
 
 // Admin dashboard stats
 export function useAdminDashboardStats() {
@@ -14,8 +15,8 @@ export function useAllProjects() {
 
 // All transactions across platform
 export function useAllTransactions(filters?: {
-  type?: string;
-  status?: string;
+  type?: TransactionType;
+  status?: TransactionStatus;
   userId?: string;
 }) {
   return trpc.admin.transactions.getAll.useQuery(filters || {});
