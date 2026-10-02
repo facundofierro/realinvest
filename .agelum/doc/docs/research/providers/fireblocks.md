@@ -345,7 +345,7 @@ Comprador crea orden ┘                                                    │
 
 **Modelo de custodia y entrega.** En custodia ómnibus, el ledger reserva la posición del vendedor y Fireblocks ejecuta el movimiento de la cuenta controlada; el contrato debe explicar la segregación y el derecho del cliente. En autocustodia, la plataforma debe comprobar que la wallet del vendedor controla el token y que la wallet del comprador está asociada, permitida y con KYC vigente. Para una primera versión, evitar *smart contracts* propios de escrow hasta contar con diseño legal y auditoría independiente; un flujo con reserva interna, aprobación Fireblocks y transferencias HTS permissioned reduce superficie técnica pero no elimina riesgo de contraparte/operación.
 
-El diagrama específico está en [operations-secondary-market.html](./operations-secondary-market.html). Los demás grupos operativos están en [operations-onboarding-compliance.html](./operations-onboarding-compliance.html) y [operations-issuance-custody.html](./operations-issuance-custody.html).
+El diagrama específico está en [operations-secondary-market.html](../../../diagrams/operations-secondary-market.html). Los demás grupos operativos están en [operations-onboarding-compliance.html](../../../diagrams/operations-onboarding-compliance.html) y [operations-issuance-custody.html](../../../diagrams/operations-issuance-custody.html).
 
 ## 9. Controles, pruebas y salida a producción
 

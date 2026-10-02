@@ -141,6 +141,6 @@ Adquirentes y agregadores aplican restricciones a rubros cripto. Nuestra posici�
 - [Zimple](https://www.zimple.com.py/) — billetera, bancos conectados y Zimple Empresas.
 - [dLocal](https://www.dlocal.com/) — [Payins](https://www.dlocal.com/our-solution/payins/), [Payouts](https://www.dlocal.com/our-solution/payouts/), [dLocal for Platforms](https://www.dlocal.com/our-solution/dlocal-for-platforms/), [cobertura de Paraguay](https://www.dlocal.com/payment-processors-in-latin-america/paraguay-payment-methods-processors-e-commerce-market-dlocal/), [documentación para desarrolladores](https://docs.dlocal.com/).
 - [BCP — Banco Central del Paraguay](https://www.bcp.gov.py/) — sistema nacional de pagos y cámaras de compensación (confirmar normativa aplicable a servicios de pago).
-- Diagramas operativos propios: [fireblocks-operations-architecture.html](./fireblocks-operations-architecture.html) y [operations-issuance-custody.html](./operations-issuance-custody.html).
+- Diagramas operativos propios: [fireblocks-operations-architecture.html](../../../diagrams/fireblocks-operations-architecture.html) y [operations-issuance-custody.html](../../../diagrams/operations-issuance-custody.html).
 
 **Fecha de investigación:** 21 de septiembre de 2026. Comisiones, métodos disponibles y requisitos de alta cambian con frecuencia; confirmar vigencia directamente con cada proveedor antes de contratar. Sitios de agregadores locales (Italpagos) no accesibles durante la investigación; pendiente verificación directa.
