@@ -21,3 +21,8 @@ export function formatPrice(value: number): string {
     maximumFractionDigits: 2,
   })}`;
 }
+
+export function parseUsdString(value: string): number {
+  const amount = Number(value.replace(/[^\d.-]/g, ""));
+  return Number.isFinite(amount) ? amount : 0;
+}
