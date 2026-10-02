@@ -50,3 +50,6 @@ yarn-error.log*
 apps/admin/next-env.d.ts
 apps/admin/tsconfig.tsbuildinfo
 apps/admin/wallet.db
+
+# Local image-generation scratch (prompts/raw/out)
+.imagegen/
