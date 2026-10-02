@@ -8,6 +8,34 @@
       "when": 1789997798529,
       "tag": "0000_low_shooting_star",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790058260548,
+      "tag": "0001_new_omega_red",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1790058863120,
+      "tag": "0002_neat_dagger",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1790118965999,
+      "tag": "0003_eminent_gamora",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1790165862882,
+      "tag": "0004_vengeful_sentinels",
+      "breakpoints": true
     }
   ]
 }

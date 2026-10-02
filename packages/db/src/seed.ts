@@ -7,7 +7,6 @@ import {
   balances,
   holdings,
   marketTokens,
-  orderBookLevels,
   positions,
   projectStories,
   projects,
@@ -23,7 +22,6 @@ import type {
   NewBalance,
   NewHolding,
   NewMarketToken,
-  NewOrderBookLevel,
   NewPosition,
   NewProject,
   NewProjectStory,
@@ -32,7 +30,6 @@ import type {
   NewTransaction,
   NewUnit,
   NewUser,
-  OrderBookSide,
   PositionSide,
   PositionStatus,
   ProjectStatus,
@@ -208,8 +205,6 @@ type TransactionFixture = {
   metadata?: Record<string, unknown>;
 };
 
-type OrderBookFixture = Record<string, { asks: { price: number; amount: number }[]; bids: { price: number; amount: number }[] }>;
-
 function mapProjects(
   projectFixtures: ProjectFixture[],
   dashboardFixtures: DashboardProjectFixture[],
@@ -368,18 +363,6 @@ function mapTransactions(fixtures: TransactionFixture[], userId: string): NewTra
   }));
 }
 
-function mapOrderBooks(orderBooks: OrderBookFixture, marketTokenFixtures: MarketTokenFixture[]): NewOrderBookLevel[] {
-  const symbolToTokenId = new Map(marketTokenFixtures.map((t) => [t.symbol, t.id]));
-  const rows: NewOrderBookLevel[] = [];
-  for (const [symbol, book] of Object.entries(orderBooks)) {
-    const tokenId = symbolToTokenId.get(symbol);
-    if (!tokenId) throw new Error(`Order book symbol does not match any market token: ${symbol}`);
-    for (const level of book.asks) rows.push({ tokenId, side: "ask" satisfies OrderBookSide, price: level.price, amount: level.amount });
-    for (const level of book.bids) rows.push({ tokenId, side: "bid" satisfies OrderBookSide, price: level.price, amount: level.amount });
-  }
-  return rows;
-}
-
 async function main() {
   const [
     projectFixtures,
@@ -393,7 +376,6 @@ async function main() {
     balanceFixtures,
     positionFixtures,
     transactionFixtures,
-    orderBookFixtures,
   ] = await Promise.all([
     readFixture<ProjectFixture[]>("projects.json"),
     readFixture<DashboardProjectFixture[]>("dashboardProjects.json"),
@@ -406,7 +388,6 @@ async function main() {
     readFixture<BalanceFixture[]>("walletBalances.json"),
     readFixture<PositionFixture[]>("walletPositions.json"),
     readFixture<TransactionFixture[]>("transactions.json"),
-    readFixture<OrderBookFixture>("marketOrderBooks.json"),
   ]);
 
   const demoUser: NewUser = { id: DEMO_USER_ID, name: "Demo User", email: "demo@realinvest.local" };
@@ -423,7 +404,6 @@ async function main() {
   const holdingRows = mapHoldings(holdingFixtures, DEMO_USER_ID);
   const positionRows = mapPositions(positionFixtures, DEMO_USER_ID);
   const transactionRows = mapTransactions(transactionFixtures, DEMO_USER_ID);
-  const orderBookRows = mapOrderBooks(orderBookFixtures, marketTokenFixtures);
 
   const db = createDb();
   try {
@@ -433,7 +413,6 @@ async function main() {
   }
 
   await db.transaction(async (tx) => {
-    await tx.delete(orderBookLevels);
     await tx.delete(transactions);
     await tx.delete(positions);
     await tx.delete(holdings);
@@ -447,7 +426,7 @@ async function main() {
     await tx.delete(marketTokens);
     await tx.delete(units);
     await tx.delete(projects);
-    await tx.run(sql`DELETE FROM sqlite_sequence WHERE name IN ('order_book_levels', 'project_stories', 'stages')`);
+    await tx.run(sql`DELETE FROM sqlite_sequence WHERE name IN ('project_stories', 'stages')`);
 
     await tx.insert(users).values(demoUser);
     await tx.insert(projects).values(projectRows);
@@ -460,7 +439,6 @@ async function main() {
     await tx.insert(holdings).values(holdingRows);
     await tx.insert(positions).values(positionRows);
     await tx.insert(transactions).values(transactionRows);
-    await tx.insert(orderBookLevels).values(orderBookRows);
   });
 
   const counts: [string, number][] = [
@@ -475,7 +453,6 @@ async function main() {
     ["holdings", holdingRows.length],
     ["positions", positionRows.length],
     ["transactions", transactionRows.length],
-    ["order_book_levels", orderBookRows.length],
   ];
   console.log(`Seeded ${process.env.DATABASE_URL ?? "file:./wallet.db"}:`);
   for (const [table, count] of counts) console.log(`  ${table}: ${count}`);
