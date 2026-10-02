@@ -1,0 +1,17 @@
+{
+  "name": "e2e",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:admin": "playwright test --project=admin",
+    "test:wallet": "playwright test --project=wallet",
+    "install:browsers": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@libsql/client": "^0.15.15",
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+}
