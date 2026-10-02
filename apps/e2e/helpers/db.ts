@@ -41,3 +41,12 @@ export async function setUsdtBalance(userId: string, available: number) {
     args: [userId, available],
   });
 }
+
+/** Gives the user `tokens` of a market token (by symbol), e.g. to reach /assets token actions without trading. */
+export async function addHolding(userId: string, symbol: string, tokens: number) {
+  await getE2eDb().execute({
+    sql: `INSERT INTO holdings (id, user_id, token_id, tokens, locked_tokens, created_at)
+          SELECT ?, ?, id, ?, 0, unixepoch() FROM market_tokens WHERE symbol = ?`,
+    args: [crypto.randomUUID(), userId, tokens, symbol],
+  });
+}
