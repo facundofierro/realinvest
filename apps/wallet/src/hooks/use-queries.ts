@@ -61,7 +61,6 @@ export function useWalletBalances() {
   return useQuery({
     queryKey: ["wallet", "balances"],
     queryFn: getWalletBalances,
-    refetchInterval: 3000,
   });
 }
 
@@ -79,8 +78,15 @@ export function useWalletPositions() {
   });
 }
 
-export function useTransactions() {
-  return useQuery({ queryKey: ["transactions"], queryFn: getTransactions, refetchInterval: 3000 });
+export function useTransactions(
+  options: { refetchInterval?: (transactions: Awaited<ReturnType<typeof getTransactions>> | undefined) => number | false } = {},
+) {
+  const { refetchInterval } = options;
+  return useQuery({
+    queryKey: ["transactions"],
+    queryFn: getTransactions,
+    refetchInterval: refetchInterval ? (query) => refetchInterval(query.state.data) : undefined,
+  });
 }
 
 // Projects

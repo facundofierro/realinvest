@@ -22,6 +22,7 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "";
 
 import { getNativeAccessToken, refreshNativeAccessToken } from "@/lib/session";
+import { emitUnauthorized } from "@/lib/auth-events";
 
 async function fetch(input: RequestInfo | URL, init?: RequestInit) {
   const token = getNativeAccessToken();
@@ -35,8 +36,10 @@ async function fetch(input: RequestInfo | URL, init?: RequestInit) {
     const refreshedToken = getNativeAccessToken();
     response = await globalThis.fetch(input, { ...init, credentials: "omit", headers: { ...Object.fromEntries(new Headers(init?.headers).entries()), Authorization: `Bearer ${refreshedToken}` } });
   }
+  // Never hard-navigate from a background fetch: notify the app, which
+  // redirects client-side (see AuthRedirectOn401).
   if (response.status === 401 && typeof window !== "undefined") {
-    window.location.assign("/login");
+    emitUnauthorized();
   }
   return response;
 }
@@ -203,7 +206,8 @@ export async function createPosition(position: {
     }
   );
   if (!res.ok)
-    throw new Error(
+    throw await walletApiError(
+      res,
       "Failed to create position"
     );
   const data = await res.json();

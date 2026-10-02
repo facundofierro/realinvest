@@ -7,12 +7,13 @@ export default async function Page({
 }: {
   searchParams: Promise<{ callbackUrl?: string; error?: string }>;
 }) {
-  if ((await auth())?.user?.id) {
-    redirect("/");
-  }
-
   const { callbackUrl, error } = await searchParams;
-  const redirectTo = callbackUrl?.startsWith("/") ? callbackUrl : "/";
+  const redirectTo =
+    callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//") ? callbackUrl : "/";
+
+  if ((await auth())?.user?.id) {
+    redirect(redirectTo);
+  }
 
   return <LoginPage callbackUrl={redirectTo} error={error} />;
 }

@@ -39,6 +39,8 @@ Create a **Web application** OAuth client in [Google Cloud Console](https://cons
 
 Copy the root `.env.example` to `.env.local` and set `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, and a secure `AUTH_SECRET` (for example, `openssl rand -base64 32`). `DATABASE_URL` and, for remote libSQL databases, `DATABASE_AUTH_TOKEN` are also required.
 
+Put this file at `apps/wallet/.env.local` and start the dev server through the wallet package (`pnpm dev --filter wallet`, `turbo dev`, or `pnpm dev` from this directory) so Next.js loads it. If the server starts without `AUTH_SECRET`, Auth.js logs `MissingSecret`, sessions fail, and the app keeps redirecting to `/login`. The server prints a `[wallet] AUTH_SECRET is not set` warning when this happens.
+
 ## 📁 Project Structure
 
 The source code is located in the `src` directory and follows the Next.js App Router convention:

@@ -8,6 +8,6 @@ export function RequireSession({ children }: { children: React.ReactNode }) {
   const { status } = useAppSession();
   const router = useRouter();
   useEffect(() => { if (status === "unauthenticated") router.replace("/login"); }, [router, status]);
-  if (status !== "authenticated") return <div className="min-h-screen bg-background" aria-busy="true" />;
+  if (status !== "authenticated") return <div className="min-h-dvh bg-background" aria-busy="true" />;
   return <>{children}</>;
 }
