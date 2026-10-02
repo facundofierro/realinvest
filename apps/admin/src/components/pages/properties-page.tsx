@@ -86,7 +86,9 @@ export function PropertiesPage() {
               Nueva Propiedad
             </Button>
           </DialogTrigger>
+          {/* Keyed so the form state re-initializes for each project (and for "new"). */}
           <PropertyFormDialog
+            key={editingProject?.id ?? "new"}
             project={editingProject}
             onClose={() => {
               setIsDialogOpen(false);
