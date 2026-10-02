@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Vest">
+  <defs><linearGradient id="vest-tile" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7A1FA8"/><stop offset="1" stop-color="#3B1259"/></linearGradient></defs>
+  <rect x="0" y="0" width="1024" height="1024" rx="230" fill="url(#vest-tile)"/>
+  <path d="M247.47 347.99 L395.61 347.99 L575.49 760.66 L427.35 760.66 Z" fill="#fff" fill-opacity=".6"/>
+  <path d="M628.39 263.34 L776.53 263.34 L575.49 760.66 L427.35 760.66 Z" fill="#fff"/>
+</svg>

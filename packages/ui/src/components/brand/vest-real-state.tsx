@@ -82,7 +82,7 @@ const VestRealState = React.forwardRef<
           )}
         </span>
         <div className="text-[0.6rem] font-medium tracking-[0.2em] uppercase opacity-90 justify-self-stretch text-left pl-3">
-          Real State
+          Real Estate
         </div>
       </div>
     );
