@@ -51,7 +51,7 @@ import {
   CandlesChart,
   OrderBook,
 } from "./exchange/charts";
-import { TradeDialog } from "./exchange/trade-dialog";
+import { TradeDialog, tradeErrorMessage } from "./exchange/trade-dialog";
 import { MarketStats } from "./exchange/market-stats";
 import { ViewSelector } from "./exchange/view-selector";
 
@@ -137,6 +137,7 @@ export function DesktopTokenTabs({
     isTradeDialogOpen,
     setIsTradeDialogOpen,
   ] = useState(false);
+  const [tradeError, setTradeError] = useState<string | null>(null);
   const [tradeType, setTradeType] =
     useState<"BUY" | "SELL">("BUY");
   const [orderType, setOrderType] =
@@ -673,9 +674,7 @@ export function DesktopTokenTabs({
 
       <TradeDialog
         isOpen={isTradeDialogOpen}
-        onOpenChange={
-          setIsTradeDialogOpen
-        }
+        onOpenChange={(open) => { setTradeError(null); setIsTradeDialogOpen(open); }}
         token={token}
         tradeType={tradeType}
         orderType={orderType}
@@ -719,7 +718,8 @@ export function DesktopTokenTabs({
             );
           }
         }}
-        onConfirm={() => { if (Number(amount) > 0) void createPosition({ tokenSymbol: token.symbol, side: tradeType, orderType, totalAmount: Number(amount), orderPriceUsd: orderType === "LIMIT" ? Number(limitPriceInput) : undefined }).then(() => setIsTradeDialogOpen(false)); }}
+        error={tradeError}
+        onConfirm={() => { if (Number(amount) > 0) { setTradeError(null); void createPosition({ tokenSymbol: token.symbol, side: tradeType, orderType, totalAmount: Number(amount), orderPriceUsd: orderType === "LIMIT" ? Number(limitPriceInput) : undefined }).then(() => setIsTradeDialogOpen(false), (error: unknown) => setTradeError(tradeErrorMessage(error))); } }}
       />
       <KycBlockedDialog open={gate.blockedDialogOpen} onOpenChange={gate.setBlockedDialogOpen} status={gate.status} rejectionReason={gate.rejectionReason} />
     </div>

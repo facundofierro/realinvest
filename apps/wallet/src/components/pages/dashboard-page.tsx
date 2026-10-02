@@ -88,7 +88,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-full">
         <div className="text-center">
           <div className="w-8 h-8 mx-auto mb-4 rounded-full border-4 border-primary/20 animate-spin border-t-primary" />
           <p className="text-sm text-muted-foreground">
@@ -101,7 +101,7 @@ export default function DashboardPage() {
 
   if (isError) {
     return (
-      <div className="flex justify-center items-center h-screen p-6">
+      <div className="flex justify-center items-center h-full p-6">
         <div className="text-center max-w-sm">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-destructive/10 flex items-center justify-center">
             <AlertTriangle className="h-8 w-8 text-destructive" />
@@ -117,7 +117,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-4 space-y-6 duration-500 animate-in fade-in slide-in-from-bottom-4">
+    <div className="p-4 mx-auto w-full max-w-7xl space-y-6 duration-500 animate-in fade-in slide-in-from-bottom-4">
       {/* Header */}
       <header className="flex justify-between items-center">
         <div>

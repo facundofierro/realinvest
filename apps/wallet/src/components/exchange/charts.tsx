@@ -1,6 +1,7 @@
 "use client";
 
 import { MarketOrderBook } from "@/types/wallet";
+import { useElementSize } from "@/hooks/use-element-size";
 
 export function LineChart({
   series,
@@ -11,6 +12,7 @@ export function LineChart({
   isUp: boolean;
   currentPrice: number;
 }) {
+  const [boxRef, box] = useElementSize<HTMLDivElement>({ width: 320, height: 200 });
   if (!series || series.length === 0)
     return (
       <div className="h-[200px] w-full" />
@@ -18,8 +20,8 @@ export function LineChart({
 
   const min = Math.min(...series);
   const max = Math.max(...series);
-  const w = 320;
-  const h = 200;
+  const w = box.width;
+  const h = box.height;
   const padRight = 45;
   const padTop = 10;
   const padBottom = 10;
@@ -73,7 +75,7 @@ export function LineChart({
   ];
 
   return (
-    <div className="flex justify-center items-center w-full h-full duration-300 animate-in fade-in zoom-in-95">
+    <div ref={boxRef} className="flex justify-center items-center w-full h-full min-h-[200px] duration-300 animate-in fade-in zoom-in-95">
       <svg
         viewBox={`0 0 ${w} ${h}`}
         className="w-full h-full"
@@ -172,7 +174,7 @@ export function LineChart({
               <text
                 x={w - padRight + 4}
                 y={y + 3}
-                fontSize="10"
+                fontSize="11"
                 fill="rgba(255,255,255,0.55)"
                 fontFamily="ui-monospace, SFMono-Regular"
               >
@@ -195,14 +197,15 @@ export function CandlesChart({
   isUp: boolean;
   currentPrice: number;
 }) {
+  const [boxRef, box] = useElementSize<HTMLDivElement>({ width: 320, height: 200 });
   if (!series || series.length === 0)
     return (
       <div className="h-[200px] w-full" />
     );
   const min = Math.min(...series);
   const max = Math.max(...series);
-  const w = 320;
-  const h = 200;
+  const w = box.width;
+  const h = box.height;
   const padTop = 10;
   const padBottom = 10;
   const candles = 28;
@@ -260,7 +263,7 @@ export function CandlesChart({
   const candleW = w / sample.length;
 
   return (
-    <div className="flex justify-center items-center w-full h-full duration-300 animate-in fade-in zoom-in-95">
+    <div ref={boxRef} className="flex justify-center items-center w-full h-full min-h-[200px] duration-300 animate-in fade-in zoom-in-95">
       <svg
         viewBox={`0 0 ${w} ${h}`}
         className="w-full h-full"
@@ -325,7 +328,7 @@ export function CandlesChart({
         <text
           x={8}
           y={16}
-          fontSize="10"
+          fontSize="11"
           fill="rgba(255,255,255,0.55)"
           fontFamily="ui-monospace, SFMono-Regular"
         >
@@ -335,7 +338,7 @@ export function CandlesChart({
         <text
           x={8}
           y={h - 6}
-          fontSize="10"
+          fontSize="11"
           fill="rgba(255,255,255,0.55)"
           fontFamily="ui-monospace, SFMono-Regular"
         >
@@ -439,7 +442,7 @@ export function OrderBook({
   return (
     <div className="flex gap-4 h-full duration-300 animate-in fade-in zoom-in-95">
       <div className="flex-1 space-y-2">
-        <div className="text-[9px] sm:text-[10px] font-black text-white/50 uppercase tracking-widest text-right">
+        <div className="text-[11px] sm:text-[10px] font-black text-white/50 uppercase tracking-widest text-right">
           Precio (USDT)
         </div>
         {asksWithWidth.map((ask, i) => (
@@ -464,7 +467,7 @@ export function OrderBook({
       </div>
       <div className="w-px bg-white/10" />
       <div className="flex-1 space-y-2">
-        <div className="text-[9px] sm:text-[10px] font-black text-white/50 uppercase tracking-widest">
+        <div className="text-[11px] sm:text-[10px] font-black text-white/50 uppercase tracking-widest">
           Precio (USDT)
         </div>
         {bidsWithWidth.map((bid, i) => (

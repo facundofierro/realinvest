@@ -31,11 +31,10 @@ import {
   TabsTrigger,
 } from "@repo/ui/components/ui/tabs";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/ui/dialog";
+  ResponsiveOverlay,
+  ResponsiveOverlayHeader,
+  ResponsiveOverlayTitle,
+} from "@/components/responsive-overlay";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import type { ProjectUnit } from "@/types/wallet";
@@ -150,7 +149,7 @@ export default function ProjectUnitsPage({
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
+      <div className="flex justify-center items-center min-h-full bg-background">
         <div className="text-muted-foreground">
           Loading units...
         </div>
@@ -160,7 +159,7 @@ export default function ProjectUnitsPage({
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
+      <div className="flex justify-center items-center min-h-full bg-background">
         <div className="text-destructive">
           {error}
         </div>
@@ -326,7 +325,7 @@ export default function ProjectUnitsPage({
   };
 
   return (
-    <div className="flex flex-col pb-40 min-h-screen bg-background">
+    <div className="flex flex-col pb-8 min-h-full bg-background">
       {/* Sticky Header Container */}
       <div className="sticky top-0 z-50 shadow-md bg-background">
         {/* Header */}
@@ -363,7 +362,7 @@ export default function ProjectUnitsPage({
                   "full_property"
                 )
               }
-              className={`h-12 px-1 rounded-xl border-2 text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "full_property" ? "bg-primary/80 text-primary-foreground shadow-lg border-primary" : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"}`}
+              className={`h-12 px-1 rounded-xl border-2 text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "full_property" ? "bg-primary/80 text-primary-foreground shadow-lg border-primary" : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"}`}
             >
               Propiedad Completa
             </button>
@@ -373,7 +372,7 @@ export default function ProjectUnitsPage({
                   "tokenized"
                 )
               }
-              className={`h-12 px-1 rounded-xl border-2 text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "tokenized" ? "bg-primary/80 text-primary-foreground shadow-lg border-primary" : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"}`}
+              className={`h-12 px-1 rounded-xl border-2 text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "tokenized" ? "bg-primary/80 text-primary-foreground shadow-lg border-primary" : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"}`}
             >
               Tokens Lanzamiento
             </button>
@@ -383,7 +382,7 @@ export default function ProjectUnitsPage({
                   "fixed_rent"
                 )
               }
-              className={`h-12 px-1 rounded-xl border-2 text-[9px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "fixed_rent" ? "bg-primary/80 text-primary-foreground shadow-lg border-primary" : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"}`}
+              className={`h-12 px-1 rounded-xl border-2 text-[11px] font-black uppercase tracking-wider transition-all active:scale-95 ${filter === "fixed_rent" ? "bg-primary/80 text-primary-foreground shadow-lg border-primary" : "bg-primary/10 border-primary/20 text-primary hover:bg-primary/20"}`}
             >
               Renta Fija
             </button>
@@ -515,7 +514,7 @@ export default function ProjectUnitsPage({
                               {
                                 tokenProgress.total
                               }
-                              <span className="text-muted-foreground text-[9px] font-bold ml-1">
+                              <span className="text-muted-foreground text-[11px] font-bold ml-1">
                                 TOKENS
                               </span>
                             </div>
@@ -614,18 +613,17 @@ export default function ProjectUnitsPage({
       />
 
       {/* Contact Dialog */}
-      <Dialog
+      <ResponsiveOverlay
         open={isContactDialogOpen}
         onOpenChange={
           setIsContactDialogOpen
         }
-      >
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
+        size="md">
+          <ResponsiveOverlayHeader>
+            <ResponsiveOverlayTitle>
               Contactar Asesor
-            </DialogTitle>
-          </DialogHeader>
+            </ResponsiveOverlayTitle>
+          </ResponsiveOverlayHeader>
           <form
             className="space-y-4"
             onSubmit={(e) => {
@@ -736,8 +734,7 @@ export default function ProjectUnitsPage({
               Enviar
             </Button>
           </form>
-        </DialogContent>
-      </Dialog>
+        </ResponsiveOverlay>
     </div>
   );
 }

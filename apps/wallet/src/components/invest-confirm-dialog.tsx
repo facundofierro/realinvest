@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Loader2, Minus, Plus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@repo/ui/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@repo/ui/components/ui/dialog";
+import { ResponsiveOverlay, ResponsiveOverlayTitle } from "@/components/responsive-overlay";
 import { Input } from "@repo/ui/components/ui/input";
 import { formatPrice, parseUsdString } from "@/lib/format";
 import { useInvestPurchase, useTransactions } from "@/hooks/use-queries";
@@ -34,7 +34,11 @@ export function InvestConfirmDialog({ isOpen, onClose, unit, projectId, availabl
   const [transactionId, setTransactionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const purchase = useInvestPurchase(projectId);
-  const { data: transactions = [] } = useTransactions();
+  // Custody settles the purchase server-side within seconds; poll until it leaves PENDING.
+  const { data: transactions = [] } = useTransactions({
+    refetchInterval: (items) =>
+      transactionId && items?.find((item) => item.id === transactionId)?.status === "PENDING" ? 1000 : false,
+  });
   const queryClient = useQueryClient();
   const remaining = Math.max(0, (unit?.totalTokens ?? 0) - (unit?.tokensSold ?? 0));
   const pricePerToken = useMemo(() => unit ? parseUsdString(unit.price) / (unit.totalTokens || 1) : 0, [unit]);
@@ -89,9 +93,8 @@ export function InvestConfirmDialog({ isOpen, onClose, unit, projectId, availabl
     }
   };
 
-  return <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-    <DialogContent className="p-0 w-[calc(100%-2rem)] max-w-[440px] overflow-hidden rounded-[32px]">
-      <DialogTitle className="sr-only">Comprar tokens de {unit.unitCode}</DialogTitle>
+  return <ResponsiveOverlay open={isOpen} onOpenChange={(open) => !open && onClose()} className="p-0 md:rounded-[32px]">
+      <ResponsiveOverlayTitle className="sr-only">Comprar tokens de {unit.unitCode}</ResponsiveOverlayTitle>
       <div className="p-5 sm:p-6 space-y-5">
         <div>
           <div className="flex gap-2 items-center"><span className="font-mono text-[10px] font-black bg-primary/10 text-primary px-2 py-1 rounded">{unit.tokenSymbol}</span><span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Inversión primaria</span></div>
@@ -114,6 +117,5 @@ export function InvestConfirmDialog({ isOpen, onClose, unit, projectId, availabl
         {step === "success" && <div className="py-6 text-center space-y-3"><CheckCircle2 className="w-10 h-10 mx-auto text-primary" /><p className="font-black">Compra completada</p><p className="text-sm text-muted-foreground">Ya tenés {tokenAmount} tokens de {unit.tokenSymbol}.</p><Button onClick={onClose}>Listo</Button></div>}
         {step === "failed" && <div className="py-6 text-center space-y-3"><p className="font-black">No se completó la compra</p><p className="text-sm text-destructive">{error}</p><Button onClick={onClose}>Cerrar</Button></div>}
       </div>
-    </DialogContent>
-  </Dialog>;
+  </ResponsiveOverlay>;
 }

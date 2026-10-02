@@ -27,7 +27,7 @@ export default function DepositPage() {
     window.setTimeout(() => setCopied(false), 1500);
   }
 
-  return <div className="p-4 space-y-6 duration-500 animate-in fade-in slide-in-from-bottom-4">
+  return <div className="p-4 mx-auto w-full max-w-xl space-y-6 duration-500 animate-in fade-in slide-in-from-bottom-4">
     <div className="flex gap-2 items-center"><Button variant="ghost" size="icon" asChild><Link href="/"><ArrowLeft className="w-5 h-5" /></Link></Button><h1 className="text-xl font-bold tracking-tight">Ingresar Dinero</h1></div>
     <Card><CardContent className="p-6 space-y-6">
       <div className="space-y-2 text-center"><div className="flex justify-center items-center p-2 mx-auto w-48 h-48 bg-white rounded-xl shadow-inner">{qrUrl ? <img src={qrUrl} width={192} height={192} alt="Código QR para depositar USDT" /> : <QrCode className="w-32 h-32 text-black" />}</div><p className="text-xs text-muted-foreground">Escanea este código QR para depositar USDT</p></div>

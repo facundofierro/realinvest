@@ -215,7 +215,7 @@ export default function TokenizationPage() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-3.5rem)]">
+    <div className="flex flex-col min-h-[calc(100dvh-3.5rem)]">
       {/* Hero Section */}
       <section className="overflow-hidden relative pt-20 pb-24 bg-white sm:pt-24 sm:pb-28 lg:pt-32 lg:pb-36 min-h-[82vh] lg:min-h-[90vh] flex items-center">
         <div className="absolute inset-0 z-0">
@@ -431,7 +431,7 @@ export default function TokenizationPage() {
 
       {/* Parallax Construction Section */}
       <section ref={sectionRef} className="relative h-[400vh] bg-white">
-        <div className="sticky top-0 w-full h-screen bg-white">
+        <div className="sticky top-0 w-full h-dvh bg-white">
           <div className="flex flex-col justify-center px-4 mx-auto w-full max-w-6xl h-full md:px-6">
             <div className="mx-auto w-full max-w-6xl">
               <div className="mb-8 text-center lg:mb-12">
@@ -534,7 +534,7 @@ export default function TokenizationPage() {
       </section>
 
       <section ref={videoSectionRef} className="relative bg-white h-[280vh]">
-        <div className="flex sticky top-0 items-center w-full h-screen">
+        <div className="flex sticky top-0 items-center w-full h-dvh">
           <div className="px-4 mx-auto w-full max-w-6xl md:px-6">
             <div className="flex flex-col items-center mx-auto w-full max-w-5xl">
               <ScrollVideoSection videoSectionRef={videoSectionRef} />

@@ -5,7 +5,7 @@ import {
   formatCurrency,
   formatPrice,
 } from "@/lib/format";
-import { useIsDesktop } from "@/hooks/use-is-desktop";
+import { useIsNavDesktop } from "@/hooks/use-media-query";
 import { DesktopTokenTabs } from "../desktop-token-tabs";
 import {
   Suspense,
@@ -25,11 +25,10 @@ import {
 } from "lucide-react";
 import { Badge } from "@repo/ui/components/ui/badge";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/ui/dialog";
+  ResponsiveOverlay,
+  ResponsiveOverlayHeader,
+  ResponsiveOverlayTitle,
+} from "@/components/responsive-overlay";
 import {
   Tabs,
   TabsContent,
@@ -131,7 +130,7 @@ function ExchangePageInner({
   const [activeTab, setActiveTab] =
     useState(tabParam || "market");
 
-  const isDesktop = useIsDesktop();
+  const isDesktop = useIsNavDesktop();
 
   useEffect(() => {
     if (tabParam)
@@ -422,7 +421,7 @@ function ExchangePageInner({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-full">
         <div className="text-center">
           <div className="mx-auto mb-4 w-8 h-8 rounded-full border-4 animate-spin border-primary/20 border-t-primary" />
           <p className="text-sm text-muted-foreground">
@@ -463,18 +462,17 @@ function ExchangePageInner({
         </header>
       )}
 
-      <Dialog
+      <ResponsiveOverlay
         open={isOrderDetailsOpen}
         onOpenChange={
           setIsOrderDetailsOpen
         }
-      >
-        <DialogContent className="max-w-[420px]">
-          <DialogHeader>
-            <DialogTitle>
+        size="md">
+          <ResponsiveOverlayHeader>
+            <ResponsiveOverlayTitle>
               Orden
-            </DialogTitle>
-          </DialogHeader>
+            </ResponsiveOverlayTitle>
+          </ResponsiveOverlayHeader>
           {selectedPosition ? (
             <div className="space-y-4">
               <div className="p-4 rounded-2xl border border-border/50 bg-background/40">
@@ -485,7 +483,7 @@ function ExchangePageInner({
                 </div>
                 <div className="grid grid-cols-3 gap-2 mt-3">
                   <div className="p-3 rounded-xl border border-border/50 bg-background/40">
-                    <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/70">
                       Apertura
                     </div>
                     <div className="mt-1 text-sm font-black">
@@ -496,7 +494,7 @@ function ExchangePageInner({
                     </div>
                   </div>
                   <div className="p-3 rounded-xl border border-border/50 bg-background/40">
-                    <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/70">
                       Orden
                     </div>
                     <div className="mt-1 text-sm font-black">
@@ -506,7 +504,7 @@ function ExchangePageInner({
                     </div>
                   </div>
                   <div className="p-3 rounded-xl border border-border/50 bg-background/40">
-                    <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/70">
                       Mercado
                     </div>
                     <div className="mt-1 text-sm font-black">
@@ -524,7 +522,7 @@ function ExchangePageInner({
                     Transacciones
                     completadas
                   </div>
-                  <Badge className="bg-primary/10 text-primary border-none rounded-full font-black text-[10px]">
+                  <Badge className="bg-primary/10 text-primary border-none rounded-full font-black text-[11px]">
                     {
                       selectedPositionTransactions.filter(
                         (t) =>
@@ -618,8 +616,7 @@ function ExchangePageInner({
               </div>
             </div>
           ) : null}
-        </DialogContent>
-      </Dialog>
+        </ResponsiveOverlay>
 
       {isDesktop ? (
         <div className="flex flex-1 min-h-0 divide-x bg-muted/5">
@@ -646,19 +643,19 @@ function ExchangePageInner({
                 <TabsList className="flex gap-1.5 w-full h-auto bg-transparent p-0 border-none">
                   <TabsTrigger
                     value="market"
-                    className="flex-1 h-10 px-2 rounded-xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase text-primary data-[state=active]:bg-primary data-[state=active]:text-white"
+                    className="flex-1 h-10 px-2 rounded-xl bg-primary/10 border border-primary/20 text-[11px] font-black uppercase text-primary data-[state=active]:bg-primary data-[state=active]:text-white"
                   >
                     Mercado
                   </TabsTrigger>
                   <TabsTrigger
                     value="favorites"
-                    className="flex-1 h-10 px-2 rounded-xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase text-primary data-[state=active]:bg-primary data-[state=active]:text-white"
+                    className="flex-1 h-10 px-2 rounded-xl bg-primary/10 border border-primary/20 text-[11px] font-black uppercase text-primary data-[state=active]:bg-primary data-[state=active]:text-white"
                   >
                     Favoritos
                   </TabsTrigger>
                   <TabsTrigger
                     value="positions"
-                    className="flex-1 h-10 px-2 rounded-xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase text-primary data-[state=active]:bg-primary data-[state=active]:text-white"
+                    className="flex-1 h-10 px-2 rounded-xl bg-primary/10 border border-primary/20 text-[11px] font-black uppercase text-primary data-[state=active]:bg-primary data-[state=active]:text-white"
                   >
                     Posiciones
                   </TabsTrigger>
@@ -674,7 +671,7 @@ function ExchangePageInner({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 h-9 text-[10px] font-black uppercase rounded-xl"
+                      className="flex-1 h-10 md:h-9 text-[10px] font-black uppercase rounded-xl"
                       onClick={() =>
                         setSortBy(
                           "marketCap"
@@ -686,7 +683,7 @@ function ExchangePageInner({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="flex-1 h-9 text-[10px] font-black uppercase rounded-xl"
+                      className="flex-1 h-10 md:h-9 text-[10px] font-black uppercase rounded-xl"
                       onClick={() =>
                         setSortBy(
                           "change"
@@ -743,7 +740,7 @@ function ExchangePageInner({
                                 pos.tokenSymbol
                               }
                             </span>
-                            <Badge className="text-[10px] font-black">
+                            <Badge className="text-[11px] font-black">
                               {pos.side}
                             </Badge>
                           </div>
@@ -800,7 +797,7 @@ function ExchangePageInner({
               <TabsList className="grid w-full grid-cols-3 gap-1.5 h-auto bg-transparent p-0 border-none">
                 <TabsTrigger
                   value="market"
-                  className="w-full min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary overflow-hidden"
+                  className="w-full min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[11px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary overflow-hidden"
                 >
                   <span className="truncate">
                     Mercado
@@ -808,7 +805,7 @@ function ExchangePageInner({
                 </TabsTrigger>
                 <TabsTrigger
                   value="favorites"
-                  className="w-full min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary overflow-hidden"
+                  className="w-full min-w-0 h-11 px-2 rounded-2xl bg-primary/10 border border-primary/20 text-[11px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary overflow-hidden"
                 >
                   <span className="truncate">
                     Favoritos
@@ -816,7 +813,7 @@ function ExchangePageInner({
                 </TabsTrigger>
                 <TabsTrigger
                   value="positions"
-                  className="w-full min-w-0 h-11 px-1 rounded-2xl bg-primary/10 border border-primary/20 text-[9px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary whitespace-normal leading-[1.05]"
+                  className="w-full min-w-0 h-11 px-1 rounded-2xl bg-primary/10 border border-primary/20 text-[11px] font-black uppercase tracking-wider text-primary data-[state=active]:bg-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:border-2 data-[state=active]:border-primary whitespace-normal leading-[1.05]"
                 >
                   Mis Posiciones
                 </TabsTrigger>
@@ -886,7 +883,7 @@ function ExchangePageInner({
                     }
                     size="sm"
                     className={cn(
-                      "rounded-xl px-2.5 h-8 text-[10px] font-black tracking-tighter transition-all border shrink-0",
+                      "rounded-xl px-2.5 h-8 text-[11px] font-black tracking-tighter transition-all border shrink-0",
                       timeframe ===
                         tf.toLowerCase()
                         ? "shadow-sm bg-primary/80 text-primary-foreground border-primary"

@@ -193,7 +193,7 @@ export default function ProjectDetailPage({
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
+      <div className="flex justify-center items-center min-h-full bg-background">
         <div className="text-muted-foreground">
           Loading project...
         </div>
@@ -203,7 +203,7 @@ export default function ProjectDetailPage({
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
+      <div className="flex justify-center items-center min-h-full bg-background">
         <div className="text-destructive">
           {error}
         </div>
@@ -267,7 +267,7 @@ export default function ProjectDetailPage({
         </div>
       </div>
 
-      <div className="h-[420px] relative w-full overflow-hidden">
+      <div className="h-[280px] sm:h-[360px] lg:h-[420px] relative w-full overflow-hidden">
         <Image
           src="/projects/header-tower.png"
           alt="Torre Libertador"
@@ -318,7 +318,7 @@ export default function ProjectDetailPage({
           className={`transition-all duration-500 ease-in-out overflow-hidden ${
             activeTab === "financials"
               ? "max-h-0 opacity-0 pointer-events-none mb-0"
-              : "max-h-[500px] opacity-100 mb-4"
+              : "max-h-[900px] opacity-100 mb-4"
           }`}
         >
           <Carousel
@@ -497,7 +497,7 @@ export default function ProjectDetailPage({
 
                     <div className="grid grid-cols-3 gap-4 mb-5">
                       <div className="flex flex-col items-center p-2 text-center rounded-xl border bg-secondary/40 border-border/50">
-                        <span className="block text-[9px] text-muted-foreground uppercase font-black mb-1">
+                        <span className="block text-[11px] text-muted-foreground uppercase font-black mb-1">
                           Total Uni.
                         </span>
                         <span className="flex gap-1 items-center text-sm font-black">
@@ -513,7 +513,7 @@ export default function ProjectDetailPage({
                             : "bg-secondary/40 border-border/50"
                         }`}
                       >
-                        <span className="block text-[9px] text-muted-foreground uppercase font-black mb-1">
+                        <span className="block text-[11px] text-muted-foreground uppercase font-black mb-1">
                           Disponibles
                         </span>
                         <span className="text-sm font-black text-primary">
@@ -523,7 +523,7 @@ export default function ProjectDetailPage({
                         </span>
                       </div>
                       <div className="flex flex-col items-center p-2 text-center rounded-xl border bg-secondary/40 border-border/50">
-                        <span className="block text-[9px] text-muted-foreground uppercase font-black mb-1">
+                        <span className="block text-[11px] text-muted-foreground uppercase font-black mb-1">
                           Mín. Inversión
                         </span>
                         <span className="text-sm font-black text-foreground">
@@ -624,7 +624,7 @@ export default function ProjectDetailPage({
                             )}
                           </div>
                           <div className="flex gap-2 items-baseline">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">
+                            <span className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">
                               {
                                 option.valueLabel
                               }
@@ -639,7 +639,7 @@ export default function ProjectDetailPage({
                         <Button
                           size="sm"
                           variant="ghost"
-                          className={`h-9 text-[10px] font-black uppercase tracking-widest shadow-none ${option.actionClassName}`}
+                          className={`h-10 md:h-9 text-[10px] font-black uppercase tracking-widest shadow-none ${option.actionClassName}`}
                           asChild
                         >
                           <Link

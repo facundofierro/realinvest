@@ -17,7 +17,7 @@ import {
   CandlesChart,
   OrderBook,
 } from "../exchange/charts";
-import { TradeDialog } from "../exchange/trade-dialog";
+import { TradeDialog, tradeErrorMessage } from "../exchange/trade-dialog";
 import { MarketStats } from "../exchange/market-stats";
 import { ViewSelector } from "../exchange/view-selector";
 import type {
@@ -158,6 +158,9 @@ export default function ExchangeDetailPage({
   const error = (() => {
     if (tokenError instanceof Error)
       return tokenError.message;
+    // An unknown symbol also fails the order book/series queries; report the root cause.
+    if (!token && !isTokenLoading)
+      return "Token not found";
     if (orderBookError instanceof Error)
       return orderBookError.message;
     if (seriesError instanceof Error)
@@ -171,6 +174,7 @@ export default function ExchangeDetailPage({
     isTradeDialogOpen,
     setIsTradeDialogOpen,
   ] = useState(false);
+  const [tradeError, setTradeError] = useState<string | null>(null);
   const [tradeType, setTradeType] =
     useState<"BUY" | "SELL">("BUY");
   const [orderType, setOrderType] =
@@ -374,7 +378,7 @@ export default function ExchangeDetailPage({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-full">
         <div className="text-center">
           <div className="w-8 h-8 mx-auto mb-4 rounded-full border-4 border-primary/20 animate-spin border-t-primary" />
           <p className="text-sm text-muted-foreground">
@@ -392,7 +396,7 @@ export default function ExchangeDetailPage({
     !series
   ) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-full">
         <div className="text-center">
           <p className="text-lg font-semibold text-destructive mb-2">
             {error || "Token not found"}
@@ -448,7 +452,7 @@ export default function ExchangeDetailPage({
             <h1 className="text-[clamp(12px,4.2vw,16px)] font-black tracking-tight leading-none text-white uppercase truncate">
               {token.symbol}
             </h1>
-            <p className="text-[9px] sm:text-[10px] italic font-medium text-white/70">
+            <p className="text-[11px] sm:text-[11px] italic font-medium text-white/70">
               Mercado de Tokens
             </p>
           </div>
@@ -551,9 +555,7 @@ export default function ExchangeDetailPage({
 
       <TradeDialog
         isOpen={isTradeDialogOpen}
-        onOpenChange={
-          setIsTradeDialogOpen
-        }
+        onOpenChange={(open) => { setTradeError(null); setIsTradeDialogOpen(open); }}
         token={token}
         tradeType={tradeType}
         orderType={orderType}
@@ -575,7 +577,8 @@ export default function ExchangeDetailPage({
           marketSimulation
         }
         onMax={handleMax}
-        onConfirm={() => { if (token && Number(amount) > 0) void createPosition({ tokenSymbol: token.symbol, side: tradeType, orderType, totalAmount: Number(amount), orderPriceUsd: orderType === "LIMIT" ? Number(limitPriceInput) : undefined }).then(() => setIsTradeDialogOpen(false)); }}
+        error={tradeError}
+        onConfirm={() => { if (token && Number(amount) > 0) { setTradeError(null); void createPosition({ tokenSymbol: token.symbol, side: tradeType, orderType, totalAmount: Number(amount), orderPriceUsd: orderType === "LIMIT" ? Number(limitPriceInput) : undefined }).then(() => setIsTradeDialogOpen(false), (error: unknown) => setTradeError(tradeErrorMessage(error))); } }}
       />
       <KycBlockedDialog open={gate.blockedDialogOpen} onOpenChange={gate.setBlockedDialogOpen} status={gate.status} rejectionReason={gate.rejectionReason} />
     </div>

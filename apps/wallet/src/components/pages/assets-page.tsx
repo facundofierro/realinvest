@@ -20,7 +20,7 @@ import {
 import { useKycGate } from "@/hooks/use-kyc-gate";
 import { computeHoldingsTotals } from "@/lib/portfolio";
 import { KycBlockedDialog } from "@/components/kyc/kyc-blocked-dialog";
-import { useIsDesktop } from "@/hooks/use-is-desktop";
+import { useIsNavDesktop } from "@/hooks/use-media-query";
 import { DesktopTokenTabs } from "../desktop-token-tabs";
 import { UnitDetailsDialog } from "../unit-details-dialog";
 import { UnitDetailsActions } from "../unit-details-actions";
@@ -30,11 +30,10 @@ import {
   CardContent,
 } from "@repo/ui/components/ui/card";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@repo/ui/components/ui/dialog";
+  ResponsiveOverlay,
+  ResponsiveOverlayHeader,
+  ResponsiveOverlayTitle,
+} from "@/components/responsive-overlay";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import {
@@ -71,7 +70,7 @@ export default function AssetsPage() {
   const isLoading = isHoldingsLoading || isBalancesLoading || isPositionsLoading || isMarketTokensLoading;
   const isError = isHoldingsError || isBalancesError || isPositionsError || isMarketTokensError;
 
-  const isDesktop = useIsDesktop();
+  const isDesktop = useIsNavDesktop();
 
   const [
     selectedTokenId,
@@ -175,7 +174,7 @@ export default function AssetsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-full">
         <div className="text-center">
           <div className="w-8 h-8 mx-auto mb-4 rounded-full border-4 border-primary/20 animate-spin border-t-primary" />
           <p className="text-sm text-muted-foreground">Loading...</p>
@@ -186,7 +185,7 @@ export default function AssetsPage() {
 
   if (isError) {
     return (
-      <div className="flex justify-center items-center h-screen p-6">
+      <div className="flex justify-center items-center h-full p-6">
         <div className="text-center max-w-sm">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-destructive/10 flex items-center justify-center">
             <AlertTriangle className="h-8 w-8 text-destructive" />
@@ -202,7 +201,7 @@ export default function AssetsPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-full flex flex-col">
       {isDesktop ? (
         <div className="flex flex-1 min-h-0 divide-x bg-muted/5">
           <div className="w-1/3 min-w-[400px] flex flex-col bg-background relative z-10 border-r shadow-sm">
@@ -217,7 +216,7 @@ export default function AssetsPage() {
                   )}
                 </div>
                 <div className="flex gap-2 items-center mt-1">
-                  <span className={cn("text-[10px] font-black px-2 py-0.5 rounded-full", portfolioTotals.pnlPct >= 0 ? "text-brand-green bg-brand-green/10" : "text-destructive bg-destructive/10")}>
+                  <span className={cn("text-[11px] font-black px-2 py-0.5 rounded-full", portfolioTotals.pnlPct >= 0 ? "text-brand-green bg-brand-green/10" : "text-destructive bg-destructive/10")}>
                     {portfolioTotals.pnlPct >= 0 ? "+" : ""}{portfolioTotals.pnlPct.toFixed(1)}%
                   </span>
                   <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
@@ -312,7 +311,7 @@ export default function AssetsPage() {
                           asset.tokenName
                         }
                       </div>
-                      <div className="text-[9px] font-bold text-muted-foreground uppercase truncate mt-0.5">
+                      <div className="text-[11px] font-bold text-muted-foreground uppercase truncate mt-0.5">
                         {
                           asset.projectName
                         }
@@ -325,7 +324,7 @@ export default function AssetsPage() {
                         asset.value
                       )}
                     </div>
-                    <div className="text-[9px] font-black text-brand-green uppercase mt-0.5">
+                    <div className="text-[11px] font-black text-brand-green uppercase mt-0.5">
                       {asset.change}
                     </div>
                   </div>
@@ -429,7 +428,7 @@ export default function AssetsPage() {
                           Liquidez
                           Disponible
                         </p>
-                        <p className="text-[10px] text-muted-foreground">
+                        <p className="text-[11px] text-muted-foreground">
                           USDT (TRC20)
                         </p>
                       </div>
@@ -443,16 +442,16 @@ export default function AssetsPage() {
                       <div className="flex gap-2 justify-end mt-1 opacity-0 transition-opacity group-hover:opacity-100">
                         <Link
                           href="/deposit"
-                          className="text-[10px] text-primary font-bold hover:underline"
+                          className="text-[11px] text-primary font-bold hover:underline"
                         >
                           Depositar
                         </Link>
-                        <span className="text-muted-foreground text-[10px]">
+                        <span className="text-muted-foreground text-[11px]">
                           •
                         </span>
                         <Link
                           href="/withdraw"
-                          className="text-[10px] text-primary font-bold hover:underline"
+                          className="text-[11px] text-primary font-bold hover:underline"
                         >
                           Retirar
                         </Link>
@@ -576,7 +575,7 @@ export default function AssetsPage() {
         })}
       />
 
-      <Dialog
+      <ResponsiveOverlay
         open={
           isTradeDialogOpen &&
           !!selectedToken
@@ -584,11 +583,10 @@ export default function AssetsPage() {
         onOpenChange={
           setIsTradeDialogOpen
         }
-      >
-        <DialogContent className="max-w-md w-[95%] rounded-[32px] p-0 overflow-hidden border-none shadow-2xl">
+        size="md" className="p-0 border-none shadow-2xl md:rounded-[32px]">
           <div className="p-6 space-y-6">
-            <DialogHeader>
-              <DialogTitle className="text-3xl font-black tracking-tighter uppercase leading-[1.05]">
+            <ResponsiveOverlayHeader>
+              <ResponsiveOverlayTitle className="text-3xl font-black tracking-tighter uppercase leading-[1.05]">
                 <span>
                   {tradeType === "BUY"
                     ? "Comprar"
@@ -599,8 +597,8 @@ export default function AssetsPage() {
                     selectedToken?.tokenName
                   }
                 </span>
-              </DialogTitle>
-            </DialogHeader>
+              </ResponsiveOverlayTitle>
+            </ResponsiveOverlayHeader>
 
             <Tabs
               value={orderType}
@@ -722,8 +720,7 @@ export default function AssetsPage() {
               </div>
             </Tabs>
           </div>
-        </DialogContent>
-      </Dialog>
+        </ResponsiveOverlay>
       <KycBlockedDialog open={gate.blockedDialogOpen} onOpenChange={gate.setBlockedDialogOpen} status={gate.status} rejectionReason={gate.rejectionReason} />
     </div>
   );

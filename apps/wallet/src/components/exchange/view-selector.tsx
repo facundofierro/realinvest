@@ -13,9 +13,10 @@ export function ViewSelector({ view, onViewChange }: ViewSelectorProps) {
     <div className="flex gap-2 p-1 w-full rounded-2xl border backdrop-blur-md bg-white/5 border-white/10">
       <button
         type="button"
+        aria-pressed={view === "linea"}
         onClick={() => onViewChange("linea")}
         className={cn(
-          "flex-1 h-8 sm:h-9 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 transition-all",
+          "flex-1 h-8 sm:h-9 rounded-xl text-[11px] sm:text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 transition-all",
           view === "linea"
             ? "bg-white/10 text-white shadow-lg shadow-black/20 border border-white/10"
             : "text-white/40 hover:text-white hover:bg-white/5"
@@ -26,9 +27,10 @@ export function ViewSelector({ view, onViewChange }: ViewSelectorProps) {
       </button>
       <button
         type="button"
+        aria-pressed={view === "velas"}
         onClick={() => onViewChange("velas")}
         className={cn(
-          "flex-1 h-8 sm:h-9 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 transition-all",
+          "flex-1 h-8 sm:h-9 rounded-xl text-[11px] sm:text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 transition-all",
           view === "velas"
             ? "bg-white/10 text-white shadow-lg shadow-black/20 border border-white/10"
             : "text-white/40 hover:text-white hover:bg-white/5"
@@ -39,9 +41,10 @@ export function ViewSelector({ view, onViewChange }: ViewSelectorProps) {
       </button>
       <button
         type="button"
+        aria-pressed={view === "ordenes"}
         onClick={() => onViewChange("ordenes")}
         className={cn(
-          "flex-1 h-8 sm:h-9 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 transition-all",
+          "flex-1 h-8 sm:h-9 rounded-xl text-[11px] sm:text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 transition-all",
           view === "ordenes"
             ? "bg-white/10 text-white shadow-lg shadow-black/20 border border-white/10"
             : "text-white/40 hover:text-white hover:bg-white/5"

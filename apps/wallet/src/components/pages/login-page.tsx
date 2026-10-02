@@ -23,7 +23,7 @@ export default function LoginPage({
   const { signIn } = useAppSession();
 
   return (
-    <div className="flex overflow-hidden relative justify-center items-center p-4 min-h-screen bg-muted/20">
+    <div className="flex overflow-hidden relative justify-center items-center p-4 min-h-dvh bg-muted/20">
       {/* Background decoration */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-accent/10 rounded-full blur-3xl pointer-events-none" />

@@ -1,10 +1,9 @@
 "use client";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@repo/ui/components/ui/dialog";
+  ResponsiveOverlay,
+  ResponsiveOverlayTitle,
+} from "@/components/responsive-overlay";
 import {
   Tabs,
   TabsList,
@@ -20,6 +19,19 @@ import {
   formatTokenAmount,
 } from "@/lib/format";
 import type { MarketToken } from "@/types/wallet";
+
+const TRADE_ERROR_COPY: Record<string, string> = {
+  INSUFFICIENT_BALANCE: "Saldo USDT insuficiente para esta orden.",
+  INSUFFICIENT_HOLDINGS: "No tenés suficientes tokens disponibles para vender.",
+  NO_LIQUIDITY: "No hay órdenes disponibles para ejecutar esta operación.",
+  INVALID_PRICE: "Ingresá un precio límite válido.",
+};
+
+/** Spanish message for a failed createPosition call (error.code comes from the positions API). */
+export function tradeErrorMessage(error: unknown) {
+  const code = (error as { code?: string } | null)?.code;
+  return (code && TRADE_ERROR_COPY[code]) ?? "No se pudo crear la orden. Intentá nuevamente.";
+}
 
 interface TradeDialogProps {
   isOpen: boolean;
@@ -50,6 +62,7 @@ interface TradeDialogProps {
   } | null;
   onMax: () => void;
   onConfirm: () => void;
+  error?: string | null;
 }
 
 export function TradeDialog({
@@ -69,25 +82,26 @@ export function TradeDialog({
   marketSimulation,
   onMax,
   onConfirm,
+  error,
 }: TradeDialogProps) {
   return (
-    <Dialog
+    <ResponsiveOverlay
       open={isOpen}
       onOpenChange={onOpenChange}
+      className="p-0 gap-0 md:max-w-[440px] md:rounded-[32px]"
     >
-      <DialogContent className="p-0 w-[calc(100%-2rem)] max-w-[440px] overflow-hidden rounded-[32px] data-[state=open]:[--tw-enter-translate-x:0] data-[state=open]:[--tw-enter-translate-y:0] data-[state=closed]:[--tw-exit-translate-x:0] data-[state=closed]:[--tw-exit-translate-y:0]">
-        <DialogTitle className="sr-only">
+        <ResponsiveOverlayTitle className="sr-only">
           {tradeType === "BUY"
             ? "Comprar"
             : "Vender"}{" "}
           {token.symbol}
-        </DialogTitle>
-        <div className="p-4 sm:p-6 space-y-5 max-h-[85dvh] overflow-y-auto">
+        </ResponsiveOverlayTitle>
+        <div className="p-4 sm:p-6 space-y-5">
           <div className="space-y-2">
             <div className="flex gap-4 justify-between items-start">
               <div className="min-w-0">
                 <div className="flex gap-2 items-center">
-                  <span className="font-mono text-[9px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
+                  <span className="font-mono text-[11px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded uppercase tracking-tighter">
                     {token.symbol}
                   </span>
                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
@@ -276,7 +290,12 @@ export function TradeDialog({
                     )}
                 </div>
 
-                <div className="pt-2">
+                <div className="sticky bottom-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-2 pb-[env(safe-area-inset-bottom)] bg-background">
+                  {error && (
+                    <p role="alert" className="pb-3 text-center text-xs font-medium text-destructive">
+                      {error}
+                    </p>
+                  )}
                   <Button
                     onClick={onConfirm}
                     disabled={
@@ -302,7 +321,6 @@ export function TradeDialog({
             </Tabs>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+    </ResponsiveOverlay>
   );
 }

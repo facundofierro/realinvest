@@ -23,6 +23,7 @@ import {
 import { cn } from "@repo/ui/lib/utils";
 import Link from "next/link";
 import { Badge } from "@repo/ui/components/ui/badge";
+import { Skeleton } from "@repo/ui/components/ui/skeleton";
 import Image from "next/image";
 
 interface Category {
@@ -56,7 +57,7 @@ type ProjectStatusUi =
   | "COMPLETADO";
 
 export default function InvestPage() {
-  const { data: fetchedProjects = [] } =
+  const { data: fetchedProjects = [], isLoading: isProjectsLoading } =
     useProjects();
   const [
     selectedCategory,
@@ -131,7 +132,7 @@ export default function InvestPage() {
     }, [selectedCategory, projects]);
 
   return (
-    <div className="overflow-x-hidden p-4 pb-32 mx-auto space-y-6 max-w-7xl duration-500 animate-in fade-in">
+    <div className="overflow-x-hidden p-4 mx-auto space-y-6 max-w-7xl duration-500 animate-in fade-in">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -202,7 +203,7 @@ export default function InvestPage() {
             Todos los activos
             <Badge
               variant="secondary"
-              className="bg-primary/5 text-[10px] text-primary border-none"
+              className="bg-primary/5 text-[11px] text-primary border-none"
             >
               {projects.length}{" "}
               resultados
@@ -211,6 +212,10 @@ export default function InvestPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {isProjectsLoading &&
+            Array.from({ length: 3 }, (_, i) => (
+              <Skeleton key={i} className="h-64 rounded-xl" />
+            ))}
           {filteredProjects.map(
             (project) => (
               <Link
@@ -264,7 +269,7 @@ export default function InvestPage() {
                             <span className="text-[7px] font-bold text-white text-center uppercase tracking-wide opacity-90">
                               Lanzamiento
                             </span>
-                            <span className="text-[9px] font-black text-white text-center uppercase tracking-wide">
+                            <span className="text-[11px] font-black text-white text-center uppercase tracking-wide">
                               {
                                 project.launchDate
                               }
@@ -281,7 +286,7 @@ export default function InvestPage() {
                               Próximo
                               Lanzamiento
                             </span>
-                            <span className="text-[9px] font-black text-white text-center uppercase tracking-wide">
+                            <span className="text-[11px] font-black text-white text-center uppercase tracking-wide">
                               {
                                 project.nextLaunchDate
                               }
@@ -296,7 +301,7 @@ export default function InvestPage() {
                         {project.title}
                       </h3>
                       <div className="flex gap-1 justify-between items-center">
-                        <p className="text-[9px] text-muted-foreground flex items-center truncate">
+                        <p className="text-[11px] text-muted-foreground flex items-center truncate">
                           <Building2 className="h-2.5 w-2.5 mr-1 shrink-0" />{" "}
                           {
                             project.location.split(
@@ -304,7 +309,7 @@ export default function InvestPage() {
                             )[0]
                           }
                         </p>
-                        <span className="text-[9px] font-bold text-primary whitespace-nowrap">
+                        <span className="text-[11px] font-bold text-primary whitespace-nowrap">
                           ROI ~
                           {project.roi}
                         </span>
@@ -327,7 +332,7 @@ export default function InvestPage() {
                             <p className="text-[7px] text-muted-foreground font-extrabold uppercase tracking-wider mb-0.5 truncate">
                               Desde
                             </p>
-                            <p className="text-[9px] font-black text-foreground truncate">
+                            <p className="text-[11px] font-black text-foreground truncate">
                               {
                                 project.precioRange.split(
                                   " "
@@ -343,7 +348,7 @@ export default function InvestPage() {
                               <p className="text-[7px] text-primary/60 font-extrabold uppercase tracking-wider mb-0.5 truncate">
                                 Tokens
                               </p>
-                              <p className="text-[9px] font-black text-primary truncate">
+                              <p className="text-[11px] font-black text-primary truncate">
                                 {
                                   project.tokensTotal
                                 }
@@ -355,7 +360,7 @@ export default function InvestPage() {
                             <p className="text-[7px] text-muted-foreground font-extrabold uppercase tracking-wider mb-0.5 truncate">
                               Renta
                             </p>
-                            <p className="text-[9px] font-black text-foreground truncate">
+                            <p className="text-[11px] font-black text-foreground truncate">
                               {
                                 project.rentaFija
                               }
@@ -388,7 +393,7 @@ export default function InvestPage() {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-[10px] text-muted-foreground font-medium">
+          <p className="text-[11px] text-muted-foreground font-medium">
             6 Proyectos activos
           </p>
           <div className="flex gap-1 justify-end mt-1">

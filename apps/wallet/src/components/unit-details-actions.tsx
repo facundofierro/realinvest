@@ -34,7 +34,7 @@ export function UnitDetailsActions({
           | "outline"
           | "secondary" = "outline";
         let className =
-          "flex-1 h-12 px-2 text-[9px] font-black tracking-wide uppercase rounded-xl transition-all";
+          "flex-1 h-12 px-2 text-[11px] font-black tracking-wide uppercase rounded-xl transition-all";
 
         if (
           action.variant ===

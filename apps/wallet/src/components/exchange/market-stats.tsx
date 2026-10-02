@@ -34,7 +34,7 @@ export function MarketStats({
       <div className="flex gap-4 justify-between items-start p-4 sm:p-5">
         <div className="flex gap-3 sm:gap-6 justify-around items-center w-full">
           <div className="space-y-0.5 text-center">
-            <div className="text-[9px] sm:text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+            <div className="text-[11px] sm:text-[10px] text-muted-foreground font-black uppercase tracking-widest">
               TENENCIA
             </div>
             <div className="text-[clamp(16px,5.2vw,20px)] sm:text-xl font-black tracking-tighter text-[#3B2146]">
@@ -45,7 +45,7 @@ export function MarketStats({
           </div>
           <div className="w-px h-7 sm:h-8 bg-gray-100" />
           <div className="space-y-0.5 text-center">
-            <div className="text-[9px] sm:text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+            <div className="text-[11px] sm:text-[10px] text-muted-foreground font-black uppercase tracking-widest">
               LIQUIDEZ
             </div>
             <div className="text-[clamp(16px,5.2vw,20px)] sm:text-xl font-black tracking-tighter text-[#3B2146]">
@@ -56,7 +56,7 @@ export function MarketStats({
           </div>
           <div className="w-px h-7 sm:h-8 bg-gray-100" />
           <div className="space-y-0.5 text-center">
-            <div className="text-[9px] sm:text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+            <div className="text-[11px] sm:text-[10px] text-muted-foreground font-black uppercase tracking-widest">
               ORDENES
             </div>
             <div className="text-[clamp(16px,5.2vw,20px)] sm:text-xl font-black tracking-tighter text-[#3B2146]">
@@ -88,11 +88,12 @@ export function MarketStats({
             <button
               key={tf}
               type="button"
+              aria-pressed={isSelected}
               onClick={() =>
                 onTimeframeChange(tf)
               }
               className={cn(
-                "h-11 sm:h-[52px] rounded-2xl border text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center",
+                "h-11 sm:h-[52px] rounded-2xl border text-[11px] sm:text-[10px] font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center",
                 isSelected
                   ? "bg-primary/20 text-primary border-primary/20 shadow-lg shadow-primary/5 scale-[1.05] z-10"
                   : "bg-primary/5 border-primary/10 text-primary hover:bg-primary/10"
@@ -103,7 +104,7 @@ export function MarketStats({
               </span>
               <span
                 className={cn(
-                  "mt-0.5 sm:mt-1 px-2 py-1 rounded-[10px] text-[9px] sm:text-[10px] font-black inline-block shadow-sm text-white border-none min-w-[44px] sm:min-w-[50px]",
+                  "mt-0.5 sm:mt-1 px-2 py-1 rounded-[10px] text-[11px] sm:text-[11px] font-black inline-block shadow-sm text-white border-none min-w-[44px] sm:min-w-[50px]",
                   up
                     ? "bg-linear-to-r from-brand-lime via-brand-green to-brand-teal shadow-brand-green/20"
                     : "bg-[#FF3366] shadow-brand-pink/20"

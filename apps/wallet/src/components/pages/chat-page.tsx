@@ -47,7 +47,7 @@ export default function ChatPage({ initialMessages = [] }: ChatPageProps) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] bg-background">
+    <div className="flex flex-col h-full w-full max-w-3xl mx-auto bg-background">
       <div className="p-4 border-b flex items-center justify-between bg-card shrink-0">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -62,10 +62,10 @@ export default function ChatPage({ initialMessages = [] }: ChatPageProps) {
           </div>
         </div>
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-10 w-10">
             <Search className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-10 w-10">
             <Settings className="h-4 w-4" />
           </Button>
         </div>

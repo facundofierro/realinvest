@@ -309,7 +309,7 @@ export function UnitDetailsDialog({
                 </h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-4 rounded-2xl bg-muted/30 border border-border/40">
-                    <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70 mb-1">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/70 mb-1">
                       Superficie
                     </div>
                     <div className="text-sm font-black text-foreground">
@@ -322,7 +322,7 @@ export function UnitDetailsDialog({
                     </div>
                   </div>
                   <div className="p-4 rounded-2xl bg-muted/30 border border-border/40">
-                    <div className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70 mb-1">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-muted-foreground/70 mb-1">
                       Orientación
                     </div>
                     <div className="text-sm font-black text-foreground">
