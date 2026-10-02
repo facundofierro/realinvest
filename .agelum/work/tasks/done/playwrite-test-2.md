@@ -1,10 +1,10 @@
 ---
 created: 2026-10-02T19:00:00.000Z
 plan: .agelum/work/plans/2026-10-02-playwrite-test-2-1790965585223.md
-status: planned
+status: done
 summary: .agelum/work/summaries/2026-10-02-playwrite-test-2-1790972692060.md
 type: task
-workflowStatus: pending
+workflowStatus: done
 ---
 
 # playwright e2e use-case tests
