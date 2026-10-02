@@ -1,0 +1,198 @@
+@import "tailwindcss";
+@source "../../../../packages/ui/src";
+
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+:root {
+  /* Landing palette (design C): ground #F6F4F7, ink #2A1634, brand #5B1187 */
+  --background: 280 17% 96%;
+  --foreground: 280 41% 14%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 280 41% 14%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 280 41% 14%;
+
+  --primary: 278 78% 30%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 276 63% 92%;
+  --secondary-foreground: 280 41% 14%;
+
+  --muted: 276 45% 94%;
+  --muted-foreground: 280 15% 31%;
+
+  --accent: 338 66% 52%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 338 66% 52%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 281 22% 90%;
+  --input: 281 22% 90%;
+  --ring: 278 78% 30%;
+
+  --radius: 0.5rem;
+
+  --chart-1: 278 78% 30%;
+  --chart-2: 338 66% 52%;
+  --chart-3: 252 47% 71%;
+  --chart-4: 48 76% 60%;
+  --chart-5: 56 33% 39%;
+}
+
+.dark {
+  --background: 282 36% 12%;
+  --foreground: 270 5% 96%;
+
+  --card: 282 36% 20%;
+  --card-foreground: 270 5% 96%;
+
+  --popover: 282 36% 20%;
+  --popover-foreground: 270 5% 96%;
+
+  --primary: 252 47% 71%;
+  --primary-foreground: 282 36% 20%;
+
+  --secondary: 298 25% 44%;
+  --secondary-foreground: 0 0% 100%;
+
+  --muted: 282 36% 30%;
+  --muted-foreground: 270 13% 70%;
+
+  --accent: 338 86% 64%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 338 86% 64%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 282 36% 25%;
+  --input: 282 36% 25%;
+  --ring: 282 47% 71%;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --color-brand: #5b1187;
+  --color-brand-hover: #45106a;
+  --color-ink: #2a1634;
+  --color-tint: #efe3f6;
+  --color-tint-strong: #ead7f5;
+  --color-dark-band: #241030;
+  --color-dark-card: #331a44;
+  --color-dark-text: #cdbcd6;
+  --color-card-border: #e6deea;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  15%,
+  85% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+.animate-fade-in-out {
+  animation: fadeInOut 2.2s ease-in-out forwards;
+}
+
+@keyframes kenBurns {
+  0% {
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    transform: scale(1.15) translate(-2%, -2%);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenBurns 20s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-fade-in-out,
+  .animate-ken-burns {
+    animation: none;
+  }
+}
