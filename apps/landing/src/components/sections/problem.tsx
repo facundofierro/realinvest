@@ -1,10 +1,23 @@
+import Image from "next/image";
 import { IconTile, type IconName } from "@/components/illustrations/icons";
-import { ProblemBeforeAfter } from "@/components/illustrations/problem-before-after";
 import { Section, SectionHeading, cardClass } from "@/components/section";
 import { problem } from "@/content/es";
 import { cn } from "@/lib/utils";
 
 const icons: IconName[] = ["grid", "users", "doc", "clock"];
+
+const beforeAfter = [
+  {
+    src: "/images/problem-before.webp",
+    alt: "Escritorio con planillas, notas y mensajes dispersos",
+    caption: problem.illustration.before,
+  },
+  {
+    src: "/images/problem-after.webp",
+    alt: "Inventario ordenado en un solo tablero",
+    caption: problem.illustration.after,
+  },
+];
 
 export function Problem() {
   return (
@@ -15,12 +28,22 @@ export function Problem() {
         lead={problem.text}
         className="mb-10"
       />
-      <div className={cn(cardClass, "mb-5 overflow-x-auto p-5")}>
-        <ProblemBeforeAfter
-          before={problem.illustration.before}
-          after={problem.illustration.after}
-          className="block h-auto w-full min-w-[640px]"
-        />
+      <div className="mb-5 grid gap-5 md:grid-cols-2">
+        {beforeAfter.map((item) => (
+          <figure key={item.src} className={cn(cardClass, "p-4")}>
+            <Image
+              src={item.src}
+              alt={item.alt}
+              width={960}
+              height={720}
+              sizes="(min-width: 1180px) 550px, (min-width: 768px) 50vw, 100vw"
+              className="block h-auto w-full rounded-xl"
+            />
+            <figcaption className="mt-3 px-1 text-[15px] font-semibold">
+              {item.caption}
+            </figcaption>
+          </figure>
+        ))}
       </div>
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {problem.items.map((item, i) => (

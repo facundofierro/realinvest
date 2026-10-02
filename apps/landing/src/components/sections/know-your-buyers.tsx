@@ -1,4 +1,4 @@
-import { BuyersReactivation } from "@/components/illustrations/buyers-reactivation";
+import Image from "next/image";
 import { CheckList, Section, SectionHeading, cardClass } from "@/components/section";
 import { StatusBadge, type UnitStatus } from "@/components/status-badge";
 import { knowYourBuyers, sampleDataLabel } from "@/content/es";
@@ -38,7 +38,14 @@ export function KnowYourBuyers() {
           "p-6 shadow-[0_30px_60px_-30px_rgba(59,33,70,0.3)]",
         )}
       >
-        <BuyersReactivation className="block h-auto w-full" />
+        <Image
+          src="/images/buyers-reactivation.webp"
+          alt="Compradores de la etapa 1 vuelven a interactuar con el lanzamiento de la etapa 2"
+          width={960}
+          height={720}
+          sizes="(min-width: 1024px) 520px, 100vw"
+          className="block h-auto w-full rounded-2xl"
+        />
         <ul className="mt-2" aria-label="Ejemplo ilustrativo de actividad de interesados">
           {knowYourBuyers.activity.map((row, i) => (
             <li

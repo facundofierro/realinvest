@@ -1,5 +1,5 @@
+import Image from "next/image";
 import { CtaLink } from "@/components/cta-link";
-import { Skyline } from "@/components/illustrations/skyline";
 import { Section, SectionHeading } from "@/components/section";
 import { DemoForm } from "@/components/sections/demo-form";
 import { contactEnv, finalCta } from "@/content/es";
@@ -30,7 +30,14 @@ export function FinalCta() {
             {finalCta.whatsappCta.label}
           </CtaLink>
         )}
-        <Skyline className="mt-12 hidden h-auto w-full sm:block" />
+        <Image
+          src="/images/final-cta-skyline.webp"
+          alt=""
+          width={1920}
+          height={800}
+          sizes="(min-width: 1024px) 560px, 100vw"
+          className="mt-12 hidden h-auto w-full rounded-2xl sm:block"
+        />
       </div>
       <DemoForm privacyUrl={contactEnv.privacyUrl} />
     </Section>

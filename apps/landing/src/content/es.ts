@@ -185,8 +185,6 @@ export const launch = {
       text: "Ajustá la disponibilidad y las condiciones a partir de lo aprendido en la etapa anterior.",
     },
   ],
-  /** Index (0-based) of the highlighted timeline step ("Apertura"). */
-  highlightedStep: 3,
   benefits: [
     "Fechas y condiciones claras para organizar el seguimiento comercial.",
     "Señales de interés para planificar cada etapa.",

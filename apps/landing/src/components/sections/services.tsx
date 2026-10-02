@@ -1,20 +1,24 @@
-import type { ComponentType } from "react";
+import Image from "next/image";
 import { CtaLink } from "@/components/cta-link";
-import {
-  Service3d,
-  ServiceCrm,
-  ServiceSetup,
-} from "@/components/illustrations/services";
 import { Section, SectionHeading, cardClass } from "@/components/section";
 import { services } from "@/content/es";
 
-const illustrations: Record<
+const images: Record<
   (typeof services.cards)[number]["key"],
-  ComponentType<{ className?: string }>
+  { src: string; alt: string }
 > = {
-  setup: ServiceSetup,
-  "3d": Service3d,
-  crm: ServiceCrm,
+  setup: {
+    src: "/images/service-setup.webp",
+    alt: "Equipo trabajando junto a una maqueta de edificio",
+  },
+  "3d": {
+    src: "/images/service-3d.webp",
+    alt: "Render de una torre residencial con jardín",
+  },
+  crm: {
+    src: "/images/service-crm.webp",
+    alt: "Ilustración de interesados avanzando por un embudo de ventas",
+  },
 };
 
 export function Services() {
@@ -28,10 +32,17 @@ export function Services() {
       />
       <div className="grid gap-5 md:grid-cols-3">
         {services.cards.map((card) => {
-          const Illustration = illustrations[card.key];
+          const image = images[card.key];
           return (
             <div key={card.key} className={cardClass}>
-              <Illustration className="mb-4 block h-auto w-full" />
+              <Image
+                src={image.src}
+                alt={image.alt}
+                width={960}
+                height={640}
+                sizes="(min-width: 1180px) 320px, (min-width: 768px) 33vw, 100vw"
+                className="mb-4 block h-auto w-full rounded-2xl"
+              />
               <h3 className="mb-2 text-[19px] font-semibold tracking-[-0.01em]">
                 {card.title}
               </h3>

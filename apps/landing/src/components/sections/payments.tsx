@@ -1,4 +1,4 @@
-import { CryptoCoin } from "@/components/illustrations/crypto-coin";
+import Image from "next/image";
 import { IconTile, type IconName } from "@/components/illustrations/icons";
 import { Section, SectionHeading, cardClass } from "@/components/section";
 import { payments } from "@/content/es";
@@ -38,7 +38,13 @@ export function Payments() {
           "mt-5 flex flex-wrap items-center gap-6 border-[#DCC4EC] bg-tint",
         )}
       >
-        <CryptoCoin className="size-[84px] flex-none" />
+        <Image
+          src="/images/payments-coin.webp"
+          alt=""
+          width={84}
+          height={84}
+          className="size-[84px] flex-none"
+        />
         <div className="min-w-[min(100%,260px)] flex-1">
           <p className="mb-1.5 font-mono text-xs font-medium uppercase tracking-[0.12em] text-brand">
             {crypto.eyebrow}

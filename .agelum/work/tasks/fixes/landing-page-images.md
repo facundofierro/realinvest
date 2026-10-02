@@ -1,9 +1,10 @@
 ---
 created: 2026-10-02T20:46:26.804Z
 plan: .agelum/work/plans/2026-10-02-landing-page-images-1790974316519.md
-status: planned
+status: done
+summary: .agelum/work/summaries/2026-10-02-landing-page-images-1790975016552.md
 type: task
-workflowStatus: fixes
+workflowStatus: doing
 ---
 
 # landing page images

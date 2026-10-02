@@ -1,7 +1,7 @@
+import Image from "next/image";
 import { IconBullets } from "@/components/icon-bullets";
 import type { IconName } from "@/components/illustrations/icons";
 import { InvestorAppMock } from "@/components/illustrations/investor-app-mock";
-import { TrustLoop } from "@/components/illustrations/trust-loop";
 import { Section, SectionHeading } from "@/components/section";
 import { investorExperience } from "@/content/es";
 
@@ -28,11 +28,21 @@ export function InvestorExperience() {
           <InvestorAppMock />
         </div>
       </div>
-      <div className="mt-14 overflow-x-auto rounded-3xl border border-card-border bg-background p-7">
-        <TrustLoop
-          labels={investorExperience.trustLoop}
-          className="block h-auto w-full min-w-[560px]"
+      <div className="mt-14 rounded-3xl border border-card-border bg-background p-4 sm:p-7">
+        <Image
+          src="/images/trust-loop.webp"
+          alt=""
+          width={1500}
+          height={500}
+          sizes="(min-width: 1180px) 1080px, 100vw"
+          className="block h-auto w-full rounded-2xl"
         />
+        {/* Columns line up with the three objects in the image (at 1/6, 1/2, 5/6). */}
+        <ol className="grid grid-cols-3 gap-2 text-center text-[13px] font-semibold sm:text-[15px]">
+          {investorExperience.trustLoop.map((label) => (
+            <li key={label}>{label}</li>
+          ))}
+        </ol>
       </div>
       <p className="mt-4 text-[13px] text-[#6B5A74]">
         {investorExperience.disclaimer}
