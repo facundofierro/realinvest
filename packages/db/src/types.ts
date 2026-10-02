@@ -1,6 +1,7 @@
 import type {
   accounts,
   balances,
+  demoRequests,
   fireblocksAccountFreezes,
   fireblocksAssetOperations,
   fireblocksAssetPauses,
@@ -70,6 +71,8 @@ export type Trade = typeof trades.$inferSelect;
 export type NewTrade = typeof trades.$inferInsert;
 export type KycApplicationRow = typeof kycApplications.$inferSelect;
 export type NewKycApplicationRow = typeof kycApplications.$inferInsert;
+export type DemoRequestRow = typeof demoRequests.$inferSelect;
+export type NewDemoRequestRow = typeof demoRequests.$inferInsert;
 export type FireblocksVaultAccountRow = typeof fireblocksVaultAccounts.$inferSelect;
 export type FireblocksVaultAssetRow = typeof fireblocksVaultAssets.$inferSelect;
 export type FireblocksBalanceRow = typeof fireblocksBalances.$inferSelect;

@@ -265,6 +265,30 @@ export const kycApplications = sqliteTable(
   ],
 );
 
+/** Demo requests submitted from the marketing landing (apps/landing). */
+export const demoRequests = sqliteTable(
+  "demo_requests",
+  {
+    id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+    name: text("name").notNull(),
+    company: text("company").notNull(),
+    role: text("role"),
+    email: text("email").notNull(),
+    phone: text("phone"),
+    country: text("country").notNull(),
+    city: text("city"),
+    projectCount: text("project_count"),
+    interests: text("interests", { mode: "json" }).$type<string[]>().notNull().$defaultFn(() => []),
+    comments: text("comments"),
+    source: text("source").notNull().default("landing"),
+  },
+  (table) => [
+    index("demo_requests_email_idx").on(table.email),
+    index("demo_requests_created_at_idx").on(table.createdAt),
+  ],
+);
+
 /** Provider-native state for the deterministic Fireblocks custody mock. */
 export const fireblocksVaultAccounts = sqliteTable("fireblocks_vault_accounts", {
   id: text("id").primaryKey(), name: text("name").notNull(), customerRefId: text("customer_ref_id"), createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
@@ -311,4 +335,4 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({ use
 export const tradesRelations = relations(trades, ({ one }) => ({ token: one(marketTokens, { fields: [trades.tokenId], references: [marketTokens.id] }) }));
 export const kycApplicationsRelations = relations(kycApplications, ({ one }) => ({ user: one(users, { fields: [kycApplications.userId], references: [users.id] }) }));
 
-export const schema = { users, accounts, sessions, nativeAuthCodes, nativeRefreshTokens, projects, units, stages, purchaseOptions, projectStories, marketTokens, holdings, balances, positions, transactions, trades, kycApplications, fireblocksVaultAccounts, fireblocksVaultAssets, fireblocksBalances, fireblocksDepositAddresses, fireblocksTransfers, fireblocksRampRequests, fireblocksEligibility, fireblocksAccountFreezes, fireblocksAssetPauses, fireblocksAssetOperations, usersRelations, accountsRelations, sessionsRelations, projectsRelations, unitsRelations, stagesRelations, marketTokensRelations, holdingsRelations, balancesRelations, positionsRelations, transactionsRelations, tradesRelations, kycApplicationsRelations };
+export const schema = { users, accounts, sessions, nativeAuthCodes, nativeRefreshTokens, projects, units, stages, purchaseOptions, projectStories, marketTokens, holdings, balances, positions, transactions, trades, kycApplications, demoRequests, fireblocksVaultAccounts, fireblocksVaultAssets, fireblocksBalances, fireblocksDepositAddresses, fireblocksTransfers, fireblocksRampRequests, fireblocksEligibility, fireblocksAccountFreezes, fireblocksAssetPauses, fireblocksAssetOperations, usersRelations, accountsRelations, sessionsRelations, projectsRelations, unitsRelations, stagesRelations, marketTokensRelations, holdingsRelations, balancesRelations, positionsRelations, transactionsRelations, tradesRelations, kycApplicationsRelations };

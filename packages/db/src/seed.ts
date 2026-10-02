@@ -5,14 +5,28 @@ import { createDb } from "./client";
 import {
   accounts,
   balances,
+  fireblocksAccountFreezes,
+  fireblocksAssetOperations,
+  fireblocksAssetPauses,
+  fireblocksBalances,
+  fireblocksDepositAddresses,
+  fireblocksEligibility,
+  fireblocksRampRequests,
+  fireblocksTransfers,
+  fireblocksVaultAccounts,
+  fireblocksVaultAssets,
   holdings,
+  kycApplications,
   marketTokens,
+  nativeAuthCodes,
+  nativeRefreshTokens,
   positions,
   projectStories,
   projects,
   purchaseOptions,
   sessions,
   stages,
+  trades,
   transactions,
   units,
   users,
@@ -413,10 +427,26 @@ async function main() {
   }
 
   await db.transaction(async (tx) => {
+    // Full reset (FK-safe order): trades reference positions/users without cascade,
+    // and custody/KYC state must not survive a re-seed (apps/e2e re-seeds every run).
+    await tx.delete(trades);
     await tx.delete(transactions);
     await tx.delete(positions);
     await tx.delete(holdings);
     await tx.delete(balances);
+    await tx.delete(kycApplications);
+    await tx.delete(fireblocksAssetOperations);
+    await tx.delete(fireblocksTransfers);
+    await tx.delete(fireblocksRampRequests);
+    await tx.delete(fireblocksDepositAddresses);
+    await tx.delete(fireblocksEligibility);
+    await tx.delete(fireblocksAccountFreezes);
+    await tx.delete(fireblocksBalances);
+    await tx.delete(fireblocksVaultAssets);
+    await tx.delete(fireblocksAssetPauses);
+    await tx.delete(fireblocksVaultAccounts);
+    await tx.delete(nativeAuthCodes);
+    await tx.delete(nativeRefreshTokens);
     await tx.delete(sessions);
     await tx.delete(accounts);
     await tx.delete(users);
