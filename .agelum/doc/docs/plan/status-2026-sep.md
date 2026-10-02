@@ -4,9 +4,9 @@ Audit of the current state of the Real Invest application and the general plan o
 
 ## 1. Executive Summary
 
-The project is at the **UI mock-up stage**. The wallet application (`apps/wallet`) implements the complete screen flow (landing, login, dashboard, invest, project details, exchange, assets, deposit, withdraw, tokenization, chat) backed only by sample JSON data served through local API routes. There is **no real authentication, no database, no external provider integration, and no business logic beyond the UI**. The first target market is **Paraguay**, and the legal/technical research for that market is already documented in the research folder.
+The project has moved past the pure UI mock-up stage. The wallet application (`apps/wallet`) implements the complete screen flow (landing, login, dashboard, invest, project details, exchange, assets, deposit, withdraw, tokenization, chat) and is now backed by a **real database** (Drizzle ORM + SQLite) seeded from the original sample JSON. Multiple changes have been integrated across the codebase (data layer wiring, schema, repository/hook consolidation, and structural refactors described in §2 and §3). There is still **no real authentication, no external provider integration, and no business logic beyond the UI**. The first target market is **Paraguay**, and the legal/technical research for that market is already documented in the research folder.
 
-The core pending work is: responsive polish for all screen sizes, a simulated crypto custody provider, a simulated KYC provider, persistence with Drizzle + SQLite, Google OAuth authentication, and a code organization that supports **multi-tenant deployments at deploy time** (shared code isolated in utility packages so future deployments can fork the base implementation).
+The core pending work is: responsive polish for all screen sizes, a simulated crypto custody provider, a simulated KYC provider, Google OAuth authentication, end-to-end investment loop wiring over the new DB layer, and code that supports **multi-tenant deployments at deploy time** (shared code isolated in utility packages so future deployments can fork the base implementation).
 
 ## 2. Current Status (What Exists Today)
 
@@ -36,10 +36,10 @@ All screens exist as UI mock-ups in `apps/wallet`:
 - **Tokenization** (`(dashboard)/tokenization`) and **Chat** (`(dashboard)/chat`).
 - Responsive scaffolding exists (bottom nav for mobile, desktop top nav, `use-is-desktop` hook), but coverage across all screen sizes is incomplete (see §3.1).
 
-### 2.3 Data Layer (Mock Only)
+### 2.3 Data Layer (Drizzle + SQLite — Real Persistence Now)
 
-- All data comes from `apps/wallet/src/sample-data/*.json` (projects, units, stages, stories, purchase options, holdings, balances, positions, transactions, market tokens, order books).
-- Local API routes (`src/app/api/**`) read those JSON files and serve them to the client via `src/lib/api/*` hooks. There is **no real persistence**.
+- The data layer has been migrated from pure sample files into a **Drizzle ORM + SQLite** database. The original sample JSON in `apps/wallet/src/sample-data/*.json` is now used as the **seed source** for the database rather than as the runtime source of truth.
+- Local API routes (`src/app/api/**`) and client hooks (`src/lib/api/*`) have been updated to read/write through Drizzle queries against the SQLite database instead of returning the JSON files directly. There is now **real persistence** for the entities covered by the schema.
 
 ### 2.4 Provider Integrations (None)
 
@@ -79,10 +79,11 @@ The research folder (`doc/docs/research/`) contains the regulatory and technical
 
 ### 3.3 Persistence
 
-- **[ ] Database with Drizzle ORM + SQLite**:
-  - Add a `db` package (or app-level module) with Drizzle schema for: users/sessions, projects, units, stages, purchase options, holdings, balances, positions, transactions, market tokens, order books.
-  - Replace the JSON sample-data API routes with real queries seeded from the existing sample data.
-  - Migration strategy so future deployments (forks) can evolve their schema independently.
+- **[x] Database with Drizzle ORM + SQLite**:
+  - Drizzle schema has been added covering users/sessions, projects, units, stages, purchase options, holdings, balances, positions, transactions, market tokens, and order books.
+  - The JSON sample-data API routes have been replaced by real Drizzle queries, with the original sample data used as the seed source.
+  - Multiple refactors around repositories, hooks, and API routes have been integrated alongside the migration to the DB layer (data-layer wiring, schema, repository/hook consolidation).
+  - **Remaining**: finalize the migration strategy so future deployments (forks) can evolve their schema independently, and extend the schema to cover new entities introduced by auth, KYC, and provider integration (custody balances/transfers, KYC verification records).
 
 ### 3.4 Authentication
 
@@ -109,12 +110,12 @@ The research folder (`doc/docs/research/`) contains the regulatory and technical
 
 ## 4. Suggested Order of Work
 
-1. **Database (Drizzle + SQLite)** — unblocks everything that needs real state (auth, KYC status, transactions).
+1. **Database (Drizzle + SQLite)** — **done**. The base schema and seeded data are in place; remaining items are extension (auth/KYC/custody entities) and migration tooling for forks.
 2. **Google OAuth** — real user identity wired to the database.
-3. **Simulated KYC provider** — onboarding/compliance flow gated by verification status.
+3. **Simulated KYC provider** — onboarding/compliance flow gated by verification status, persisted in the DB.
 4. **Simulated crypto custody provider (Fireblocks mock)** — deposit/withdraw/balance flows over the provider port, persisted in the DB.
-5. **Responsive audit** — can run in parallel; polish all screens for every form factor.
-6. **End-to-end investment loop** — connect invest/exchange/asset screens to DB + simulated providers (buy tokens, secondary market trades, portfolio updates).
+5. **End-to-end investment loop** — connect invest/exchange/asset screens to DB + simulated providers (buy tokens, secondary market trades, portfolio updates).
+6. **Responsive audit** — can run in parallel; polish all screens for every form factor.
 7. **Packaging for multi-tenant forks** — progressive extraction of utility packages as boundaries become clear.
 8. **Paraguay launch track (parallel, mostly non-code)** — PSAV/fideicomiso/legal validation using the research docs, selection of real custody/KYC providers.
 

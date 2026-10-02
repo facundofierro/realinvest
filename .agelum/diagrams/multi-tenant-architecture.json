@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arquitectura multi-tenant y marketplace global",
+    "locale": "en",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "investor", "type": "external", "label": "Inversor", "sublabel": "cuenta de la red", "pos": [40, 300], "size": [130, 60] },
+    { "id": "portals", "type": "frontend", "label": "Portales white-label", "sublabel": "wallet + admin · host → tenant", "pos": [260, 300], "size": [170, 64], "tag": "app por región" },
+    { "id": "dba", "type": "database", "label": "DB tenant A", "sublabel": "libSQL · fuente de verdad", "pos": [520, 215], "size": [150, 60] },
+    { "id": "dbb", "type": "database", "label": "DB tenant B", "sublabel": "libSQL · fuente de verdad", "pos": [520, 395], "size": [150, 60] },
+    { "id": "outbox", "type": "backend", "label": "Outbox / publicador", "sublabel": "eventos v1", "pos": [760, 300], "size": [150, 60] },
+    { "id": "cp", "type": "cloud", "label": "Control plane", "sublabel": "tenants, dominios, config", "pos": [260, 110], "size": [170, 60] },
+    { "id": "identity", "type": "security", "label": "Identidad de la red", "sublabel": "OIDC · perfil + KYC + consentimiento", "pos": [260, 520], "size": [190, 64] },
+    { "id": "bus", "type": "messagebus", "label": "Cola de eventos", "sublabel": "Postgres / Redis / NATS", "pos": [1010, 300], "size": [150, 60] },
+    { "id": "indexer", "type": "backend", "label": "Indexador", "sublabel": "idempotente por event_id", "pos": [1010, 110], "size": [150, 60] },
+    { "id": "gdb", "type": "database", "label": "DB global de mercado", "sublabel": "Postgres · proyección + FTS", "pos": [1010, 520], "size": [170, 64] },
+    { "id": "market", "type": "frontend", "label": "Servicio marketplace", "sublabel": "apps/market · servidor aparte", "pos": [640, 520], "size": [180, 64] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Celda regional (ej. Paraguay)", "wraps": ["portals", "dba", "dbb", "outbox"] }
+  ],
+  "connections": [
+    { "id": "inv-portals", "from": "investor", "to": "portals", "label": "HTTPS", "variant": "emphasis" },
+    { "id": "portals-dba", "from": "portals", "to": "dba", "fromSide": "right", "toSide": "left" },
+    { "id": "portals-dbb", "from": "portals", "to": "dbb", "fromSide": "right", "toSide": "left" },
+    { "id": "dba-out", "from": "dba", "to": "outbox", "fromSide": "right", "toSide": "top" },
+    { "id": "dbb-out", "from": "dbb", "to": "outbox", "fromSide": "right", "toSide": "bottom" },
+    { "id": "out-bus", "from": "outbox", "to": "bus", "label": "publica", "variant": "dashed" },
+    { "id": "bus-idx", "from": "bus", "to": "indexer", "label": "consume", "fromSide": "top", "toSide": "bottom" },
+    { "id": "idx-gdb", "from": "indexer", "to": "gdb", "label": "proyecta", "fromSide": "right", "toSide": "right", "via": [[1230, 140], [1230, 552]] },
+    { "id": "mkt-gdb", "from": "market", "to": "gdb", "label": "lee" },
+    { "id": "portals-cp", "from": "portals", "to": "cp", "label": "resuelve tenant", "variant": "dashed", "fromSide": "top", "toSide": "bottom" },
+    { "id": "portals-id", "from": "portals", "to": "identity", "label": "login SSO", "variant": "security", "fromSide": "bottom", "toSide": "top" },
+    { "id": "mkt-id", "from": "market", "to": "identity", "label": "login SSO", "variant": "security" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Plano de tenant", "items": ["App compartida por región, una base por desarrolladora", "Fuente de verdad: catálogo, reservas, pagos"] },
+    { "dot": "emerald", "title": "Plano global", "items": ["Control plane, identidad, cola e indexador", "La DB global es solo una proyección eventual"] },
+    { "dot": "rose", "title": "Marketplace", "items": ["Sin credenciales de bases de tenant", "Reservar/comprar se redirige al portal con SSO"] }
+  ]
+}
