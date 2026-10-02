@@ -4,28 +4,26 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Building2,
-  ArrowLeftRight,
   MessageSquare,
   Wallet,
-  Blocks,
 } from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
 import { formatCurrency } from "@/lib/format";
 import { useWalletBalances } from "@/hooks/use-queries";
 import { VestRealState } from "@repo/ui/components/brand/vest-real-state";
 import { Button } from "@repo/ui/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "@repo/ui/components/ui/dialog";
-import { useAppSession } from "@/lib/session";
+import { Skeleton } from "@repo/ui/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { AccountOverlay } from "@/components/account-overlay";
+import {
+  ResponsiveOverlay,
+  ResponsiveOverlayClose,
+  ResponsiveOverlayDescription,
+  ResponsiveOverlayFooter,
+  ResponsiveOverlayHeader,
+  ResponsiveOverlayTitle,
+} from "@/components/responsive-overlay";
+import { TOP_MAIN_ITEMS, isNavActive } from "@/components/nav/nav-items";
 
 export function DesktopTopNav() {
   const pathname = usePathname();
@@ -33,10 +31,7 @@ export function DesktopTopNav() {
     useState(false);
   const [accountDialogOpen, setAccountDialogOpen] = useState(false);
   const { user } = useCurrentUser();
-  const { signOut } = useAppSession();
-  const kycStatus = user?.kycStatus ?? "none";
-  const kycAction = kycStatus === "none" ? "Completar verificación" : kycStatus === "pending" ? "Ver estado de verificación" : kycStatus === "rejected" ? "Reintentar verificación" : null;
-  const { data: balances = [] } =
+  const { data: balances = [], isLoading: isBalancesLoading } =
     useWalletBalances();
 
   const availableUsdt =
@@ -44,31 +39,10 @@ export function DesktopTopNav() {
       (b) => b.currencyCode === "USDT"
     )?.available ?? 0;
 
-  const isActive = (path: string) =>
-    pathname === path;
-
-  const mainLinks = [
-    {
-      href: "/invest",
-      label: "Proyectos",
-      icon: Building2,
-      blocked: true,
-    },
-    {
-      href: "/exchange",
-      label: "Exchange",
-      icon: ArrowLeftRight,
-      blocked: true,
-    },
-    {
-      href: "/tokenization",
-      label: "Tokenización",
-      icon: Blocks,
-    },
-  ];
+  const mainLinks = TOP_MAIN_ITEMS;
 
   return (
-    <header className="flex fixed top-0 right-0 left-0 z-50 justify-between items-center px-8 h-14 bg-white border-b">
+    <header className="hidden lg:flex fixed top-0 right-0 left-0 z-50 justify-between items-center px-8 h-14 bg-white border-b">
       <div className="flex gap-12 items-center">
         <Link href="/">
           <VestRealState
@@ -80,7 +54,8 @@ export function DesktopTopNav() {
 
         <nav className="flex gap-6 items-center h-14">
           {mainLinks.map((link) => {
-            const active = isActive(
+            const active = isNavActive(
+              pathname,
               link.href
             );
             const linkClasses = cn(
@@ -127,6 +102,7 @@ export function DesktopTopNav() {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={active ? "page" : undefined}
                 className={linkClasses}
               >
                 {linkContent}
@@ -149,11 +125,15 @@ export function DesktopTopNav() {
 
         <div className="flex gap-2 items-center px-1">
           <Wallet className="w-4 h-4 text-muted-foreground/60" />
-          <span className="text-sm font-bold tracking-tight text-[#3B2146]">
-            {formatCurrency(
-              availableUsdt
-            )}
-          </span>
+          {isBalancesLoading ? (
+            <Skeleton className="h-4 w-16" />
+          ) : (
+            <span className="text-sm font-bold tracking-tight text-[#3B2146]">
+              {formatCurrency(
+                availableUsdt
+              )}
+            </span>
+          )}
         </div>
 
         <div className="flex items-center pl-2 ml-2 border-l">
@@ -168,50 +148,39 @@ export function DesktopTopNav() {
         </div>
       </div>
 
-      <Dialog
+      <ResponsiveOverlay
         open={launchDialogOpen}
         onOpenChange={setLaunchDialogOpen}
       >
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              Disponible en marzo de 2026
-            </DialogTitle>
-            <DialogDescription>
-              Exchange y Proyectos están en
-              camino. Regístrate para recibir
-              novedades y ser de los primeros en
-              acceder.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <DialogClose asChild>
-              <Button variant="ghost">
-                Cerrar
-              </Button>
-            </DialogClose>
-            <Button asChild>
-              <Link href="/login">
-                Iniciar sesión
-              </Link>
+        <ResponsiveOverlayHeader>
+          <ResponsiveOverlayTitle>
+            Disponible en marzo de 2026
+          </ResponsiveOverlayTitle>
+          <ResponsiveOverlayDescription>
+            Exchange y Proyectos están en
+            camino. Regístrate para recibir
+            novedades y ser de los primeros en
+            acceder.
+          </ResponsiveOverlayDescription>
+        </ResponsiveOverlayHeader>
+        <ResponsiveOverlayFooter className="gap-2 sm:gap-0">
+          <ResponsiveOverlayClose asChild>
+            <Button variant="ghost">
+              Cerrar
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </ResponsiveOverlayClose>
+          <Button asChild>
+            <Link href="/login">
+              Iniciar sesión
+            </Link>
+          </Button>
+        </ResponsiveOverlayFooter>
+      </ResponsiveOverlay>
 
-      <Dialog open={accountDialogOpen} onOpenChange={setAccountDialogOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Tu cuenta</DialogTitle>
-            <DialogDescription>{user?.email}</DialogDescription>
-            <DialogDescription>Estado KYC: {kycStatus}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            {kycAction ? <Button asChild variant="outline"><Link href="/kyc" onClick={() => setAccountDialogOpen(false)}>{kycAction}</Link></Button> : <span className="text-sm text-green-600">Verificación aprobada.</span>}
-            <Button onClick={() => void signOut()}>Cerrar sesión</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AccountOverlay
+        open={accountDialogOpen}
+        onOpenChange={setAccountDialogOpen}
+      />
     </header>
   );
 }

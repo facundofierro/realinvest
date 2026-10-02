@@ -6,30 +6,20 @@ import {
 } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Building2,
-  ArrowLeftRight,
-  MessageSquare,
-  Wallet,
-  User,
-} from "lucide-react";
 import { cn } from "@repo/ui/lib/utils";
 import { VestLogo } from "@repo/ui/components/brand/vest-logo";
-import { Button } from "@repo/ui/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@repo/ui/components/ui/dialog";
-import { useAppSession } from "@/lib/session";
-import { useCurrentUser } from "@/hooks/use-current-user";
+import { AccountOverlay } from "@/components/account-overlay";
+import {
+  BOTTOM_LEFT_ITEMS,
+  BOTTOM_RIGHT_ITEMS,
+  isNavActive,
+} from "@/components/nav/nav-items";
 
 export function BottomNav() {
   const pathname = usePathname();
   const [isHidden, setIsHidden] =
     useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const { user } = useCurrentUser();
-  const { signOut } = useAppSession();
-  const kycStatus = user?.kycStatus ?? "none";
-  const kycAction = kycStatus === "none" ? "Completar verificación" : kycStatus === "pending" ? "Ver estado de verificación" : kycStatus === "rejected" ? "Reintentar verificación" : null;
-
   useEffect(() => {
     const handleStoryActive = (
       e: Event
@@ -50,50 +40,20 @@ export function BottomNav() {
       );
   }, []);
 
-  const isActive = (path: string) =>
-    pathname === path;
-
-  const leftNavItems = [
-    {
-      href: "/invest",
-      label: "Proyectos",
-      icon: Building2,
-    },
-    {
-      href: "/exchange",
-      label: "Exchange",
-      icon: ArrowLeftRight,
-    },
-  ];
-
-  const rightNavItems = [
-    {
-      href: "/chat",
-      label: "Chat",
-      icon: MessageSquare,
-    },
-    {
-      href: "/assets",
-      label: "Wallet",
-      icon: Wallet,
-    },
-    {
-      href: "#account",
-      label: "Cuenta",
-      icon: User,
-    },
-  ];
+  const leftNavItems = BOTTOM_LEFT_ITEMS;
+  const rightNavItems = BOTTOM_RIGHT_ITEMS;
 
   return (
     <div
       className={cn(
-        "fixed bottom-0 left-1/2 z-50 w-full max-w-md transition-transform duration-300 -translate-x-1/2 pb-safe",
+        "fixed inset-x-0 bottom-0 z-50 lg:hidden transition-transform duration-300 pb-safe",
         isHidden
-          ? "translate-y-full"
+          ? "translate-y-[calc(100%+env(safe-area-inset-bottom))]"
           : "translate-y-0"
       )}
     >
-      <div className="absolute inset-0 -top-4 pointer-events-none">
+     <div className="relative mx-auto w-full max-w-md">
+      <div className="absolute inset-0 -top-4 short:-top-2 pointer-events-none">
         <svg
           viewBox="0 -20 375 120"
           className="overflow-visible w-full h-full"
@@ -146,10 +106,54 @@ export function BottomNav() {
         </svg>
       </div>
 
-      <nav className="flex relative justify-around items-center px-2 pt-3 h-16">
-        <div className="flex z-10 justify-around items-center mr-12 w-full">
+      <nav className="flex relative justify-around items-center pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] pt-3 h-16 short:pt-1 short:h-12">
+        <div className="flex z-10 justify-around items-center mr-12 short:mr-8 w-full">
           {leftNavItems.map((item) => {
-            const active = isActive(
+            const active = isNavActive(
+              pathname,
+              item.href
+            );
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "flex flex-col justify-center items-center space-y-1 w-full h-full transition-colors",
+                  active
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-[10px] font-medium short:sr-only">
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div
+          className="absolute left-1/2 z-20 pl-2 -translate-x-1/2 top-[-1.3rem] short:top-[-0.6rem]"
+        >
+          <Link
+            href="/"
+            className="flex justify-center items-center w-32 h-24 short:w-20 short:h-14 transition-transform hover:scale-105 active:scale-95"
+          >
+            <VestLogo
+              className="w-36 h-36 short:w-20 short:h-20"
+              showSubtitle={false}
+            />
+          </Link>
+        </div>
+
+        <div className="flex z-10 justify-around items-center ml-12 short:ml-8 w-full">
+          {rightNavItems.map((item) => {
+            const active = isNavActive(
+              pathname,
               item.href
             );
             const Icon = item.icon;
@@ -163,7 +167,7 @@ export function BottomNav() {
                   className="flex flex-col justify-center items-center space-y-1 w-full h-full text-muted-foreground hover:text-foreground"
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">{item.label}</span>
+                  <span className="text-[10px] font-medium short:sr-only">{item.label}</span>
                 </button>
               );
             }
@@ -172,6 +176,7 @@ export function BottomNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex flex-col justify-center items-center space-y-1 w-full h-full transition-colors",
                   active
@@ -180,49 +185,7 @@ export function BottomNav() {
                 )}
               >
                 <Icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium">
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-
-        <div
-          className="absolute left-1/2 z-20 pl-2 -translate-x-1/2"
-          style={{ top: "-1.3rem" }}
-        >
-          <Link
-            href="/"
-            className="flex justify-center items-center w-32 h-24 transition-transform hover:scale-105 active:scale-95"
-          >
-            <VestLogo
-              className="w-36 h-36"
-              showSubtitle={false}
-            />
-          </Link>
-        </div>
-
-        <div className="flex z-10 justify-around items-center ml-12 w-full">
-          {rightNavItems.map((item) => {
-            const active = isActive(
-              item.href
-            );
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex flex-col justify-center items-center space-y-1 w-full h-full transition-colors",
-                  active
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-[10px] font-medium">
+                <span className="text-[10px] font-medium short:sr-only">
                   {item.label}
                 </span>
               </Link>
@@ -231,24 +194,11 @@ export function BottomNav() {
         </div>
       </nav>
 
-      <Dialog open={accountOpen} onOpenChange={setAccountOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <div className="mb-2 flex items-center gap-3">
-              {user?.image ? <img alt="" className="h-10 w-10 rounded-full" src={user.image} /> : <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">{user?.name?.[0] ?? "U"}</span>}
-              <div>
-                <DialogTitle>{user?.name ?? "Cuenta"}</DialogTitle>
-                <DialogDescription>{user?.email}</DialogDescription>
-              </div>
-            </div>
-            <DialogDescription>Estado KYC: {kycStatus}</DialogDescription>
-            {kycAction ? <Button asChild variant="outline"><Link href="/kyc" onClick={() => setAccountOpen(false)}>{kycAction}</Link></Button> : <DialogDescription>Verificación aprobada.</DialogDescription>}
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => void signOut()}>Cerrar sesión</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AccountOverlay
+        open={accountOpen}
+        onOpenChange={setAccountOpen}
+      />
+     </div>
     </div>
   );
 }

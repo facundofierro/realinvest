@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -16,6 +16,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Real Invest Wallet",
   description: "Wallet para tokenización de activos reales",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  // Android: shrink the layout viewport when the keyboard opens so dvh-capped
+  // overlays keep their inputs and actions visible (iOS already behaves so).
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({

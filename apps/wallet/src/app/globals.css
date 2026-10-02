@@ -4,8 +4,17 @@
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:where(.dark, .dark *));
+/* Short viewports (landscape phones, small desktop windows). Keep in sync
+   with SHORT_VIEWPORT_MAX_HEIGHT in lib/breakpoints.ts. */
+@custom-variant short (@media (max-height: 480px));
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
 :root {
+  /* Bottom nav h-16 (4rem) + logo overhang; used for <main> clearance */
+  --bottom-nav-h: 6rem;
   /* Light Mode - using #F4F3F5 as bg and #3B2146 as text base */
   --background: 270 5% 96%;
   --foreground: 282 36% 20%;
@@ -42,6 +51,13 @@
   --chart-3: 252 47% 71%;
   --chart-4: 48 76% 60%;
   --chart-5: 56 33% 39%;
+}
+
+/* Compact bottom nav on short viewports (see bottom-nav.tsx `short:` classes) */
+@media (max-height: 480px) {
+  :root {
+    --bottom-nav-h: 3.5rem;
+  }
 }
 
 .dark {
