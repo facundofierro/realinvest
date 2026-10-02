@@ -183,7 +183,8 @@ export function ChatPage() {
                       </p>
                       <div className="flex gap-1 items-center mt-1 text-xs text-muted-foreground">
                         <Clock className="w-3 h-3" />
-                        {formatDateTime(conversation.timestamp)}
+                        {/* Mock timestamps derive from Date.now() at module load, so server and client differ. */}
+                        <span suppressHydrationWarning>{formatDateTime(conversation.timestamp)}</span>
                       </div>
                     </div>
                   </div>
@@ -252,7 +253,7 @@ export function ChatPage() {
                         >
                           <p className="text-sm">{msg.content}</p>
                         </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="mt-1 text-xs text-muted-foreground" suppressHydrationWarning>
                           {formatDateTime(msg.timestamp)}
                         </p>
                       </div>
