@@ -4,6 +4,8 @@ import { useProjectUnits, useWalletBalances } from "@/hooks/use-queries";
 
 import { UnitDetailsDialog } from "../unit-details-dialog";
 import { InvestConfirmDialog } from "../invest-confirm-dialog";
+import { KycBlockedDialog } from "@/components/kyc/kyc-blocked-dialog";
+import { useKycGate } from "@/hooks/use-kyc-gate";
 import { UnitDetailsActions } from "../unit-details-actions";
 import {
   useState,
@@ -62,6 +64,7 @@ export default function ProjectUnitsPage({
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [purchaseUnit, setPurchaseUnit] = useState<ProjectUnit | null>(null);
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
+  const gate = useKycGate();
   const [contactForm, setContactForm] = useState({
     name: "",
     phone: "",
@@ -596,8 +599,10 @@ export default function ProjectUnitsPage({
           const u = unit as ProjectUnit;
           if (u.isTokenized && u.tokenSymbol) {
             if (u.statusRaw !== "available") return;
-            setPurchaseUnit(u);
-            setIsPurchaseDialogOpen(true);
+            gate.guard(() => {
+              setPurchaseUnit(u);
+              setIsPurchaseDialogOpen(true);
+            });
             return;
           }
           setIsContactDialogOpen(true);
@@ -611,6 +616,8 @@ export default function ProjectUnitsPage({
         projectId={projectId}
         availableBalance={walletBalances.find((balance) => balance.currencyCode === "USDT")?.available ?? 0}
       />
+
+      <KycBlockedDialog open={gate.blockedDialogOpen} onOpenChange={gate.setBlockedDialogOpen} status={gate.status} rejectionReason={gate.rejectionReason} />
 
       {/* Contact Dialog */}
       <ResponsiveOverlay
