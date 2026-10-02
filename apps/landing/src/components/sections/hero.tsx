@@ -1,5 +1,5 @@
 import { CtaLink } from "@/components/cta-link";
-import { HeroPhone } from "@/components/illustrations/hero-phone";
+import { PhoneScreenshot } from "@/components/phone-screenshot";
 import { Eyebrow } from "@/components/section";
 import { StatusBadge, type UnitStatus } from "@/components/status-badge";
 import { hero, sampleDataLabel } from "@/content/es";
@@ -39,7 +39,7 @@ function DashboardCard() {
           </div>
         ))}
       </div>
-      {/* Right padding keeps the badges clear of the overlapping phone mock. */}
+      {/* Right padding keeps the badges clear of the overlapping phone screenshot. */}
       <div className="text-sm sm:pr-[124px]">
         {units.map((unit) => (
           <div
@@ -81,7 +81,14 @@ export function Hero() {
         </div>
         <div className="animate-fade-in-up relative pb-10 sm:pr-2">
           <DashboardCard />
-          <HeroPhone className="absolute -bottom-6 right-0 hidden w-[150px] drop-shadow-[0_20px_24px_rgba(59,33,70,0.35)] sm:block sm:-right-2" />
+          <PhoneScreenshot
+            src="/images/screenshot-hero.webp"
+            alt="Pantalla de inicio de la app en el celular"
+            height={1300}
+            sizes="150px"
+            priority
+            className="absolute -bottom-6 right-0 hidden w-[150px] shadow-[0_20px_24px_rgba(59,33,70,0.35)] sm:block sm:-right-2"
+          />
         </div>
       </div>
     </section>

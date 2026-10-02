@@ -144,16 +144,6 @@ export const investorExperience = {
       text: "Novedades del proyecto y avisos importantes, sin tener que pedirlos.",
     },
   ],
-  mock: {
-    opportunitiesTitle: "Oportunidades para vos",
-    purchaseTitle: "Mi compra · Torre Mirador 8B",
-    progressLabel: "Avance de obra",
-    progressValue: 62,
-    installmentsLabel: "Cuotas",
-    installmentsValue: "3 de 12",
-    nextInstallmentLabel: "Próxima cuota",
-    nextInstallmentValue: "15 nov",
-  },
   trustLoop: ["Más claridad", "Más confianza", "Vuelven a elegirte"],
   disclaimer:
     "La información que se muestra en la plataforma es informativa; no constituye una oferta ni garantiza resultados.",

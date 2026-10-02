@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { IconBullets } from "@/components/icon-bullets";
 import type { IconName } from "@/components/illustrations/icons";
-import { InvestorAppMock } from "@/components/illustrations/investor-app-mock";
+import { PhoneScreenshot } from "@/components/phone-screenshot";
 import { Section, SectionHeading } from "@/components/section";
 import { investorExperience } from "@/content/es";
 
@@ -24,8 +24,13 @@ export function InvestorExperience() {
           />
           <IconBullets items={points} className="mt-7" />
         </div>
-        <div className="rounded-[28px] bg-[linear-gradient(160deg,#EAD7F5,#F6F4F7)] p-4 sm:p-7">
-          <InvestorAppMock />
+        <div className="flex justify-center rounded-[28px] bg-[linear-gradient(160deg,#EAD7F5,#F6F4F7)] px-6 py-10">
+          <PhoneScreenshot
+            src="/images/screenshot-investor.webp"
+            alt="Oportunidades de inversión en la app del celular"
+            sizes="280px"
+            className="w-full max-w-[280px] shadow-[0_30px_36px_rgba(59,33,70,0.3)]"
+          />
         </div>
       </div>
       <div className="mt-14 rounded-3xl border border-card-border bg-background p-4 sm:p-7">

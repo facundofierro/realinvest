@@ -1,6 +1,6 @@
 import { IconBullets } from "@/components/icon-bullets";
 import type { IconName } from "@/components/illustrations/icons";
-import { PortalPhone } from "@/components/illustrations/portal-phone";
+import { PhoneScreenshot } from "@/components/phone-screenshot";
 import { Section, SectionHeading } from "@/components/section";
 import { buyerPortal } from "@/content/es";
 import { flags } from "@/content/flags";
@@ -21,9 +21,11 @@ export function BuyerPortal() {
   return (
     <Section containerClassName="grid items-center gap-14 lg:grid-cols-2">
       <div className="flex justify-center rounded-[28px] bg-[linear-gradient(160deg,#EAD7F5,#F6F4F7)] px-6 py-10">
-        <PortalPhone
-          showAssistant={flags.showAiAssistantBullet}
-          className="h-auto w-full max-w-[280px] drop-shadow-[0_30px_36px_rgba(59,33,70,0.3)]"
+        <PhoneScreenshot
+          src="/images/screenshot-portal.webp"
+          alt="Ficha del proyecto en el celular: fotos, lanzamiento y fases de construcción"
+          sizes="280px"
+          className="w-full max-w-[280px] shadow-[0_30px_36px_rgba(59,33,70,0.3)]"
         />
       </div>
       <div>
