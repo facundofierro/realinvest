@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Real Invest Wallet',
   webDir: '../nextjs/out',
   ios: {
-    scheme: "RealInvestWallet",
+    scheme: "realinvestwallet",
     backgroundColor: "#000000",
     scrollEnabled: false,
   },

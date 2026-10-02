@@ -5,7 +5,7 @@
   "identifier": "com.realinvest.wallet",
   "build": {
     "frontendDist": "../../nextjs/out",
-    "devUrl": "http://localhost:8001",
+    "devUrl": "http://localhost:47313",
     "beforeDevCommand": "pnpm --filter wallet-native dev",
     "beforeBuildCommand": "pnpm --filter wallet-native build"
   },
@@ -23,6 +23,11 @@
     ],
     "security": {
       "csp": null
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": { "schemes": ["realinvestwallet"] }
     }
   },
   "bundle": {

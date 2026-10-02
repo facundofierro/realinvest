@@ -9,8 +9,11 @@
     "@capacitor/cli": "^6.0.0"
   },
   "dependencies": {
-    "@capacitor/core": "^6.0.0",
+    "@aparajita/capacitor-secure-storage": "^6.0.1",
     "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/browser": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
     "@capacitor/ios": "^6.0.0"
   }
 }

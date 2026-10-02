@@ -267,6 +267,12 @@ pnpm tauri dev
 - Deep linking via custom URL schemes
 - State management for navigation
 
+### Challenge: Authentication in static native shells
+
+**Solution**: System-browser OAuth with a custom deep link and rotating native
+tokens. The complete Capacitor/Tauri flow, storage choices, and limitations are
+documented in [Wallet native authentication](./wallet-native-auth.md).
+
 ## Future Considerations
 
 ### Progressive Web App (PWA)
