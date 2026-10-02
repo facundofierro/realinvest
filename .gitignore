@@ -36,4 +36,17 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Agelum runtime + per-task debug artifacts (config, browser cache,
+# debug screenshots / DOM / network captures captured during planning).
+.agelum/cache/
+.agelum/config.json
 .agelum/time.json
+.agelum/work/tasks/context/
+.agelum/work/tasks/images/
+
+# Next.js per-app artifacts that apps/<name>/.gitignore should also cover;
+# listed here for apps that ship without one (e.g. apps/admin).
+apps/admin/next-env.d.ts
+apps/admin/tsconfig.tsbuildinfo
+apps/admin/wallet.db
