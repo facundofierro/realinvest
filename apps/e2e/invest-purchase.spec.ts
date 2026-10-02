@@ -65,26 +65,34 @@ test.describe("browse (demo-user)", () => {
     await expect(page.getByRole("tab", { name: "Proyecto" })).toHaveAttribute("aria-selected", "true");
   });
 
-  test("units page filters and status badges", async ({ page }) => {
+  test("units page filters and status labels", async ({ page }) => {
     const units = await getUnits(page);
-    const fixedRent = units.filter((u) => u.isTokenized && u.investmentType === "fixed_rent");
-    const fullProperty = units.filter((u) => !u.isTokenized && u.investmentType === "full_property");
+    const byFilter = {
+      fixed_rent: units.filter((u) => u.isTokenized && u.investmentType === "fixed_rent"),
+      full_property: units.filter((u) => !u.isTokenized && u.investmentType === "full_property"),
+      tokenized: units.filter((u) => u.isTokenized && u.investmentType === "appreciation"),
+    };
+    // Only non-available units show a status label (uppercased in the UI).
+    const label = (status: string) => ({ sold_out: "VENDIDO", blocked: "BLOQUEADO", upcoming: "PRÓXIMAMENTE" })[status];
 
     await page.goto(`/project/${PROJECT_ID}/units`);
     const cards = page.locator('[id^="unit-"]');
     await expect(cards).toHaveCount(units.length);
 
-    await page.getByRole("button", { name: "Renta Fija" }).click();
-    await expect(page).toHaveURL(/filter=fixed_rent/);
-    await expect(cards).toHaveCount(fixedRent.length);
-    await expect(page.getByText("Vendido").first()).toBeVisible();
-
-    await page.getByRole("button", { name: "Propiedad Completa" }).click();
-    await expect(cards).toHaveCount(fullProperty.length);
-    await expect(page.getByText("Disponible").first()).toBeVisible();
-
-    await page.getByRole("button", { name: "Tokens Lanzamiento" }).click();
-    await expect(page.getByText("Bloqueado").first()).toBeVisible();
+    for (const [button, filter] of [
+      ["Renta Fija", "fixed_rent"],
+      ["Propiedad Completa", "full_property"],
+      ["Tokens Lanzamiento", "tokenized"],
+    ] as const) {
+      await page.getByRole("button", { name: button }).click();
+      await expect(page).toHaveURL(new RegExp(`filter=${filter}`));
+      const expected = byFilter[filter];
+      await expect(cards).toHaveCount(expected.length);
+      for (const status of ["sold_out", "blocked", "upcoming"]) {
+        const n = expected.filter((u) => u.statusRaw === status).length;
+        await expect(cards.getByText(label(status)!, { exact: true }), `${filter} ${status}`).toHaveCount(n);
+      }
+    }
   });
 
   test("sold-out unit cannot be invested in", async ({ page }) => {
