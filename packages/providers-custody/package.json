@@ -1,0 +1,22 @@
+{
+  "name": "@repo/providers-custody",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./conformance": "./src/conformance/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.19.1",
+    "typescript": "5.9.2",
+    "vitest": "^3.0.0"
+  }
+}
