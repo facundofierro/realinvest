@@ -48,7 +48,7 @@ export function Services() {
                 cardClass,
                 "service-card",
                 // Hovered card grows, siblings shrink; flex-grow eases smoothly.
-                "min-w-0 md:basis-0 md:grow md:transition-[flex-grow] md:duration-700 md:ease-in-out motion-reduce:transition-none",
+                "min-w-0 md:basis-0 md:grow md:transition-[flex-grow] md:duration-[1200ms] md:ease-in-out motion-reduce:transition-none",
                 "md:group-has-[:hover]/grid:grow-[0.55] md:hover:grow-[1.9]!",
               )}
             >

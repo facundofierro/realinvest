@@ -3,7 +3,7 @@ created: 2026-10-03T07:56:09.565Z
 status: done
 summary: .agelum/work/summaries/2026-10-03-images-to-videos-1791014389975.md
 type: task
-workflowStatus: doing
+workflowStatus: done
 ---
 
 # images to videos

@@ -259,18 +259,18 @@ html {
 /* Services cards: while a card resizes, its text re-wraps. Fade it to almost
    transparent during the resize and back in at the end to hide the jumps.
    Each state uses a different animation name so it restarts on every change. */
-@keyframes cardTextSettleA { 0%, 100% { opacity: 1; } 30%, 60% { opacity: 0.1; } }
-@keyframes cardTextSettleB { 0%, 100% { opacity: 1; } 30%, 60% { opacity: 0.1; } }
-@keyframes cardTextSettleC { 0%, 100% { opacity: 1; } 30%, 60% { opacity: 0.1; } }
+@keyframes cardTextSettleA { 0%, 100% { opacity: 1; } 25%, 85% { opacity: 0.1; } }
+@keyframes cardTextSettleB { 0%, 100% { opacity: 1; } 25%, 85% { opacity: 0.1; } }
+@keyframes cardTextSettleC { 0%, 100% { opacity: 1; } 25%, 85% { opacity: 0.1; } }
 
 @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
   .services-row .service-card .card-text {
-    animation: cardTextSettleA 800ms ease-in-out;
+    animation: cardTextSettleA 1200ms ease-in-out;
   }
   .services-row:has(:hover) .service-card .card-text {
-    animation: cardTextSettleB 800ms ease-in-out;
+    animation: cardTextSettleB 1200ms ease-in-out;
   }
   .services-row .service-card:hover .card-text {
-    animation: cardTextSettleC 800ms ease-in-out;
+    animation: cardTextSettleC 1200ms ease-in-out;
   }
 }

@@ -3,7 +3,7 @@ created: 2026-10-03T07:48:15.801Z
 status: done
 summary: .agelum/work/summaries/2026-10-03-image-change-1791014160588.md
 type: task
-workflowStatus: doing
+workflowStatus: done
 ---
 
 # image change
