@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { InventoryVideo } from "@/components/inventory-video";
 import { CheckList, Section, SectionHeading } from "@/components/section";
 import { StatusBadge } from "@/components/status-badge";
 import { inventory } from "@/content/es";
@@ -18,18 +18,21 @@ export function Inventory() {
         />
         <CheckList items={inventory.points} className="mt-5" />
       </div>
-      <div className="rounded-3xl border border-card-border bg-background p-6">
-        <Image
-          src="/images/inventory-building.webp"
-          alt="Ilustración de un edificio con cada unidad coloreada según su estado"
-          width={1200}
-          height={1200}
-          sizes="(min-width: 1024px) 540px, 100vw"
-          className="mx-auto block h-auto max-h-[440px] w-auto rounded-2xl"
-        />
-        <div className="mt-3.5 flex flex-wrap gap-2">
+      <div>
+        <InventoryVideo label="Ilustración de un edificio con cada unidad coloreada según su estado" />
+        <div className="badge-carousel relative mx-auto -mt-10 grid w-fit grid-cols-2 justify-items-center gap-x-2 gap-y-5">
           {inventory.statuses.map((status) => (
-            <StatusBadge key={status.key} status={status.key}>
+            <StatusBadge
+              key={status.key}
+              status={status.key}
+              className={
+                status.key === "available"
+                  ? "relative -left-14"
+                  : status.key === "reserved"
+                    ? "relative left-14"
+                    : undefined
+              }
+            >
               {status.label}
             </StatusBadge>
           ))}

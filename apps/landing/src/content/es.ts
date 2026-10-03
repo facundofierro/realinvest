@@ -1,7 +1,7 @@
 /**
  * Landing copy (es, voseo), as shown in design C.
  * Source: .agelum/doc/docs/plan/landing-copy-2026-oct.md + the landing plan.
- * Rules: no yield/return promises, no tokenization/marketplace/founders content,
+ * Rules: no yield/return promises, no marketplace/founders content (tokenization only as a demo-form interest option),
  * "comprador" in general ("inversor" only in the investor-experience section).
  */
 
@@ -47,7 +47,7 @@ export const hero = {
 export const problem = {
   eyebrow: "El problema",
   title: "Tu equipo necesita información clara para vender",
-  text: "Cuando la disponibilidad, las reservas y el seguimiento se reparten entre planillas y mensajes, coordinar la venta lleva más tiempo. El equipo pierde visibilidad y los compradores necesitan consultar por cada novedad.",
+  text: "Cuando disponibilidad, reservas y seguimiento se reparten entre planillas y mensajes, coordinar la venta lleva más tiempo y los compradores consultan por cada novedad.",
   items: [
     {
       title: "Disponibilidad poco clara",
@@ -66,7 +66,6 @@ export const problem = {
       text: "Sin un momento claro de decisión, la preventa avanza despacio.",
     },
   ],
-  illustration: { before: "Hoy", after: "Con Real Invest" },
 } as const;
 
 export const inventory = {
@@ -369,6 +368,7 @@ export const demoForm = {
     "Pagos con cripto",
     "3D y multimedia",
     "Marketing, CRM y agentes de IA",
+    "Tokenización",
   ],
   submit: "Solicitar demo",
   submitting: "Enviando…",

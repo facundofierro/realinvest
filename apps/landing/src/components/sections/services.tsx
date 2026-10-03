@@ -1,11 +1,13 @@
 import Image from "next/image";
+import { CardVideo } from "@/components/card-video";
 import { CtaLink } from "@/components/cta-link";
 import { Section, SectionHeading, cardClass } from "@/components/section";
 import { services } from "@/content/es";
+import { cn } from "@/lib/utils";
 
 const images: Record<
   (typeof services.cards)[number]["key"],
-  { src: string; alt: string }
+  { src: string; alt: string; video?: string | string[] }
 > = {
   setup: {
     src: "/images/service-setup.webp",
@@ -13,11 +15,17 @@ const images: Record<
   },
   "3d": {
     src: "/images/service-3d.webp",
+    video: [
+      "service-3d",
+      "service-3d-living",
+      "service-3d-bedroom",
+      "service-3d-lobby",
+    ],
     alt: "Render de una torre residencial con jardín",
   },
   crm: {
-    src: "/images/service-crm.webp",
-    alt: "Ilustración de interesados avanzando por un embudo de ventas",
+    src: "/images/service-crm-team.webp",
+    alt: "Equipo de marketing revisando métricas de campañas en una pantalla grande",
   },
 };
 
@@ -30,23 +38,49 @@ export function Services() {
         lead={services.text}
         className="mb-10"
       />
-      <div className="grid gap-5 md:grid-cols-3">
+      <div className="group/grid services-row grid gap-5 md:flex">
         {services.cards.map((card) => {
           const image = images[card.key];
           return (
-            <div key={card.key} className={cardClass}>
-              <Image
-                src={image.src}
-                alt={image.alt}
-                width={960}
-                height={640}
-                sizes="(min-width: 1180px) 320px, (min-width: 768px) 33vw, 100vw"
-                className="mb-4 block h-auto w-full rounded-2xl"
-              />
-              <h3 className="mb-2 text-[19px] font-semibold tracking-[-0.01em]">
-                {card.title}
-              </h3>
-              <p className="text-[15.5px] text-muted-foreground">{card.text}</p>
+            <div
+              key={card.key}
+              className={cn(
+                cardClass,
+                "service-card",
+                // Hovered card grows, siblings shrink; flex-grow eases smoothly.
+                "min-w-0 md:basis-0 md:grow md:transition-[flex-grow] md:duration-700 md:ease-in-out motion-reduce:transition-none",
+                "md:group-has-[:hover]/grid:grow-[0.55] md:hover:grow-[1.9]!",
+              )}
+            >
+              {image.video ? (
+                <CardVideo
+                  name={image.video}
+                  poster={image.src}
+                  label={image.alt}
+                  width={960}
+                  height={640}
+                  fade={0.35}
+                  gap={80}
+                  className="mb-4 block h-auto w-full rounded-2xl"
+                />
+              ) : (
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  width={960}
+                  height={640}
+                  sizes="(min-width: 1180px) 320px, (min-width: 768px) 33vw, 100vw"
+                  className="mb-4 block h-auto w-full rounded-2xl"
+                />
+              )}
+              {/* Text re-wraps as the card resizes; the text fades to near-transparent
+                  while the card animates (see .card-text in globals.css). */}
+              <div className="card-text">
+                <h3 className="mb-2 text-[19px] font-semibold tracking-[-0.01em]">
+                  {card.title}
+                </h3>
+                <p className="text-[15.5px] text-muted-foreground">{card.text}</p>
+              </div>
             </div>
           );
         })}

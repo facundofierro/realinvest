@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@repo/ui/components/ui/select";
 import { ctaClass } from "@/components/cta-link";
 import { demoForm } from "@/content/es";
 import {
@@ -33,6 +40,7 @@ export function DemoForm({ privacyUrl }: { privacyUrl?: string }) {
   const [errorMessage, setErrorMessage] = useState<string>(demoForm.error);
   const {
     register,
+    control,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
@@ -144,19 +152,37 @@ export function DemoForm({ privacyUrl }: { privacyUrl?: string }) {
           <label htmlFor="demo-proyectos" className="text-sm font-semibold">
             {demoForm.fields.projects}
           </label>
-          <select
-            id="demo-proyectos"
-            className={controlClass}
-            aria-invalid={Boolean(errors.proyectos)}
-            {...register("proyectos")}
-          >
-            <option value="">{demoForm.fields.projectsPlaceholder}</option>
-            {demoForm.projectOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <Controller
+            name="proyectos"
+            control={control}
+            render={({ field }) => (
+              <Select
+                value={field.value ?? ""}
+                onValueChange={field.onChange}
+                name={field.name}
+              >
+                <SelectTrigger
+                  id="demo-proyectos"
+                  ref={field.ref}
+                  onBlur={field.onBlur}
+                  className={cn(
+                    controlClass,
+                    "h-auto justify-between shadow-none data-[placeholder]:text-[#6B5A74]",
+                  )}
+                  aria-invalid={Boolean(errors.proyectos)}
+                >
+                  <SelectValue placeholder={demoForm.fields.projectsPlaceholder} />
+                </SelectTrigger>
+                <SelectContent>
+                  {demoForm.projectOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
           <FieldError message={errors.proyectos?.message} />
         </div>
       </div>

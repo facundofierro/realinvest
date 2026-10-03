@@ -8,6 +8,7 @@ export const interestOptions = [
   "Pagos con cripto",
   "3D y multimedia",
   "Marketing, CRM y agentes de IA",
+  "Tokenización",
 ] as const;
 
 const optionalText = (max: number) =>
@@ -38,7 +39,7 @@ export const demoRequestSchema = z.object({
     .min(1, "Ingresá tu país.")
     .max(80, "El texto es demasiado largo."),
   ciudad: optionalText(80),
-  // "" is the unselected state of the <select>.
+  // "" is the unselected state of the Select.
   proyectos: z
     .union([z.enum(projectCounts), z.literal("")], "Elegí una opción válida.")
     .optional(),

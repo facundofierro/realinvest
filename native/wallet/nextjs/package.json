@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NEXT_PUBLIC_API_URL=http://localhost:47310 next dev -p 47313",
+    "dev": "NEXT_PUBLIC_API_URL=http://localhost:47310 next dev -p 47314",
     "build": "next build",
-    "start": "NEXT_PUBLIC_API_URL=http://localhost:47310 next start -p 47313",
+    "start": "NEXT_PUBLIC_API_URL=http://localhost:47310 next start -p 47314",
     "lint": "eslint"
   },
   "dependencies": {

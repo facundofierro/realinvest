@@ -23,7 +23,7 @@ export function PhoneScreenshot({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-[28px] border-[6px] border-[#2A1634] bg-[#2A1634]",
+        "overflow-hidden rounded-[28px] border-[1px] border-[#2A1634] bg-[#2A1634]",
         className,
       )}
     >
@@ -34,7 +34,7 @@ export function PhoneScreenshot({
         height={height}
         sizes={sizes}
         priority={priority}
-        className="block h-auto w-full rounded-[22px]"
+        className="block h-auto w-full rounded-[27px]"
       />
     </div>
   );

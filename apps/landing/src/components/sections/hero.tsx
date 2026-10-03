@@ -59,7 +59,7 @@ function DashboardCard() {
 
 export function Hero() {
   return (
-    <section className="bg-[radial-gradient(900px_400px_at_85%_0%,#EAD7F5_0%,rgba(246,244,247,0)_70%)] pb-[72px] pt-14 md:pt-[88px]">
+    <section className="bg-[radial-gradient(900px_400px_at_85%_0%,#F3E8FA_0%,rgba(246,244,247,0)_70%)] pb-[72px] pt-14 md:pt-[88px]">
       <div className="mx-auto grid w-full max-w-[1180px] items-center gap-14 px-6 lg:grid-cols-2">
         <div>
           <Eyebrow>{hero.eyebrow}</Eyebrow>
@@ -84,7 +84,7 @@ export function Hero() {
           <PhoneScreenshot
             src="/images/screenshot-hero.webp"
             alt="Pantalla de inicio de la app en el celular"
-            height={1300}
+            height={1688}
             sizes="150px"
             priority
             className="absolute -bottom-6 right-0 hidden w-[150px] shadow-[0_20px_24px_rgba(59,33,70,0.35)] sm:block sm:-right-2"

@@ -1,14 +1,13 @@
 import Image from "next/image";
-import { IconTile, type IconName } from "@/components/illustrations/icons";
 import { Section, SectionHeading, cardClass } from "@/components/section";
 import { payments } from "@/content/es";
 import { cn } from "@/lib/utils";
 
-const icons: Record<(typeof payments.points)[number]["key"], IconName> = {
-  cards: "card",
-  qr: "qr",
-  transfer: "bank",
-  abroad: "globe",
+const images: Record<(typeof payments.points)[number]["key"], string> = {
+  cards: "/images/payment-cards.webp",
+  qr: "/images/payment-qr.webp",
+  transfer: "/images/payment-transfer.webp",
+  abroad: "/images/payment-abroad.webp",
 };
 
 export function Payments() {
@@ -23,8 +22,20 @@ export function Payments() {
       />
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {payments.points.map((point) => (
-          <div key={point.key} className={cn(cardClass, "bg-background")}>
-            <IconTile name={icons[point.key]} className="mb-4" />
+          <div
+            key={point.key}
+            className={cn(
+              cardClass,
+              "group bg-background transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1.5 hover:border-[#DCC4EC] hover:shadow-[0_14px_32px_-12px_rgba(74,20,110,0.25)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+            )}
+          >
+            <Image
+              src={images[point.key]}
+              alt=""
+              width={72}
+              height={72}
+              className="mb-4 size-[72px] transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            />
             <h3 className="mb-2 text-[17px] font-semibold tracking-[-0.01em]">
               {point.title}
             </h3>

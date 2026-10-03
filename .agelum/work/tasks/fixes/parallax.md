@@ -1,5 +1,7 @@
 ---
 created: 2026-10-02T21:09:24.833Z
+plan: .agelum/work/plans/2026-10-03-parallax-1791016344315.md
+status: planned
 type: task
 workflowStatus: fixes
 ---

@@ -9,7 +9,49 @@ html {
   scroll-behavior: smooth;
 }
 
+@keyframes trustCarousel {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.6);
+  }
+  6%,
+  28% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  33.33%,
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(0.6);
+  }
+}
+
+@keyframes trustShimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.trust-label {
+  background: linear-gradient(90deg, #3b2146, #a63fd0, #3b2146);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
+  animation:
+    trustCarousel 9s ease-in-out infinite,
+    trustShimmer 5s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .trust-label {
+    animation: none;
+  }
+  .trust-label:first-child {
+    opacity: 1;
+  }
+
   html {
     scroll-behavior: auto;
   }
@@ -194,5 +236,41 @@ html {
   .animate-fade-in-out,
   .animate-ken-burns {
     animation: none;
+  }
+}
+
+/* Inventory status badges: size change on hover only */
+.badge-carousel > * {
+  transition:
+    transform 0.25s ease-out,
+    box-shadow 0.25s ease-out;
+}
+.badge-carousel > *:hover {
+  transform: scale(1.25);
+  box-shadow: 0 4px 12px rgb(42 22 52 / 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-carousel > * {
+    transition: none;
+  }
+}
+
+/* Services cards: while a card resizes, its text re-wraps. Fade it to almost
+   transparent during the resize and back in at the end to hide the jumps.
+   Each state uses a different animation name so it restarts on every change. */
+@keyframes cardTextSettleA { 0%, 100% { opacity: 1; } 30%, 60% { opacity: 0.1; } }
+@keyframes cardTextSettleB { 0%, 100% { opacity: 1; } 30%, 60% { opacity: 0.1; } }
+@keyframes cardTextSettleC { 0%, 100% { opacity: 1; } 30%, 60% { opacity: 0.1; } }
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .services-row .service-card .card-text {
+    animation: cardTextSettleA 800ms ease-in-out;
+  }
+  .services-row:has(:hover) .service-card .card-text {
+    animation: cardTextSettleB 800ms ease-in-out;
+  }
+  .services-row .service-card:hover .card-text {
+    animation: cardTextSettleC 800ms ease-in-out;
   }
 }

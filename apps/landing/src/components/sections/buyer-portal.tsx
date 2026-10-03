@@ -20,7 +20,7 @@ export function BuyerPortal() {
 
   return (
     <Section containerClassName="grid items-center gap-14 lg:grid-cols-2">
-      <div className="flex justify-center rounded-[28px] bg-[linear-gradient(160deg,#EAD7F5,#F6F4F7)] px-6 py-10">
+      <div className="flex justify-center rounded-[28px] bg-[linear-gradient(160deg,#F3E8FA,#FAF8FB)] px-6 py-10">
         <PhoneScreenshot
           src="/images/screenshot-portal.webp"
           alt="Ficha del proyecto en el celular: fotos, lanzamiento y fases de construcción"

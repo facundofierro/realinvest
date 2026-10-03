@@ -17,12 +17,15 @@ export function Section({
   tone = "ground",
   className,
   containerClassName,
+  background,
   children,
 }: {
   id?: string;
   tone?: Tone;
   className?: string;
   containerClassName?: string;
+  /** Decorative layer rendered inside the section, before the content container. */
+  background?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -34,6 +37,7 @@ export function Section({
         className,
       )}
     >
+      {background}
       <div
         className={cn("mx-auto w-full max-w-[1180px] px-6", containerClassName)}
       >
@@ -69,6 +73,7 @@ export function SectionHeading({
   dark = false,
   className,
   titleClassName,
+  leadClassName,
 }: {
   eyebrow?: string;
   title: string;
@@ -76,6 +81,7 @@ export function SectionHeading({
   dark?: boolean;
   className?: string;
   titleClassName?: string;
+  leadClassName?: string;
 }) {
   return (
     <div className={className}>
@@ -93,6 +99,7 @@ export function SectionHeading({
           className={cn(
             "max-w-[60ch] text-lg",
             dark ? "text-dark-text" : "text-muted-foreground",
+            leadClassName,
           )}
         >
           {lead}

@@ -22,7 +22,7 @@ export function LaunchDay() {
         width={1800}
         height={770}
         sizes="(min-width: 1180px) 1132px, 100vw"
-        className="mb-2 hidden h-auto w-full rounded-3xl sm:block"
+        className="mb-2 hidden h-auto w-full sm:block"
       />
       <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {launch.steps.map((step, i) => (
