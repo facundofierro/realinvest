@@ -42,6 +42,12 @@ export const hero = {
     "Tu marca y tu dominio",
     "Venta directa o por etapas",
   ],
+  // Decorative sample notifications floating around the dashboard card.
+  chips: [
+    { status: "reserved", badge: "Reserva confirmada", text: "Unidad 8B" },
+    { status: "available", badge: "+3", text: "registrados hoy" },
+    { status: "upcoming", badge: "Lanzamiento", text: "en 12 días" },
+  ],
 } as const;
 
 export const problem = {

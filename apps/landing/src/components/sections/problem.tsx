@@ -4,7 +4,7 @@ import { problem } from "@/content/es";
 
 export function Problem() {
   return (
-    <Section className="pt-10 md:pt-14">
+    <Section className="parallax-gap-close relative z-[1] pt-10 md:pt-14">
       <SectionHeading
         eyebrow={problem.eyebrow}
         title={problem.title}
@@ -13,7 +13,7 @@ export function Problem() {
         leadClassName="max-w-[110ch]"
         className="mb-10"
       />
-      <div className="overflow-hidden rounded-[20px] border border-card-border bg-card">
+      <div className="overflow-clip rounded-[20px] border border-card-border bg-card">
         <figure className="border-b border-card-border">
           <ProblemSplit />
         </figure>

@@ -240,18 +240,18 @@ html {
 }
 
 /* Inventory status badges: size change on hover only */
-.badge-carousel > * {
+.badge-carousel > * > * {
   transition:
     transform 0.25s ease-out,
     box-shadow 0.25s ease-out;
 }
-.badge-carousel > *:hover {
+.badge-carousel > * > *:hover {
   transform: scale(1.25);
   box-shadow: 0 4px 12px rgb(42 22 52 / 0.25);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .badge-carousel > * {
+  .badge-carousel > * > * {
     transition: none;
   }
 }
@@ -272,5 +272,125 @@ html {
   }
   .services-row .service-card:hover .card-text {
     animation: cardTextSettleC 1200ms ease-in-out;
+  }
+}
+
+/* ---- Parallax ----
+   Scroll-driven animations, transform/opacity only. With reduced motion or
+   without support (Firefox) the layout stays static; only the hero gets a JS
+   fallback through --hero-p (see components/scroll-progress.tsx).
+   Ancestors of view()-animated elements must clip with `overflow: clip`, not
+   `hidden`: a hidden box is a scroll container and would capture the timeline. */
+@keyframes parallax-hero-out { to { translate: 0 var(--hero-drift, 18vh); opacity: 0.35; scale: 0.97; } }
+@keyframes parallax-hero-phone { to { translate: 0 -12vh; rotate: -3deg; } }
+@keyframes parallax-hero-bg { to { translate: 0 30vh; } }
+@keyframes parallax-hero-chip { to { translate: 0 var(--chip-rise, -8vh); } }
+@keyframes parallax-fade-out { to { opacity: 0; } }
+@keyframes parallax-gap-close { from { translate: 0 var(--gap-close, 14vh); } }
+@keyframes parallax-drift { from { translate: 0 var(--drift, 40px); } to { translate: 0 calc(var(--drift, 40px) * -1); } }
+@keyframes parallax-rise { from { translate: 0 var(--rise, 60px); } }
+@keyframes parallax-zoom { from { scale: 1.12; } to { scale: 1; } }
+@keyframes parallax-skyline { from { translate: 0 15%; scale: 1.08; } }
+
+/* Hero progress: from the moment the hero starts leaving the viewport until
+   it is gone. Works for a hero taller than the screen (mobile) too. */
+.parallax-hero {
+  view-timeline: --hero block;
+}
+
+.hero-dot-grid {
+  background-image: radial-gradient(rgb(91 17 135 / 0.22) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 45% 60% at 74% 45%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 45% 60% at 74% 45%, #000 0%, transparent 75%);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .parallax-hero-out {
+      animation: parallax-hero-out linear both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 100%;
+    }
+    .parallax-hero-phone {
+      animation: parallax-hero-phone linear both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 100%;
+    }
+    .parallax-hero-bg {
+      animation: parallax-hero-bg linear both;
+      animation-timeline: --hero;
+      animation-range: exit 0% exit 100%;
+    }
+    /* Next section starts lower and catches up while it enters. */
+    .parallax-gap-close {
+      animation: parallax-gap-close linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+
+    @media (min-width: 768px) {
+      .parallax-hero-chip {
+        animation: parallax-hero-chip linear both;
+        animation-timeline: --hero;
+        animation-range: exit 0% exit 100%;
+      }
+      .parallax-hero-cue {
+        animation: parallax-fade-out linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0px 20svh;
+      }
+      .parallax-drift {
+        animation: parallax-drift linear both;
+        animation-timeline: view();
+        animation-range: cover 0% cover 100%;
+      }
+      .parallax-rise {
+        animation: parallax-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 40%;
+      }
+      .parallax-zoom {
+        animation: parallax-zoom linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 50%;
+      }
+      .parallax-skyline {
+        animation: parallax-skyline linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 100%;
+      }
+    }
+  }
+}
+
+/* JS fallback, hero only. --hero-p defaults keep the layout static until
+   (or if never) the script runs. */
+@supports not (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .parallax-hero-out {
+      translate: 0 calc(var(--hero-p, 0) * 18vh);
+      opacity: calc(1 - var(--hero-p, 0) * 0.65);
+      scale: calc(1 - var(--hero-p, 0) * 0.03);
+    }
+    .parallax-hero-phone {
+      translate: 0 calc(var(--hero-p, 0) * -12vh);
+      rotate: calc(var(--hero-p, 0) * -3deg);
+    }
+    .parallax-hero-bg {
+      translate: 0 calc(var(--hero-p, 0) * 30vh);
+    }
+    .parallax-gap-close {
+      translate: 0 calc(max(0, 1 - var(--hero-p, 1) / 0.7) * 14vh);
+    }
+
+    @media (min-width: 768px) {
+      .parallax-hero-chip {
+        translate: 0 calc(var(--hero-p, 0) * var(--chip-rise, -8vh));
+      }
+      .parallax-hero-cue {
+        opacity: calc(1 - min(1, var(--hero-p, 0) * 5));
+      }
+    }
   }
 }

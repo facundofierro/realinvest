@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { Section, SectionHeading, cardClass } from "@/components/section";
 import { payments } from "@/content/es";
@@ -21,25 +22,32 @@ export function Payments() {
         className="mb-10"
       />
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {payments.points.map((point) => (
+        {payments.points.map((point, i) => (
           <div
             key={point.key}
-            className={cn(
-              cardClass,
-              "group bg-background transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1.5 hover:border-[#DCC4EC] hover:shadow-[0_14px_32px_-12px_rgba(74,20,110,0.25)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
-            )}
+            className="parallax-rise"
+            style={{ "--rise": `${40 + i * 20}px` } as CSSProperties}
           >
-            <Image
-              src={images[point.key]}
-              alt=""
-              width={72}
-              height={72}
-              className="mb-4 size-[72px] transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-            />
-            <h3 className="mb-2 text-[17px] font-semibold tracking-[-0.01em]">
-              {point.title}
-            </h3>
-            <p className="text-[14.5px] text-muted-foreground">{point.text}</p>
+            <div
+              className={cn(
+                cardClass,
+                "group h-full bg-background transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1.5 hover:border-[#DCC4EC] hover:shadow-[0_14px_32px_-12px_rgba(74,20,110,0.25)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+              )}
+            >
+              <Image
+                src={images[point.key]}
+                alt=""
+                width={72}
+                height={72}
+                className="mb-4 size-[72px] transition-transform duration-300 ease-out group-hover:scale-110 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+              />
+              <h3 className="mb-2 text-[17px] font-semibold tracking-[-0.01em]">
+                {point.title}
+              </h3>
+              <p className="text-[14.5px] text-muted-foreground">
+                {point.text}
+              </p>
+            </div>
           </div>
         ))}
       </div>

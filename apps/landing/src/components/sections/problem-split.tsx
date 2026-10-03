@@ -12,6 +12,10 @@ const after = {
   alt: "Compradores y asesor mirando juntos el inventario ordenado en una tablet",
 };
 
+// The photos are taller than the frame and drift inside it on scroll.
+const drift = { "--drift": "4%" } as React.CSSProperties;
+const driftBox = "parallax-drift absolute inset-x-0 -inset-y-[8%]";
+
 // Divider x position (% of width) at mid-height, and how far it travels.
 const MID = 36;
 const SHIFT = 8;
@@ -21,7 +25,7 @@ export function ProblemSplit() {
 
   return (
     <div
-      className="relative aspect-[2/1] overflow-hidden sm:aspect-[17/5]"
+      className="relative aspect-[2/1] overflow-clip sm:aspect-[17/5]"
       style={{ "--shift": `${shift}%` } as React.CSSProperties}
       onPointerMove={(e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -31,21 +35,27 @@ export function ProblemSplit() {
       onPointerLeave={() => setShift(0)}
     >
       <div className="absolute inset-y-0 right-0 w-[80%]">
-        <Image
-          src={after.src}
-          alt={after.alt}
-          fill
-          sizes="(min-width: 1180px) 880px, 80vw"
-          className="object-cover object-right"
-        />
+        <div className={driftBox} style={drift}>
+          <Image
+            src={after.src}
+            alt={after.alt}
+            fill
+            sizes="(min-width: 1180px) 880px, 80vw"
+            className="object-cover object-right"
+          />
+        </div>
       </div>
-      <Image
-        src={before.src}
-        alt={before.alt}
-        fill
-        sizes="(min-width: 1180px) 1100px, 100vw"
-        className="object-cover object-left transition-[clip-path] duration-500 ease-out [clip-path:polygon(0_0,calc(40%+var(--shift))_0,calc(32%+var(--shift))_100%,0_100%)] motion-reduce:transition-none"
-      />
+      <div className="absolute inset-0 transition-[clip-path] duration-500 ease-out [clip-path:polygon(0_0,calc(40%+var(--shift))_0,calc(32%+var(--shift))_100%,0_100%)] motion-reduce:transition-none">
+        <div className={driftBox} style={drift}>
+          <Image
+            src={before.src}
+            alt={before.alt}
+            fill
+            sizes="(min-width: 1180px) 1100px, 100vw"
+            className="object-cover object-left"
+          />
+        </div>
+      </div>
       <svg
         aria-hidden
         viewBox="0 0 100 100"

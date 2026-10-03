@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { IconBullets } from "@/components/icon-bullets";
 import type { IconName } from "@/components/illustrations/icons";
 import { PhoneScreenshot } from "@/components/phone-screenshot";
@@ -21,12 +22,17 @@ export function BuyerPortal() {
   return (
     <Section containerClassName="grid items-center gap-14 lg:grid-cols-2">
       <div className="flex justify-center rounded-[28px] bg-[linear-gradient(160deg,#F3E8FA,#FAF8FB)] px-6 py-10">
-        <PhoneScreenshot
-          src="/images/screenshot-portal.webp"
-          alt="Ficha del proyecto en el celular: fotos, lanzamiento y fases de construcción"
-          sizes="280px"
-          className="w-full max-w-[280px] shadow-[0_30px_36px_rgba(59,33,70,0.3)]"
-        />
+        <div
+          className="parallax-drift w-full max-w-[280px]"
+          style={{ "--drift": "30px" } as CSSProperties}
+        >
+          <PhoneScreenshot
+            src="/images/screenshot-portal.webp"
+            alt="Ficha del proyecto en el celular: fotos, lanzamiento y fases de construcción"
+            sizes="280px"
+            frameClassName="shadow-[0_30px_36px_rgba(59,33,70,0.3)] group-hover/phone:shadow-[0_36px_42px_rgba(59,33,70,0.36)]"
+          />
+        </div>
       </div>
       <div>
         <SectionHeading

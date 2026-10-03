@@ -1,5 +1,11 @@
+import type { CSSProperties } from "react";
 import { CardVideo } from "@/components/card-video";
-import { CheckList, Section, SectionHeading, cardClass } from "@/components/section";
+import {
+  CheckList,
+  Section,
+  SectionHeading,
+  cardClass,
+} from "@/components/section";
 import { StatusBadge, type UnitStatus } from "@/components/status-badge";
 import { knowYourBuyers, sampleDataLabel } from "@/content/es";
 import { cn } from "@/lib/utils";
@@ -33,46 +39,56 @@ export function KnowYourBuyers() {
         </p>
       </div>
       <div
-        className={cn(
-          cardClass,
-          "p-6 shadow-[0_30px_60px_-30px_rgba(59,33,70,0.3)]",
-        )}
+        className="parallax-drift"
+        style={{ "--drift": "30px" } as CSSProperties}
       >
-        <CardVideo
-          name="buyers-reactivation"
-          poster="/images/buyers-reactivation.webp"
-          label="Compradores de la etapa 1 vuelven a interactuar con el lanzamiento de la etapa 2"
-          width={960}
-          height={720}
-          fade={1}
-          className="block h-auto w-full rounded-2xl"
-        />
-        <ul className="mt-2" aria-label="Ejemplo ilustrativo de actividad de interesados">
-          {knowYourBuyers.activity.map((row, i) => (
-            <li
-              key={row.name}
-              className="flex flex-wrap items-center justify-between gap-3 border-t border-[#EEE7F2] py-3.5"
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  aria-hidden="true"
-                  className="flex size-[38px] flex-none items-center justify-center rounded-full text-sm font-bold text-white"
-                  style={{ background: rowStyles[i].avatar }}
-                >
-                  {row.name.split(" ").at(-1)?.charAt(0)}
+        <div
+          className={cn(
+            cardClass,
+            "p-6 shadow-[0_30px_60px_-30px_rgba(59,33,70,0.3)]",
+          )}
+        >
+          <CardVideo
+            name="buyers-reactivation"
+            poster="/images/buyers-reactivation.webp"
+            label="Compradores de la etapa 1 vuelven a interactuar con el lanzamiento de la etapa 2"
+            width={960}
+            height={720}
+            fade={1}
+            className="block h-auto w-full rounded-2xl"
+          />
+          <ul
+            className="mt-2"
+            aria-label="Ejemplo ilustrativo de actividad de interesados"
+          >
+            {knowYourBuyers.activity.map((row, i) => (
+              <li
+                key={row.name}
+                className="flex flex-wrap items-center justify-between gap-3 border-t border-[#EEE7F2] py-3.5"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    aria-hidden="true"
+                    className="flex size-[38px] flex-none items-center justify-center rounded-full text-sm font-bold text-white"
+                    style={{ background: rowStyles[i].avatar }}
+                  >
+                    {row.name.split(" ").at(-1)?.charAt(0)}
+                  </div>
+                  <div>
+                    <b className="font-semibold">{row.name}</b>
+                    <small className="block text-[13px] text-[#6B5A74]">
+                      {row.detail}
+                    </small>
+                  </div>
                 </div>
-                <div>
-                  <b className="font-semibold">{row.name}</b>
-                  <small className="block text-[13px] text-[#6B5A74]">
-                    {row.detail}
-                  </small>
-                </div>
-              </div>
-              <StatusBadge status={rowStyles[i].badge}>{row.badge}</StatusBadge>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-1.5 text-xs text-[#6B5A74]">{sampleDataLabel}</div>
+                <StatusBadge status={rowStyles[i].badge}>
+                  {row.badge}
+                </StatusBadge>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-1.5 text-xs text-[#6B5A74]">{sampleDataLabel}</div>
+        </div>
       </div>
     </Section>
   );

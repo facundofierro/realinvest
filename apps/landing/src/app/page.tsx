@@ -1,3 +1,4 @@
+import { ScrollProgress } from "@/components/scroll-progress";
 import { BuyerPortal } from "@/components/sections/buyer-portal";
 import { FaqSection } from "@/components/sections/faq";
 import { FinalCta } from "@/components/sections/final-cta";
@@ -28,6 +29,7 @@ export default function Home() {
   return (
     <>
       <SiteHeader />
+      <ScrollProgress />
       <main id="top">
         <Hero />
         <Problem />

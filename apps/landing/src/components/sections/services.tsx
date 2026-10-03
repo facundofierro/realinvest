@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { CardVideo } from "@/components/card-video";
 import { CtaLink } from "@/components/cta-link";
+import { DecorBlobs } from "@/components/decor-blobs";
 import { Section, SectionHeading, cardClass } from "@/components/section";
 import { services } from "@/content/es";
 import { cn } from "@/lib/utils";
@@ -31,7 +32,18 @@ const images: Record<
 
 export function Services() {
   return (
-    <Section id="servicios">
+    <Section
+      id="servicios"
+      className="relative isolate overflow-clip"
+      background={
+        <DecorBlobs
+          blobs={[
+            { className: "-right-40 top-[-6%] size-[460px]" },
+            { className: "-left-44 bottom-[4%] size-[380px]", drift: -80 },
+          ]}
+        />
+      }
+    >
       <SectionHeading
         eyebrow={services.eyebrow}
         title={services.title}
@@ -79,14 +91,18 @@ export function Services() {
                 <h3 className="mb-2 text-[19px] font-semibold tracking-[-0.01em]">
                   {card.title}
                 </h3>
-                <p className="text-[15.5px] text-muted-foreground">{card.text}</p>
+                <p className="text-[15.5px] text-muted-foreground">
+                  {card.text}
+                </p>
               </div>
             </div>
           );
         })}
       </div>
       <div className="mt-7 flex flex-wrap items-center justify-between gap-5">
-        <p className="max-w-[60ch] text-sm text-[#6B5A74]">{services.scopeNote}</p>
+        <p className="max-w-[60ch] text-sm text-[#6B5A74]">
+          {services.scopeNote}
+        </p>
         <CtaLink href={services.cta.href} variant="ghost">
           {services.cta.label}
         </CtaLink>

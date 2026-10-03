@@ -1,7 +1,7 @@
 import { VestLogo } from "@repo/ui/components/brand/vest-logo";
 import { cn } from "@/lib/utils";
 
-/** Vest lockup cropped to its artwork so it can sit inline in the header/footer. */
+/** Full Vest lockup (wordmark + "REAL ESTATE" subtitle) cropped to its artwork so it can sit inline in the header/footer. */
 export function BrandLogo({
   white = false,
   className,
@@ -11,10 +11,9 @@ export function BrandLogo({
 }) {
   return (
     <VestLogo
-      showSubtitle={false}
       forceWhite={white}
-      viewBox="30 79 140 62"
-      className={cn("h-9 w-auto", className)}
+      viewBox="30 65 140 78"
+      className={cn("h-11 w-auto", className)}
     />
   );
 }
